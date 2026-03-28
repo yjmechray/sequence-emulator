@@ -333,19 +333,19 @@
       letter-spacing: 0.05em;
     }
 
-    /* Terminals (Sockets) */
+    /* Terminals (Sockets) - Made smaller to fit neatly inside panels */
     .terminal-group {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
 
     .terminal {
-      width: 24px;
-      height: 24px;
+      width: 18px; /* Reduced from 24px */
+      height: 18px; /* Reduced from 24px */
       border-radius: 50%;
-      border: 3px solid #334155;
+      border: 2px solid #334155; /* Reduced border thickness */
       box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
       position: relative;
       cursor: pointer;
@@ -357,15 +357,16 @@
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 10px; height: 10px;
+      width: 6px; /* Reduced from 10px */
+      height: 6px; /* Reduced from 10px */
       background: #020617;
       border-radius: 50%;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
     }
 
-    .terminal:hover { transform: scale(1.15); }
+    .terminal:hover { transform: scale(1.2); }
     .terminal.selected {
-      transform: scale(1.15);
+      transform: scale(1.2);
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
     }
 
@@ -374,20 +375,20 @@
     .term-blue { background: var(--term-blue); }
 
     /* Specific Module Layouts */
-    .grid-row { display: flex; gap: 1rem; }
-    .grid-col { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+    .grid-row { display: flex; gap: 0.5rem; justify-content: center; } /* Reduced gap */
+    .grid-col { display: flex; flex-direction: column; gap: 0.25rem; align-items: center; } /* Reduced gap */
     
     .symbol {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #475569;
       font-weight: 600;
       text-align: center;
-      margin: 0.25rem 0;
+      margin: 0.15rem 0;
     }
 
     /* Push Button Elements */
     .pb-actuator {
-      width: 40px; height: 40px;
+      width: 36px; height: 36px;
       border-radius: 50%;
       border: 2px solid #94a3b8;
       background: radial-gradient(circle at 30% 30%, #f8fafc, #cbd5e1 60%);
@@ -397,7 +398,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       margin-bottom: 0.5rem;
       user-select: none;
       transition: all 0.1s;
@@ -410,9 +411,9 @@
 
     /* Lamp Elements */
     .lamp-dome {
-      width: 60px; height: 60px;
+      width: 50px; height: 50px;
       border-radius: 50%;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       border: 4px solid #64748b;
       box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2);
       transition: all 0.2s;
@@ -433,7 +434,7 @@
 
     /* Relay Indicator */
     .relay-indicator {
-      width: 12px; height: 12px;
+      width: 10px; height: 10px;
       border-radius: 50%;
       background: #475569;
       margin-bottom: 0.5rem;
@@ -763,7 +764,7 @@
         let pbHTML = `
           <div class="grid-col">
             <div class="pb-actuator" id="btn_pb${i}" onmousedown="pressPB('pb${i}', true)" onmouseup="pressPB('pb${i}', false)" onmouseleave="pressPB('pb${i}', false)" ontouchstart="pressPB('pb${i}', true)" ontouchend="pressPB('pb${i}', false)">PB${i}</div>
-            <div class="grid-row" style="gap:10px;">
+            <div class="grid-row" style="gap:8px;">
               <div class="grid-col">
                 <div class="terminal term-yellow" id="pb${i}_no_top"></div>
                 <div class="symbol">NO</div>
@@ -776,18 +777,18 @@
               </div>
             </div>
           </div>`;
-        // PB1: 200, PB2: 330, PB3: 460
-        createModule(`pb${i}_mod`, 70 + (i * 130), 40, 110, 180, `버튼 (PB${i})`, pbHTML);
+        // PB1: 195, PB2: 330, PB3: 465. Made narrower to tightly encapsulate contents
+        createModule(`pb${i}_mod`, 60 + (i * 135), 40, 120, 190, `버튼 (PB${i})`, pbHTML);
       }
 
       // 3. Lamps (Top Right)
       const lamps = [
-        { id: 'rl', color: 'red', name: '램프 (RL)', x: 610 },
-        { id: 'gl', color: 'green', name: '램프 (GL)', x: 730 }
+        { id: 'rl', color: 'red', name: '램프 (RL)', x: 620 },
+        { id: 'gl', color: 'green', name: '램프 (GL)', x: 740 }
       ];
       lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 40, 100, 180, l.name, `
-          <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}" style="margin-bottom: 0.5rem; width: 50px; height: 50px;"></div>
+        createModule(`lamp_${l.id}`, l.x, 40, 100, 190, l.name, `
+          <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
           <div class="grid-col">
             <div class="terminal term-red" id="${l.id}_top"></div>
             <div class="terminal term-red" id="${l.id}_bot"></div>
@@ -888,8 +889,8 @@
       }
 
       // Safe X gaps threading through the new layout:
-      // Power (180), PB1 (310), PB2 (440), PB3 (570), RL (710), GL (830)
-      const safeX = [20, 190, 320, 450, 590, 720, 850, 960];
+      // Power (180), PB1 (315), PB2 (450), PB3 (585), RL (720), GL (840)
+      const safeX = [20, 188, 322, 458, 602, 730, 850, 960];
       let bestX = safeX[0];
       let minCost = Infinity;
       
