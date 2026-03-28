@@ -824,8 +824,10 @@
     }
 
     function buildHardware() {
+      // Adjusted module placement to carve out wider safe vertical and horizontal routing channels
+      
       // 1. Power Supply (Top Left)
-      createModule('power', 40, 40, 140, 100, '전원 (POWER)', `
+      createModule('power', 20, 40, 130, 100, '전원 (POWER)', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-red" id="pow_T"></div><div class="symbol">T</div></div>
@@ -833,34 +835,35 @@
       `);
 
       // 2. Separate Push Buttons (Top Middle)
-      for(let i=1; i<=3; i++) {
+      const pbXPositions = [190, 340, 490];
+      pbXPositions.forEach((pbX, i) => {
+        const pbNum = i + 1;
         let pbHTML = `
           <div class="grid-col">
-            <div class="pb-actuator" id="btn_pb${i}" onmousedown="pressPB('pb${i}', true)" onmouseup="pressPB('pb${i}', false)" onmouseleave="pressPB('pb${i}', false)" ontouchstart="pressPB('pb${i}', true)" ontouchend="pressPB('pb${i}', false)">PB${i}</div>
+            <div class="pb-actuator" id="btn_pb${pbNum}" onmousedown="pressPB('pb${pbNum}', true)" onmouseup="pressPB('pb${pbNum}', false)" onmouseleave="pressPB('pb${pbNum}', false)" ontouchstart="pressPB('pb${pbNum}', true)" ontouchend="pressPB('pb${pbNum}', false)">PB${pbNum}</div>
             <div class="grid-row" style="gap:8px;">
               <div class="grid-col">
-                <div class="terminal term-yellow" id="pb${i}_no_top"></div>
+                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div>
                 <div class="symbol">NO</div>
-                <div class="terminal term-yellow" id="pb${i}_no_bot"></div>
+                <div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
               </div>
               <div class="grid-col">
-                <div class="terminal term-blue" id="pb${i}_nc_top"></div>
+                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div>
                 <div class="symbol">NC</div>
-                <div class="terminal term-blue" id="pb${i}_nc_bot"></div>
+                <div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
               </div>
             </div>
           </div>`;
-        // PB1: 195, PB2: 330, PB3: 465. Made narrower to tightly encapsulate contents
-        createModule(`pb${i}_mod`, 60 + (i * 135), 40, 120, 190, `버튼 (PB${i})`, pbHTML);
-      }
+        createModule(`pb${pbNum}_mod`, pbX, 40, 110, 190, `버튼 (PB${pbNum})`, pbHTML);
+      });
 
       // 3. Lamps (Top Right)
       const lamps = [
-        { id: 'rl', color: 'red', name: '램프 (RL)', x: 620 },
-        { id: 'gl', color: 'green', name: '램프 (GL)', x: 740 }
+        { id: 'rl', color: 'red', name: '램프 (RL)', x: 640 },
+        { id: 'gl', color: 'green', name: '램프 (GL)', x: 770 }
       ];
       lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 40, 100, 190, l.name, `
+        createModule(`lamp_${l.id}`, l.x, 40, 90, 190, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
           <div class="grid-col">
             <div class="terminal term-red" id="${l.id}_top"></div>
@@ -880,7 +883,9 @@
           relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
         }
         relayHTML += '</div>';
-        createModule(`relay${num}`, 40 + (idx * 380), 280, 360, 160, `릴레이 (X${num})`, relayHTML);
+        
+        // R1: x=70, R2: x=570 (provides a nice vertical global highway gap between 430 and 570)
+        createModule(`relay${num}`, 70 + (idx * 500), 280, 360, 160, `릴레이 (X${num})`, relayHTML);
       });
 
       document.querySelectorAll('.terminal').forEach(term => {
@@ -945,25 +950,39 @@
 
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
       const getDir = (id) => id.includes('_bot') ? 'down' : 'up';
+      
       const getChannelY = (y, dir, offset) => {
-         // Top row items (Power, PB, Lamps) vs Bottom row items (Relays)
-         if (y < 270) return dir === 'up' ? 20 + offset : 240 - offset; 
-         return dir === 'up' ? 255 + offset : 460 + offset; 
+         // Wider horizontal routing channels to prevent bundling
+         if (y < 270) return dir === 'up' ? 15 + offset : 245 - offset; 
+         return dir === 'up' ? 255 + offset : 465 + offset; 
       };
 
-      const offset1 = (index % 6) * 4;
-      const offset2 = ((index + 3) % 6) * 4;
+      // Increased gap spread multiplier to completely unbundle stacked wires
+      const offset1 = (index % 6) * 6; 
+      const offset2 = ((index + 3) % 6) * 6;
+      
       const cy1 = getChannelY(y1, getDir(idA), offset1);
       const cy2 = getChannelY(y2, getDir(idB), offset2);
 
+      // Small vertical jump if both modules are securely within the same logical horizontal band
       if (Math.abs(cy1 - cy2) < 40 && ((y1 < 270 && y2 < 270) || (y1 > 270 && y2 > 270))) {
          const midY = (cy1 + cy2) / 2;
          return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
       }
 
-      // Safe X gaps threading through the new layout:
-      // Power (180), PB1 (315), PB2 (450), PB3 (585), RL (720), GL (840)
-      const safeX = [20, 188, 322, 458, 602, 730, 850, 960];
+      // Safe vertical columns to traverse between top/bottom without hitting components
+      let safeX = [];
+      if (y1 < 270 && y2 < 270) {
+          // Top-row dedicated vertical highways
+          safeX = [20, 175, 325, 475, 620, 750, 900];
+      } else if (y1 > 270 && y2 > 270) {
+          // Bottom-row dedicated vertical highways
+          safeX = [35, 500, 965];
+      } else {
+          // Global unobstructed top-to-bottom highways
+          safeX = [20, 500, 970];
+      }
+
       let bestX = safeX[0];
       let minCost = Infinity;
       
@@ -972,7 +991,9 @@
           if (cost < minCost) { minCost = cost; bestX = sx; }
       }
       
-      const trunkX = bestX + (index % 5) * 4 - 8;
+      // Increased vertical gap spread
+      const trunkX = bestX + ((index % 5) - 2) * 8;
+      
       return `M ${x1} ${y1} L ${x1} ${cy1} L ${trunkX} ${cy1} L ${trunkX} ${cy2} L ${x2} ${cy2} L ${x2} ${y2}`;
     }
 
