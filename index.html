@@ -584,11 +584,12 @@
       <select id="lesson-select">
         <option value="latch_basic">1. 자기유지 회로 - 기본 (Basic Latch Circuit)</option>
         <option value="latch_stop">2. 자기유지 회로 - 정지 포함 (Latch Circuit w/ Stop)</option>
-        <option value="a_contact">3. a접점 회로 (a-contact Circuit)</option>
-        <option value="b_contact">4. b접점 회로 (b-contact Circuit)</option>
-        <option value="c_contact">5. c접점 회로 (c-contact Circuit)</option>
-        <option value="and_circuit">6. 직렬 회로 (Series AND Circuit)</option>
-        <option value="or_circuit">7. 병렬 회로 (Parallel OR Circuit)</option>
+        <option value="interlock">3. 인터록 회로 (Interlock Circuit)</option>
+        <option value="a_contact">4. a접점 회로 (a-contact Circuit)</option>
+        <option value="b_contact">5. b접점 회로 (b-contact Circuit)</option>
+        <option value="c_contact">6. c접점 회로 (c-contact Circuit)</option>
+        <option value="and_circuit">7. 직렬 회로 (Series AND Circuit)</option>
+        <option value="or_circuit">8. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
       <button class="danger" onclick="clearWires()">초기화 (Clear)</button>
@@ -612,7 +613,7 @@
           <summary>회로도 (Schematic Diagram)</summary>
           <div id="diagram-container" class="diagram-container">
             
-            <!-- 1. 자기유지 회로 (기본) - NEW -->
+            <!-- 1. 자기유지 회로 (기본) -->
             <svg id="diag_latch_basic" class="active" viewBox="0 0 200 180">
               <path class="dw" d="M 30 30 H 140 M 30 150 H 140" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
@@ -710,7 +711,108 @@
               <circle cx="140" cy="220" r="3" fill="#1e293b" />
             </svg>
 
-            <!-- 3. a접점 회로 -->
+            <!-- 3. 인터록 회로 (NEW) -->
+            <svg id="diag_interlock" viewBox="0 0 480 260">
+              <path class="dw" d="M 30 30 H 60 M 90 30 H 400 M 30 230 H 400" />
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="236" class="dt bold" style="font-size: 20px;">T</text>
+
+              <!-- PB3 (NC) -->
+              <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
+              <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB3</text>
+
+              <!-- Branch 1 (Left) -->
+              <circle cx="120" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 120 30 V 45" />
+              <path class="dw" d="M 120 45 H 180" />
+
+              <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="180" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- PB1 -->
+              <path class="dw" d="M 130 45 V 75 M 130 60 H 140" />
+              <text x="85" y="66" class="dt bold" style="font-size: 18px;">PB1</text>
+              <!-- X1 (NO) -->
+              <path class="dw" d="M 190 45 V 75" />
+              <text x="195" y="66" class="dt bold" style="font-size: 18px;">X1</text>
+
+              <circle cx="120" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="180" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 120 75 H 180" />
+              <circle cx="120" cy="75" r="3" fill="#1e293b"/>
+
+              <!-- X2 (NC) -->
+              <path class="dw" d="M 120 75 V 105" />
+              <circle cx="120" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="120" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 123 105 V 135 M 123 120 H 133" />
+              <text x="140" y="126" class="dt bold" style="font-size: 18px;">X2</text>
+
+              <path class="dw" d="M 120 135 V 150" />
+              <circle cx="120" cy="150" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 120 150 H 180" />
+
+              <!-- X1 Coil -->
+              <path class="dw" d="M 120 150 V 170" />
+              <circle cx="120" cy="185" r="15" class="dw" />
+              <text x="109" y="191" class="dt bold" style="font-size: 16px;">X1</text>
+              <path class="dw" d="M 120 200 V 230" />
+              <circle cx="120" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- R Lamp -->
+              <path class="dw" d="M 180 150 V 170" />
+              <circle cx="180" cy="185" r="15" class="dw" />
+              <text x="173" y="191" class="dt bold" style="font-size: 16px;">R</text>
+              <path class="dw" d="M 180 200 V 230" />
+              <circle cx="180" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- Branch 2 (Right) -->
+              <circle cx="280" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 280 30 V 45" />
+              <path class="dw" d="M 280 45 H 340" />
+
+              <circle cx="280" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="340" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- PB2 -->
+              <path class="dw" d="M 290 45 V 75 M 290 60 H 300" />
+              <text x="245" y="66" class="dt bold" style="font-size: 18px;">PB2</text>
+              <!-- X2 (NO) -->
+              <path class="dw" d="M 350 45 V 75" />
+              <text x="355" y="66" class="dt bold" style="font-size: 18px;">X2</text>
+
+              <circle cx="280" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="340" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 280 75 H 340" />
+              <circle cx="280" cy="75" r="3" fill="#1e293b"/>
+
+              <!-- X1 (NC) -->
+              <path class="dw" d="M 280 75 V 105" />
+              <circle cx="280" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="280" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 283 105 V 135 M 283 120 H 293" />
+              <text x="300" y="126" class="dt bold" style="font-size: 18px;">X1</text>
+
+              <path class="dw" d="M 280 135 V 150" />
+              <circle cx="280" cy="150" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 280 150 H 340" />
+
+              <!-- X2 Coil -->
+              <path class="dw" d="M 280 150 V 170" />
+              <circle cx="280" cy="185" r="15" class="dw" />
+              <text x="269" y="191" class="dt bold" style="font-size: 16px;">X2</text>
+              <path class="dw" d="M 280 200 V 230" />
+              <circle cx="280" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- G Lamp -->
+              <path class="dw" d="M 340 150 V 170" />
+              <circle cx="340" cy="185" r="15" class="dw" />
+              <text x="332" y="191" class="dt bold" style="font-size: 16px;">G</text>
+              <path class="dw" d="M 340 200 V 230" />
+              <circle cx="340" cy="230" r="3" fill="#1e293b"/>
+            </svg>
+
+            <!-- 4. a접점 회로 -->
             <svg id="diag_a_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
@@ -744,7 +846,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 4. b접점 회로 -->
+            <!-- 5. b접점 회로 -->
             <svg id="diag_b_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
@@ -780,7 +882,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 5. c접점 회로 -->
+            <!-- 6. c접점 회로 -->
             <svg id="diag_c_contact" viewBox="0 0 260 160">
               <path class="dw" d="M 30 30 H 200 M 30 80 V 130 H 200" />
               
@@ -826,7 +928,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 6. 직렬 (AND) 회로 -->
+            <!-- 7. 직렬 (AND) 회로 -->
             <svg id="diag_and_circuit" viewBox="0 0 400 190">
               <path class="dw" d="M 30 30 H 60 M 90 30 H 370 M 30 170 H 370" />
 
@@ -908,7 +1010,7 @@
               <circle cx="350" cy="170" r="3" fill="#1e293b"/>
             </svg>
 
-            <!-- 7. 병렬 (OR) 회로 -->
+            <!-- 8. 병렬 (OR) 회로 -->
             <svg id="diag_or_circuit" viewBox="0 0 480 190">
               <!-- Top & Bottom Rails -->
               <path class="dw" d="M 30 30 H 60 M 90 30 H 450 M 30 170 H 450" />
@@ -1057,7 +1159,7 @@
     const lessons = {
       latch_basic: [
         {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pb1_no_top', b: 'x1_no1_top'}, 
+        {a: 'pow_R', b: 'x1_no1_top'}, 
         {a: 'pb1_no_bot', b: 'x1_no1_bot'},
         {a: 'pb1_no_bot', b: 'x1_coil_top'},
         {a: 'pow_T', b: 'x1_coil_bot'}
@@ -1071,6 +1173,28 @@
         {a: 'pb2_nc_bot', b: 'rl_top'},
         {a: 'pow_T', b: 'x1_coil_bot'},
         {a: 'pow_T', b: 'rl_bot'} 
+      ],
+      interlock: [
+        {a: 'pow_R', b: 'pb3_nc_top'},
+        
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
+        {a: 'pb1_no_top', b: 'x1_no1_top'},
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
+        {a: 'pb1_no_bot', b: 'x2_nc1_top'},
+        {a: 'x2_nc1_bot', b: 'x1_coil_top'},
+        {a: 'x2_nc1_bot', b: 'rl_top'},
+
+        {a: 'pb3_nc_bot', b: 'pb2_no_top'},
+        {a: 'pb2_no_top', b: 'x2_no1_top'},
+        {a: 'pb2_no_bot', b: 'x2_no1_bot'},
+        {a: 'pb2_no_bot', b: 'x1_nc1_top'},
+        {a: 'x1_nc1_bot', b: 'x2_coil_top'},
+        {a: 'x1_nc1_bot', b: 'gl_top'},
+        
+        {a: 'pow_T', b: 'x1_coil_bot'},
+        {a: 'x1_coil_bot', b: 'rl_bot'},
+        {a: 'rl_bot', b: 'x2_coil_bot'},
+        {a: 'x2_coil_bot', b: 'gl_bot'}
       ],
       a_contact: [
         {a: 'pow_R', b: 'pb1_no_top'},
