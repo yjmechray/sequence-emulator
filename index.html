@@ -1,9 +1,10 @@
+<!-- Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sequence Control Wiring Emulator</title>
+  <title>Global U Sequence Control Emulator</title>
   <style>
     :root {
       --bg: #f1f5f9;
@@ -48,6 +49,7 @@
       flex-wrap: wrap;
       gap: 1rem;
       z-index: 10;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .title-area h1 {
@@ -70,24 +72,33 @@
     }
 
     select, button {
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 1rem;
       border: 1px solid var(--border);
-      border-radius: 0.4rem;
-      font-size: 0.85rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
       background: var(--card);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    button:hover { background: #f8fafc; }
+    button:hover { 
+      background: #f8fafc; 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
     
     button.primary {
       background: var(--primary);
       color: white;
       border-color: var(--primary);
-      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
     }
-    button.primary:hover { background: var(--primary-hover); }
+    button.primary:hover { 
+      background: var(--primary-hover); 
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
+    }
 
     /* Hint Animation */
     @keyframes flashHint {
@@ -251,8 +262,15 @@
       border-radius: 0.25rem;
       font-size: 0.65rem;
       cursor: pointer;
+      box-shadow: none;
+      transform: none;
+      font-weight: normal;
     }
-    .wire-item button:hover { background: #fecaca; }
+    .wire-item button:hover { 
+      background: #fecaca; 
+      box-shadow: none;
+      transform: none;
+    }
 
     /* Right Area: The Physical Board (Centerpiece) */
     .board-container {
@@ -361,10 +379,10 @@
     }
 
     .terminal {
-      width: 18px; /* Reduced from 24px */
-      height: 18px; /* Reduced from 24px */
+      width: 18px; 
+      height: 18px; 
       border-radius: 50%;
-      border: 2px solid #334155; /* Reduced border thickness */
+      border: 2px solid #334155; 
       box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
       position: relative;
       cursor: pointer;
@@ -376,8 +394,8 @@
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 6px; /* Reduced from 10px */
-      height: 6px; /* Reduced from 10px */
+      width: 6px; 
+      height: 6px; 
       background: #020617;
       border-radius: 50%;
       box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
@@ -394,8 +412,8 @@
     .term-blue { background: var(--term-blue); }
 
     /* Specific Module Layouts */
-    .grid-row { display: flex; gap: 0.5rem; justify-content: center; } /* Reduced gap */
-    .grid-col { display: flex; flex-direction: column; gap: 0.25rem; align-items: center; } /* Reduced gap */
+    .grid-row { display: flex; gap: 0.5rem; justify-content: center; } 
+    .grid-col { display: flex; flex-direction: column; gap: 0.25rem; align-items: center; } 
     
     .symbol {
       font-size: 0.65rem;
@@ -491,7 +509,7 @@
 
   <header>
     <div class="title-area">
-      <h1>시퀀스 제어 에뮬레이터 (Sequence Control Emulator)</h1>
+      <h1>글로벌 U 시퀀스 제어 에뮬레이터 (Global U Sequence Control Emulator)</h1>
       <p>전기 논리 회로 실습 보드 (Interactive electrical logic training board)</p>
     </div>
     <div class="controls">
@@ -668,6 +686,7 @@
   </div>
 
   <script>
+    // Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem
     // --- 1. ARCHITECTURE & DEFINITIONS ---
     const board = document.getElementById('board');
     const wireLayer = document.getElementById('wire-layer');
