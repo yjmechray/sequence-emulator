@@ -377,7 +377,7 @@
 
     .wire-path {
       fill: none;
-      stroke-width: 3;
+      stroke-width: 2.5;
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15));
@@ -387,14 +387,14 @@
     }
     
     .wire-path:hover {
-      stroke-width: 6;
+      stroke-width: 5;
       stroke: #3b82f6 !important;
     }
 
     .wire-temp {
       fill: none;
       stroke: #94a3b8;
-      stroke-width: 3;
+      stroke-width: 2.5;
       stroke-dasharray: 6 6;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -582,12 +582,13 @@
     </div>
     <div class="controls">
       <select id="lesson-select">
-        <option value="latch_circuit">1. 자기유지 회로 (Self-Holding Circuit)</option>
-        <option value="a_contact">2. a접점 회로 (a-contact Circuit)</option>
-        <option value="b_contact">3. b접점 회로 (b-contact Circuit)</option>
-        <option value="c_contact">4. c접점 회로 (c-contact Circuit)</option>
-        <option value="and_circuit">5. 직렬 회로 (Series AND Circuit)</option>
-        <option value="or_circuit">6. 병렬 회로 (Parallel OR Circuit)</option>
+        <option value="latch_basic">1. 자기유지 회로 - 기본 (Basic Latch Circuit)</option>
+        <option value="latch_stop">2. 자기유지 회로 - 정지 포함 (Latch Circuit w/ Stop)</option>
+        <option value="a_contact">3. a접점 회로 (a-contact Circuit)</option>
+        <option value="b_contact">4. b접점 회로 (b-contact Circuit)</option>
+        <option value="c_contact">5. c접점 회로 (c-contact Circuit)</option>
+        <option value="and_circuit">6. 직렬 회로 (Series AND Circuit)</option>
+        <option value="or_circuit">7. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
       <button class="danger" onclick="clearWires()">초기화 (Clear)</button>
@@ -606,67 +607,110 @@
     <!-- Sidebar / Collapsible Menus (Collapsed by Default) -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-content">
+        <!-- Schema Diagram Collapsed by default -->
         <details class="collapsible-panel">
           <summary>회로도 (Schematic Diagram)</summary>
           <div id="diagram-container" class="diagram-container">
             
-            <!-- 1. 자기유지 회로 (NEW: Latch Circuit) -->
-            <svg id="diag_latch_circuit" class="active" viewBox="0 0 240 240">
-              <path class="dw" d="M 30 30 H 140 M 30 210 H 140" />
-
-              <!-- Parallel PB1 and Xa -->
+            <!-- 1. 자기유지 회로 (기본) - NEW -->
+            <svg id="diag_latch_basic" class="active" viewBox="0 0 200 180">
+              <path class="dw" d="M 30 30 H 140 M 30 150 H 140" />
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="156" class="dt bold" style="font-size: 20px;">T</text>
+              
+              <!-- PB1 -->
               <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
               <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
 
+              <!-- X1 Contact (Parallel to PB1) -->
+              <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
+              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 150 45 V 75" />
+              <text x="160" y="65" class="dt bold" style="font-size: 20px;">X1</text>
+
+              <!-- Merge parallel -->
+              <path class="dw" d="M 80 90 H 140" />
+
+              <!-- X1 Coil -->
+              <path class="dw" d="M 80 90 V 105" />
+              <circle cx="80" cy="120" r="15" class="dw" />
+              <text x="71" y="126" class="dt bold" style="font-size: 18px;">X1</text>
+              <path class="dw" d="M 80 135 V 150" />
+
+              <!-- Junctions & Terminals -->
+              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="30" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="30" r="3" fill="#1e293b" />
+              <circle cx="140" cy="30" r="3" fill="#1e293b" />
+              <circle cx="80" cy="90" r="3" fill="#1e293b" />
+              <circle cx="140" cy="90" r="3" fill="#1e293b" />
+              <circle cx="80" cy="150" r="3" fill="#1e293b" />
+            </svg>
+
+            <!-- 2. 자기유지 회로 (정지버튼 추가) -->
+            <svg id="diag_latch_stop" viewBox="0 0 240 240">
+              <!-- R and T rails -->
+              <path class="dw" d="M 30 30 H 160 M 30 100 V 220 H 160" />
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="106" class="dt bold" style="font-size: 20px;">T</text>
+              
+              <!-- R, T main terminals -->
+              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="30" cy="100" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+              <!-- Parallel PB1 and Xa -->
+              <!-- Branch PB1 -->
+              <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
+              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
+              <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
+
+              <!-- Branch Xa -->
               <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 150 45 V 75" />
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">Xa</text>
 
-              <!-- Merge parallel -->
+              <!-- Merge parallel top/bottom -->
               <path class="dw" d="M 80 90 H 140" />
 
-              <!-- PB2 (NC) -->
-              <path class="dw" d="M 80 90 V 105 M 80 135 V 150" />
-              <circle cx="80" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 83 105 V 135 M 83 120 H 93" />
-              <text x="98" y="125" class="dt bold" style="font-size: 20px;">PB2</text>
+              <!-- Series PB2 (NC) -->
+              <path class="dw" d="M 80 90 V 110 M 80 140 V 155" />
+              <circle cx="80" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- NC contact bar touches -->
+              <path class="dw" d="M 83 110 V 140 M 83 125 H 93" />
+              <text x="100" y="132" class="dt bold" style="font-size: 20px;">PB2</text>
 
               <!-- Split to X and L -->
-              <path class="dw" d="M 80 150 H 140" />
+              <path class="dw" d="M 80 155 H 140" />
 
               <!-- X Coil -->
-              <path class="dw" d="M 80 150 V 160 M 80 190 V 210" />
-              <circle cx="80" cy="175" r="15" class="dw" />
-              <text x="73" y="181" class="dt bold" style="font-size: 18px;">X</text>
+              <path class="dw" d="M 80 155 V 165 M 80 195 V 220" />
+              <circle cx="80" cy="180" r="15" class="dw" />
+              <text x="73" y="186" class="dt bold" style="font-size: 18px;">X</text>
 
               <!-- L Lamp -->
-              <path class="dw" d="M 140 150 V 160 M 140 190 V 210" />
-              <circle cx="140" cy="175" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="133" y="181" class="dt bold" style="fill: #dc2626; font-size: 18px;">L</text>
+              <path class="dw" d="M 140 155 V 165 M 140 195 V 220" />
+              <circle cx="140" cy="180" r="15" class="dw" /> 
+              <text x="134" y="186" class="dt bold" style="font-size: 18px;">L</text>
 
-              <!-- Junctions & Terminals -->
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="210" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- Junction Dots -->
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
               <circle cx="140" cy="30" r="3" fill="#1e293b" />
               <circle cx="80" cy="90" r="3" fill="#1e293b" />
-              <circle cx="140" cy="90" r="3" fill="#1e293b" />
-              <circle cx="80" cy="150" r="3" fill="#1e293b" />
-              <circle cx="140" cy="150" r="3" fill="#1e293b" />
-              <circle cx="80" cy="210" r="3" fill="#1e293b" />
-              <circle cx="140" cy="210" r="3" fill="#1e293b" />
-
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="216" class="dt bold" style="font-size: 20px;">T</text>
+              <circle cx="80" cy="155" r="3" fill="#1e293b" />
+              <circle cx="80" cy="220" r="3" fill="#1e293b" />
+              <circle cx="140" cy="220" r="3" fill="#1e293b" />
             </svg>
 
-            <!-- 2. a접점 회로 -->
+            <!-- 3. a접점 회로 -->
             <svg id="diag_a_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
@@ -700,7 +744,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 3. b접점 회로 -->
+            <!-- 4. b접점 회로 -->
             <svg id="diag_b_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
@@ -736,7 +780,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 4. c접점 회로 -->
+            <!-- 5. c접점 회로 -->
             <svg id="diag_c_contact" viewBox="0 0 260 160">
               <path class="dw" d="M 30 30 H 200 M 30 80 V 130 H 200" />
               
@@ -782,7 +826,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 5. 직렬 (AND) 회로 -->
+            <!-- 6. 직렬 (AND) 회로 -->
             <svg id="diag_and_circuit" viewBox="0 0 400 190">
               <path class="dw" d="M 30 30 H 60 M 90 30 H 370 M 30 170 H 370" />
 
@@ -864,7 +908,7 @@
               <circle cx="350" cy="170" r="3" fill="#1e293b"/>
             </svg>
 
-            <!-- 6. 병렬 (OR) 회로 -->
+            <!-- 7. 병렬 (OR) 회로 -->
             <svg id="diag_or_circuit" viewBox="0 0 480 190">
               <!-- Top & Bottom Rails -->
               <path class="dw" d="M 30 30 H 60 M 90 30 H 450 M 30 170 H 450" />
@@ -1011,15 +1055,22 @@
 
     // --- 2. LESSON DATA ---
     const lessons = {
-      latch_circuit: [
+      latch_basic: [
         {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pb1_no_top', b: 'x1_no1_top'},
+        {a: 'pb1_no_top', b: 'x1_no1_top'}, 
         {a: 'pb1_no_bot', b: 'x1_no1_bot'},
-        {a: 'pb1_no_bot', b: 'pb2_nc_top'},
+        {a: 'pb1_no_bot', b: 'x1_coil_top'},
+        {a: 'pow_T', b: 'x1_coil_bot'}
+      ],
+      latch_stop: [
+        {a: 'pow_R', b: 'pb1_no_top'},
+        {a: 'pow_R', b: 'x1_no1_top'}, 
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
+        {a: 'x1_no1_bot', b: 'pb2_nc_top'}, 
         {a: 'pb2_nc_bot', b: 'x1_coil_top'},
         {a: 'pb2_nc_bot', b: 'rl_top'},
         {a: 'pow_T', b: 'x1_coil_bot'},
-        {a: 'x1_coil_bot', b: 'rl_bot'}
+        {a: 'pow_T', b: 'rl_bot'} 
       ],
       a_contact: [
         {a: 'pow_R', b: 'pb1_no_top'},
@@ -1242,48 +1293,61 @@
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
       const getDir = (id) => id.includes('_bot') ? 'down' : 'up';
       
-      const getChannelY = (y, dir, offset) => {
-         // Wider horizontal routing channels to prevent bundling
-         if (y < 270) return dir === 'up' ? 15 + offset : 245 - offset; 
-         return dir === 'up' ? 255 + offset : 465 + offset; 
-      };
+      // 선들이 겹치지 않도록 각 배선마다 고유한 간격을 생성 (Wide Spreading)
+      const hSpread1 = index % 8;        // 0 ~ 7
+      const hSpread2 = (index + 4) % 8;  // 0 ~ 7 (Shifted)
+      const vSpread  = index % 15;       // 0 ~ 14 (하단 공간 최대 활용)
 
-      // Increased gap spread multiplier to completely unbundle stacked wires
-      const offset1 = (index % 6) * 6; 
-      const offset2 = ((index + 3) % 6) * 6;
-      
-      const cy1 = getChannelY(y1, getDir(idA), offset1);
-      const cy2 = getChannelY(y2, getDir(idB), offset2);
+      let cy1, cy2;
+      const dirA = getDir(idA);
+      const dirB = getDir(idB);
 
-      // Small vertical jump if both modules are securely within the same logical horizontal band
+      // 모듈 위/아래의 수평 라우팅 채널 설정
+      if (y1 < 270) {
+          cy1 = dirA === 'up' ? 8 + (hSpread1 * 4) : 235 - (hSpread1 * 3); 
+      } else {
+          cy1 = dirA === 'up' ? 255 + (hSpread1 * 3) : 470 + (vSpread * 12); // 하단은 12px씩 크게 벌림
+      }
+
+      if (y2 < 270) {
+          cy2 = dirB === 'up' ? 8 + (hSpread2 * 4) : 235 - (hSpread2 * 3);
+      } else {
+          cy2 = dirB === 'up' ? 255 + (hSpread2 * 3) : 470 + (((vSpread + 7) % 15) * 12);
+      }
+
+      // 같은 수평 구역에 있으면 수직 기둥(Trunk) 없이 바로 연결
       if (Math.abs(cy1 - cy2) < 40 && ((y1 < 270 && y2 < 270) || (y1 > 270 && y2 > 270))) {
          const midY = (cy1 + cy2) / 2;
          return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
       }
 
-      // Safe vertical columns to traverse between top/bottom without hitting components
-      let safeX = [];
+      // 부품을 피해서 지나가는 안전한 수직 채널(Trunk) 탐색
+      let safeXList = [];
+      let spreadFactor = 3;
+
       if (y1 < 270 && y2 < 270) {
-          // Top-row dedicated vertical highways
-          safeX = [20, 175, 325, 475, 620, 750, 900];
+          safeXList = [15, 170, 320, 470, 620, 750, 880];
+          spreadFactor = 4; // 좌우 분산 범위 (+/- 12px)
       } else if (y1 > 270 && y2 > 270) {
-          // Bottom-row dedicated vertical highways
-          safeX = [35, 500, 965];
+          safeXList = [35, 500, 960];
+          spreadFactor = 12; // 하단 릴레이 사이 빈 공간을 넓게 활용
       } else {
-          // Global unobstructed top-to-bottom highways
-          safeX = [20, 500, 970];
+          // 상/하단을 가로지르는 메인 라인 (부품들을 완전히 피하는 3개의 메인 고속도로)
+          safeXList = [10, 470, 960];
+          spreadFactor = 4;
       }
 
-      let bestX = safeX[0];
+      let bestX = safeXList[0];
       let minCost = Infinity;
       
-      for (let sx of safeX) {
+      for (let sx of safeXList) {
           let cost = Math.abs(x1 - sx) + Math.abs(x2 - sx);
           if (cost < minCost) { minCost = cost; bestX = sx; }
       }
       
-      // Increased vertical gap spread
-      const trunkX = bestX + ((index % 5) - 2) * 8;
+      // 수직선들이 하나로 뭉치지 않도록 좌우로 퍼뜨림
+      const trunkOffset = ((index % (spreadFactor * 2 + 1)) - spreadFactor) * 3;
+      const trunkX = bestX + trunkOffset;
       
       return `M ${x1} ${y1} L ${x1} ${cy1} L ${trunkX} ${cy1} L ${trunkX} ${cy2} L ${x2} ${cy2} L ${x2} ${y2}`;
     }
@@ -1425,6 +1489,11 @@
       } else {
         statusPanel.className = 'status-bar';
         statusPanel.innerHTML = "정상. 버튼을 눌러 논리 회로를 테스트하세요. (Circuit ready. Press buttons to test flow.)";
+        
+        // Explain permanent latch warning for Basic Latch
+        if(document.getElementById('lesson-select').value === 'latch_basic' && state.x1) {
+            statusPanel.innerHTML = "릴레이가 자기유지 되었습니다. 정지 버튼이 없으므로 전선을 해제하거나 초기화해야 꺼집니다.";
+        }
       }
 
       [1, 2].forEach(i => {
@@ -1505,7 +1574,7 @@
     scrollContainer.addEventListener('scroll', () => { if (wires.length > 0) renderWires(); });
 
     // Set initial diagram active based on dropdown
-    document.getElementById('diag_latch_circuit').classList.add('active');
+    document.getElementById('diag_latch_basic').classList.add('active');
 
     buildHardware();
   </script>
