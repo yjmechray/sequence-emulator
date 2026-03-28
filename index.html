@@ -89,6 +89,16 @@
     }
     button.primary:hover { background: var(--primary-hover); }
 
+    /* Hint Animation */
+    @keyframes flashHint {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.8); transform: scale(1.2); background: #86efac; }
+      50% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4); transform: scale(1); }
+    }
+    .hint-flash {
+      animation: flashHint 1.5s infinite !important;
+      z-index: 30;
+    }
+
     /* Top Thin Status Bar */
     .status-bar {
       background: #eff6ff;
@@ -235,6 +245,7 @@
       display: flex;
       align-items: flex-start;
       justify-content: flex-start;
+      -webkit-overflow-scrolling: touch;
     }
 
     .board {
@@ -439,7 +450,7 @@
         width: 100%; 
         border-right: none; 
         border-bottom: 1px solid var(--border); 
-        max-height: 40vh; /* Prevents sidebar from eating entire screen on mobile */
+        max-height: 40vh;
       }
       .board-container { padding: 0.5rem; }
       header { align-items: flex-start; }
@@ -452,25 +463,26 @@
 
   <header>
     <div class="title-area">
-      <h1>Sequence Control Emulator</h1>
-      <p>Interactive electrical logic training board</p>
+      <h1>시퀀스 제어 에뮬레이터 (Sequence Control Emulator)</h1>
+      <p>전기 논리 회로 실습 보드 (Interactive electrical logic training board)</p>
     </div>
     <div class="controls">
       <select id="lesson-select">
-        <option value="a_contact">1. a접점 회로</option>
-        <option value="b_contact">2. b접점 회로</option>
-        <option value="c_contact">3. c접점 회로</option>
-        <option value="and_circuit">4. 직렬(AND) 회로</option>
-        <option value="or_circuit">5. 병렬(OR) 회로</option>
+        <option value="a_contact">1. a접점 회로 (a-contact Circuit)</option>
+        <option value="b_contact">2. b접점 회로 (b-contact Circuit)</option>
+        <option value="c_contact">3. c접점 회로 (c-contact Circuit)</option>
+        <option value="and_circuit">4. 직렬 회로 (Series AND Circuit)</option>
+        <option value="or_circuit">5. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
-      <button onclick="clearWires()">Clear</button>
-      <button class="primary" onclick="loadLessonTarget()">Load Target</button>
+      <button onclick="clearWires()">초기화 (Clear)</button>
+      <button onclick="showHint()">힌트 (Hint)</button>
+      <button class="primary" onclick="loadLessonTarget()">정답 불러오기 (Load Target)</button>
     </div>
   </header>
 
   <!-- Thin Status Bar -->
   <div id="status-panel" class="status-bar">
-    Click two terminals to connect a wire. Press buttons to test.
+    두 단자를 클릭하여 전선을 연결하세요. 버튼을 눌러 테스트하세요. (Click two terminals to connect a wire. Press buttons to test.)
   </div>
 
   <div class="workspace">
@@ -481,7 +493,7 @@
         <summary>회로도 (Schematic Diagram)</summary>
         <div id="diagram-container" class="diagram-container">
           
-          <!-- 1. a접점 회로 (NO) -->
+          <!-- 1. a접점 회로 -->
           <svg id="diag_a_contact" class="active" viewBox="0 0 200 160">
             <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
             <text x="5" y="34" class="dt bold">R</text>
@@ -498,7 +510,7 @@
             <text x="131" y="119" class="dt d-red">RL</text>
           </svg>
 
-          <!-- 2. b접점 회로 (NC) -->
+          <!-- 2. b접점 회로 -->
           <svg id="diag_b_contact" viewBox="0 0 200 160">
             <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
             <text x="5" y="34" class="dt bold">R</text>
@@ -515,7 +527,7 @@
             <text x="130" y="119" class="dt d-green">GL</text>
           </svg>
 
-          <!-- 3. c접점 회로 (Changeover) -->
+          <!-- 3. c접점 회로 -->
           <svg id="diag_c_contact" viewBox="0 0 240 160">
             <path class="dw" d="M 20 30 H 220 M 20 130 H 220" />
             <text x="5" y="34" class="dt bold">R</text>
@@ -607,9 +619,9 @@
       </details>
 
       <details class="collapsible-panel" open>
-        <summary>Connections (<span id="wire-count">0</span>)</summary>
+        <summary>연결 (Connections) (<span id="wire-count">0</span>)</summary>
         <div id="wire-container" class="wire-list-compact">
-          <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections.</div>
+          <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">연결 없음 (No connections).</div>
         </div>
       </details>
     </div>
@@ -721,6 +733,7 @@
       document.querySelectorAll('#diagram-container svg').forEach(svg => svg.classList.remove('active'));
       const activeSvg = document.getElementById('diag_' + e.target.value);
       if(activeSvg) activeSvg.classList.add('active');
+      clearWires();
     });
 
     // --- 3. HARDWARE RENDERING ---
@@ -737,16 +750,17 @@
     }
 
     function buildHardware() {
-      createModule('power', 40, 40, 140, 100, 'POWER', `
+      // 1. Power Supply (Top Left)
+      createModule('power', 40, 40, 140, 100, '전원 (POWER)', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-red" id="pow_T"></div><div class="symbol">T</div></div>
         </div>
       `);
 
-      let pbHTML = '<div class="grid-row" style="gap:1.5rem;">';
+      // 2. Separate Push Buttons (Top Middle)
       for(let i=1; i<=3; i++) {
-        pbHTML += `
+        let pbHTML = `
           <div class="grid-col">
             <div class="pb-actuator" id="btn_pb${i}" onmousedown="pressPB('pb${i}', true)" onmouseup="pressPB('pb${i}', false)" onmouseleave="pressPB('pb${i}', false)" ontouchstart="pressPB('pb${i}', true)" ontouchend="pressPB('pb${i}', false)">PB${i}</div>
             <div class="grid-row" style="gap:10px;">
@@ -762,10 +776,26 @@
               </div>
             </div>
           </div>`;
+        // PB1: 200, PB2: 330, PB3: 460
+        createModule(`pb${i}_mod`, 70 + (i * 130), 40, 110, 180, `버튼 (PB${i})`, pbHTML);
       }
-      pbHTML += '</div>';
-      createModule('pbs', 220, 40, 360, 180, 'PUSH BUTTONS', pbHTML);
 
+      // 3. Lamps (Top Right)
+      const lamps = [
+        { id: 'rl', color: 'red', name: '램프 (RL)', x: 610 },
+        { id: 'gl', color: 'green', name: '램프 (GL)', x: 730 }
+      ];
+      lamps.forEach(l => {
+        createModule(`lamp_${l.id}`, l.x, 40, 100, 180, l.name, `
+          <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}" style="margin-bottom: 0.5rem; width: 50px; height: 50px;"></div>
+          <div class="grid-col">
+            <div class="terminal term-red" id="${l.id}_top"></div>
+            <div class="terminal term-red" id="${l.id}_bot"></div>
+          </div>
+        `);
+      });
+
+      // 4. Relays (Bottom Row)
       [1, 2].forEach((num, idx) => {
         let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
         relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
@@ -776,21 +806,7 @@
           relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
         }
         relayHTML += '</div>';
-        createModule(`relay${num}`, 40 + (idx * 380), 260, 360, 160, `RELAY ${num} (X${num})`, relayHTML);
-      });
-
-      const lamps = [
-        { id: 'rl', color: 'red', name: 'RL', x: 820 },
-        { id: 'gl', color: 'green', name: 'GL', x: 910 }
-      ];
-      lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 260, 80, 220, l.name, `
-          <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
-          <div class="grid-col">
-            <div class="terminal term-red" id="${l.id}_top"></div>
-            <div class="terminal term-red" id="${l.id}_bot"></div>
-          </div>
-        `);
+        createModule(`relay${num}`, 40 + (idx * 380), 280, 360, 160, `릴레이 (X${num})`, relayHTML);
       });
 
       document.querySelectorAll('.terminal').forEach(term => {
@@ -800,10 +816,13 @@
 
     // --- 4. INTERACTION & DRAWING ---
     function handleTerminalClick(e, term) {
+      // Remove any active hints when user starts interacting
+      document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
+
       if (!selectedTerminal) {
         selectedTerminal = term;
         term.classList.add('selected');
-        updateStatus("Select a second terminal to connect the wire.");
+        updateStatus("두 번째 단자를 선택하세요 (Select a second terminal to connect the wire).");
       } else {
         if (selectedTerminal !== term) {
           addWire(selectedTerminal.id, term.id);
@@ -827,7 +846,7 @@
 
     function addWire(idA, idB) {
       if (wires.some(w => (w.a === idA && w.b === idB) || (w.a === idB && w.b === idA))) {
-        updateStatus("Wire already exists between these terminals.", true);
+        updateStatus("이미 연결되어 있습니다 (Wire already exists between these terminals).", true);
         return;
       }
       const color = wireColors[wires.length % wireColors.length];
@@ -844,16 +863,18 @@
 
     function clearWires() {
       wires = [];
+      document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
       renderWires();
       evaluateCircuit();
-      updateStatus("All wires cleared. Ready to build.");
+      updateStatus("초기화 완료. (All wires cleared. Ready to build.)");
     }
 
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
       const getDir = (id) => id.includes('_bot') ? 'down' : 'up';
       const getChannelY = (y, dir, offset) => {
-         if (y < 250) return dir === 'up' ? 20 + offset : 235 - offset; 
-         return dir === 'up' ? 245 + offset : 520 + offset; 
+         // Top row items (Power, PB, Lamps) vs Bottom row items (Relays)
+         if (y < 270) return dir === 'up' ? 20 + offset : 240 - offset; 
+         return dir === 'up' ? 255 + offset : 460 + offset; 
       };
 
       const offset1 = (index % 6) * 4;
@@ -861,12 +882,14 @@
       const cy1 = getChannelY(y1, getDir(idA), offset1);
       const cy2 = getChannelY(y2, getDir(idB), offset2);
 
-      if (Math.abs(cy1 - cy2) < 40 && ((y1 < 250 && y2 < 250) || (y1 > 250 && y2 > 250))) {
+      if (Math.abs(cy1 - cy2) < 40 && ((y1 < 270 && y2 < 270) || (y1 > 270 && y2 > 270))) {
          const midY = (cy1 + cy2) / 2;
          return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
       }
 
-      const safeX = [20, 200, 410, 600, 800, 995];
+      // Safe X gaps threading through the new layout:
+      // Power (180), PB1 (310), PB2 (440), PB3 (570), RL (710), GL (830)
+      const safeX = [20, 190, 320, 450, 590, 720, 850, 960];
       let bestX = safeX[0];
       let minCost = Infinity;
       
@@ -907,14 +930,14 @@
 
       document.getElementById('wire-count').innerText = wires.length;
       if (wires.length === 0) {
-        wireContainer.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections.</div>`;
+        wireContainer.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">연결 없음 (No connections).</div>`;
       } else {
         wireContainer.innerHTML = wires.map(w => `
           <div class="wire-item">
             <span style="border-left: 4px solid ${w.color}; padding-left: 6px;">
-              ${w.a.toUpperCase().replace('_', ' ')} ↔ ${w.b.toUpperCase().replace('_', ' ')}
+              ${w.a.toUpperCase().replace(/_/g, ' ')} ↔ ${w.b.toUpperCase().replace(/_/g, ' ')}
             </span>
-            <button onclick="removeWire('${w.id}')">Remove</button>
+            <button onclick="removeWire('${w.id}')">삭제 (Remove)</button>
           </div>
         `).join('');
       }
@@ -1012,10 +1035,10 @@
 
       if (isShortCircuit) {
         statusPanel.className = 'status-bar short';
-        statusPanel.innerHTML = "⚠️ SHORT CIRCUIT DETECTED! R and T are connected directly.";
+        statusPanel.innerHTML = "⚠️ 단락 경고! R상과 T상이 직접 연결되었습니다. (SHORT CIRCUIT DETECTED!)";
       } else {
         statusPanel.className = 'status-bar';
-        statusPanel.innerHTML = "Circuit evaluated successfully. Press buttons to test logic flow.";
+        statusPanel.innerHTML = "정상. 버튼을 눌러 논리 회로를 테스트하세요. (Circuit ready. Press buttons to test flow.)";
       }
 
       [1, 2].forEach(i => {
@@ -1031,6 +1054,35 @@
       });
     }
 
+    function showHint() {
+      const lessonKey = document.getElementById('lesson-select').value;
+      const targetWires = lessons[lessonKey];
+      
+      // Clear previous hints
+      document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
+
+      for (let expected of targetWires) {
+        // Check if wire already exists (bidirectional check)
+        const exists = wires.some(w => 
+          (w.a === expected.a && w.b === expected.b) || 
+          (w.a === expected.b && w.b === expected.a)
+        );
+        
+        if (!exists) {
+          const tA = document.getElementById(expected.a);
+          const tB = document.getElementById(expected.b);
+          if (tA && tB) {
+            tA.classList.add('hint-flash');
+            tB.classList.add('hint-flash');
+            updateStatus(`💡 힌트 (Hint): 깜빡이는 두 단자를 연결하세요. (Connect the two flashing terminals)`);
+          }
+          return;
+        }
+      }
+      
+      updateStatus("모든 연결이 완료되었습니다! (All connections match the target diagram!)", false);
+    }
+
     function loadLessonTarget() {
       const lessonKey = document.getElementById('lesson-select').value;
       const targetWires = lessons[lessonKey];
@@ -1039,7 +1091,7 @@
       targetWires.forEach((w, i) => {
         setTimeout(() => { addWire(w.a, w.b); }, i * 100); 
       });
-      updateStatus(`Loaded target layout for: ${document.getElementById('lesson-select').options[document.getElementById('lesson-select').selectedIndex].text}`);
+      updateStatus(`정답을 불러왔습니다 (Loaded target layout)`);
     }
 
     function updateStatus(msg, isError = false) {
