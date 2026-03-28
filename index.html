@@ -21,8 +21,9 @@
       box-shadow: 5px 5px 10px #060911, -5px -5px 10px #182543;
       border: 1px solid #e2e8f0;
       position: relative;
-      z-index: 20;
+      z-index: 20; /* Panels are z-20 */
     }
+    
     .terminal { box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5); touch-action: none; cursor: crosshair; }
     
     .btn-push { transition: transform 0.1s; touch-action: none; cursor: pointer; }
@@ -67,6 +68,15 @@
 
       const containerRef = useRef(null);
       const nodeRefs = useRef({});
+
+      // Lock scrolling on mobile when user is actively dragging a wire
+      useEffect(() => {
+        if (drawingWire) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }, [drawingWire]);
 
       const updatePositions = () => {
         if (!containerRef.current) return;
@@ -152,7 +162,7 @@
           const el = nodeRefs.current[id];
           if (el) {
             const rect = el.getBoundingClientRect();
-            // Added padding to touch area for easier connection on mobile
+            // Added 15px padding to hit-area for easier mobile connections
             if (pos.clientX >= rect.left - 15 && pos.clientX <= rect.right + 15 &&
                 pos.clientY >= rect.top - 15 && pos.clientY <= rect.bottom + 15) {
               droppedNodeId = id;
@@ -277,9 +287,10 @@
           ref={el => nodeRefs.current[id] = el}
           onMouseDown={(e) => handleDrawStart(e, id)}
           onTouchStart={(e) => handleDrawStart(e, id)}
-          className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 border-slate-700 terminal flex items-center justify-center z-30 transition-transform hover:scale-125 ${colorCls} ${simState.isSimulating ? 'pointer-events-none' : ''}`}
+          /* Z-50 Ensures terminals are ALWAYS above the wires so they can be clicked */
+          className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 border-slate-700 terminal flex items-center justify-center relative z-50 transition-transform hover:scale-125 ${colorCls} ${simState.isSimulating ? 'pointer-events-none' : ''}`}
         >
-          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-800 opacity-50"></div>
+          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-800 opacity-50 pointer-events-none"></div>
         </div>
       );
 
@@ -293,7 +304,7 @@
           onMouseLeave={handleEnd}
         >
           {/* Header */}
-          <div className="bg-slate-800 p-3 md:p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center z-50 shadow-md gap-3 w-full sticky top-0 relative">
+          <div className="bg-slate-800 p-3 md:p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center shadow-md gap-3 w-full sticky top-0 relative z-[60]">
             <div className="text-center sm:text-left">
               <h1 className="text-lg md:text-2xl font-bold text-slate-100">Lab Emulator</h1>
               <p className="text-xs md:text-sm text-slate-400">Parallel (OR) Circuit / 병렬(OR) 회로</p>
@@ -328,8 +339,8 @@
           {/* Main Content Workspace */}
           <div className="flex-1 flex flex-col lg:flex-row relative min-h-[700px] w-full" ref={containerRef}>
             
-            {/* SVG Layer for Wires */}
-            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style={{ minHeight: '700px' }}>
+            {/* SVG Layer for Wires - CHANGED FROM Z-10 to Z-40 to sit ABOVE panels but BELOW terminals */}
+            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-40" style={{ minHeight: '700px', overflow: 'visible' }}>
               {wires.map(wire => {
                 const start = nodePositions[wire.startNode];
                 const end = nodePositions[wire.endNode];
@@ -344,7 +355,7 @@
                     className="wire-line pointer-events-auto"
                     onDoubleClick={() => removeWire(wire.id)}
                     onTouchStart={(e) => {
-                       if (e.touches.length === 2) removeWire(wire.id); // Simple two-finger tap to delete on mobile
+                       if (e.touches.length === 2) removeWire(wire.id); 
                     }}
                   />
                 );
@@ -372,7 +383,6 @@
               </p>
 
               <div className="border-2 border-slate-300 p-2 lg:p-4 rounded-xl bg-white max-w-sm mx-auto">
-                {/* SVG Image representation */}
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/OR_gate_symbol.svg/1200px-OR_gate_symbol.svg.png" className="w-16 h-auto mx-auto mb-4 opacity-20" alt="background logo" />
                 <svg viewBox="0 0 300 250" className="w-full h-auto stroke-black fill-transparent stroke-2 text-xs lg:text-sm font-sans font-medium">
                   <line x1="20" y1="20" x2="20" y2="230" />
