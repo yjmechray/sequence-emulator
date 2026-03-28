@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sequence Control Lab Emulator</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Fixed for iframe embedding: ensure min-height and allow scrolling */
+    html, body { margin: 0; background-color: #0f172a; color: white; min-height: 900px; touch-action: pan-y; }
+    
+    .wire-line {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke-width 0.2s;
+    }
+    .wire-line:hover { stroke-width: 8; cursor: pointer; }
+    
+    .panel-box {
+      background: linear-gradient(145deg, #cbd5e1, #94a3b8);
+      box-shadow: 5px 5px 10px #060911, -5px -5px 10px #182543;
+      border: 1px solid #e2e8f0;
+    }
+    .terminal { box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5); touch-action: none; }
+    
+    .btn-push { transition: transform 0.1s; touch-action: manipulation; }
+    .btn-push:active, .btn-push.pressed { transform: scale(0.95) translateY(2px); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useLayoutEffect } = React;
+
+    const REQUIRED_NETS = [
+      ['R_OUT', 'PB3_IN'],
+      ['PB3_OUT', 'PB1_IN', 'X1_NO1_IN', 'PB2_IN', 'X2_NO1_IN', 'X1_NO2_IN', 'X2_NO2_IN'],
+      ['PB1_OUT', 'X1_NO1_OUT', 'X1_COIL_P'],
+      ['PB2_OUT', 'X2_NO1_OUT', 'X2_COIL_P'],
+      ['X1_NO2_OUT', 'X2_NO2_OUT', 'RL_P'],
+      ['T_OUT', 'X1_COIL_N', 'X2_COIL_N', 'RL_N']
+    ];
+
+    const WIRE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#111827'];
+
+    function App() {
+      const [wires, setWires] = useState([]);
+      const [drawingWire, setDrawingWire] = useState(null);
+      const [selectedColor, setSelectedColor] = useState(WIRE_COLORS[0]);
+      const [nodePositions, setNodePositions] = useState({});
+      
+      const [simState, setSimState] = useState({
+        isSimulating: false,
+        statusMsgEn: 'Complete the wiring to run the simulation.',
+        statusMsgKo: '배선을 완료해야 시뮬레이션을 실행할 수 있습니다.',
+        isCorrect: false,
+        pb1Pressed: false, pb2Pressed: false, pb3Pressed: false,
+        x1Active: false, x2Active: false, lampActive: false
+      });
+
+      const containerRef = useRef(null);
+      const nodeRefs = useRef({});
+
+      const updatePositions = () => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const positions = {};
+        Object.keys(nodeRefs.current).forEach(id => {
+          const el = nodeRefs.current[id];
+          if (el) {
+            const elRect = el.getBoundingClientRect();
+            // Calculate relative to the container for SVG overlay
+            positions[id] = {
+              x: elRect.left - rect.left + elRect.width / 2,
+              y: elRect.top - rect.top + elRect.height / 2
+            };
+          }
+        });
+        setNodePositions(positions);
+      };
+
+      useLayoutEffect(() => {
+        updatePositions();
+        window.addEventListener('resize', updatePositions);
+        setTimeout(updatePositions, 500); // extra delay for iframe rendering
+        return () => window.removeEventListener('resize', updatePositions);
+      }, [wires]);
+
+      useEffect(() => {
+        if (!simState.isSimulating) return;
+
+        let nextX1 = simState.x1Active;
+        let nextX2 = simState.x2Active;
+        const powerAvailable = !simState.pb3Pressed;
+
+        if (!powerAvailable) {
+          nextX1 = false;
+          nextX2 = false;
+        } else {
+          if (simState.pb1Pressed) nextX1 = true;
+          if (simState.pb2Pressed) nextX2 = true;
+        }
+
+        const nextLamp = powerAvailable && (nextX1 || nextX2);
+
+        if (nextX1 !== simState.x1Active || nextX2 !== simState.x2Active || nextLamp !== simState.lampActive) {
+          setSimState(prev => ({ ...prev, x1Active: nextX1, x2Active: nextX2, lampActive: nextLamp }));
+        }
+      }, [simState.isSimulating, simState.pb1Pressed, simState.pb2Pressed, simState.pb3Pressed, simState.x1Active, simState.x2Active, simState.lampActive]);
+
+      const getClientPos = (e) => {
+        if (e.touches && e.touches.length > 0) {
+          return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+        }
+        return { clientX: e.clientX, clientY: e.clientY };
+      };
+
+      const handlePointerDown = (e, nodeId) => {
+        if (e.cancelable) e.preventDefault();
+        if (simState.isSimulating) return;
+        const pos = nodePositions[nodeId];
+        if(pos) {
+          setDrawingWire({ startNode: nodeId, mouseX: pos.x, mouseY: pos.y, color: selectedColor });
+        }
+      };
+
+      const handlePointerMove = (e) => {
+        if (!drawingWire || !containerRef.current) return;
+        const pos = getClientPos(e);
+        const rect = containerRef.current.getBoundingClientRect();
+        setDrawingWire(prev => ({
+          ...prev,
+          mouseX: pos.clientX - rect.left,
+          mouseY: pos.clientY - rect.top
+        }));
+      };
+
+      const handlePointerUp = (e) => {
+        if (!drawingWire || simState.isSimulating) return;
+        
+        const pos = getClientPos(e.changedTouches ? e.changedTouches[0] : e);
+        let droppedNodeId = null;
+
+        Object.keys(nodeRefs.current).forEach(id => {
+          const el = nodeRefs.current[id];
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (pos.clientX >= rect.left && pos.clientX <= rect.right &&
+                pos.clientY >= rect.top && pos.clientY <= rect.bottom) {
+              droppedNodeId = id;
+            }
+          }
+        });
+
+        if (droppedNodeId && drawingWire.startNode !== droppedNodeId) {
+          const exists = wires.some(w => 
+            (w.startNode === drawingWire.startNode && w.endNode === droppedNodeId) ||
+            (w.startNode === droppedNodeId && w.endNode === drawingWire.startNode)
+          );
+          if (!exists) {
+            setWires([...wires, { 
+              id: Date.now(), 
+              startNode: drawingWire.startNode, 
+              endNode: droppedNodeId, 
+              color: drawingWire.color 
+            }]);
+          }
+        }
+        setDrawingWire(null);
+      };
+
+      const removeWire = (id) => {
+        if (simState.isSimulating) return;
+        setWires(wires.filter(w => w.id !== id));
+      };
+
+      const resetWiring = () => {
+        if (simState.isSimulating) stopSimulation();
+        setWires([]);
+        setSimState(prev => ({
+          ...prev,
+          statusMsgEn: 'Wiring reset. Start connecting terminals.',
+          statusMsgKo: '배선이 초기화되었습니다. 터미널을 연결하세요.',
+          isCorrect: false
+        }));
+      };
+
+      const validateCircuit = () => {
+        const parent = {};
+        const find = (i) => {
+          if (parent[i] === undefined) parent[i] = i;
+          if (parent[i] === i) return i;
+          return parent[i] = find(parent[i]);
+        };
+        const union = (i, j) => {
+          let rootI = find(i);
+          let rootJ = find(j);
+          if (rootI !== rootJ) parent[rootI] = rootJ;
+        };
+
+        wires.forEach(w => union(w.startNode, w.endNode));
+
+        let isValid = true;
+        for (let i = 0; i < REQUIRED_NETS.length; i++) {
+          const net = REQUIRED_NETS[i];
+          const root = find(net[0]);
+          for (let j = 1; j < net.length; j++) {
+            if (find(net[j]) !== root) {
+              isValid = false;
+              break;
+            }
+          }
+          if (!isValid) break;
+        }
+
+        const roots = new Set();
+        let isShorted = false;
+        for (let net of REQUIRED_NETS) {
+          const root = find(net[0]);
+          if (roots.has(root)) {
+            isShorted = true;
+            break;
+          }
+          roots.add(root);
+        }
+
+        if (isShorted) {
+          return { ok: false, en: 'Short circuit detected!', ko: '단락(합선)이 감지되었습니다!' };
+        } else if (!isValid) {
+          return { ok: false, en: 'Incomplete or incorrect wiring.', ko: '배선이 불완전하거나 잘못되었습니다.' };
+        }
+        return { ok: true, en: 'All Required Connections Verified.', ko: '모든 필수 연결이 확인되었습니다.' };
+      };
+
+      const startSimulation = () => {
+        const check = validateCircuit();
+        if (check.ok) {
+          setSimState({
+            ...simState,
+            isSimulating: true,
+            statusMsgEn: 'Simulation Running. Try pressing the buttons.',
+            statusMsgKo: '시뮬레이션 실행 중. 버튼을 눌러보세요.',
+            isCorrect: true,
+            pb1Pressed: false, pb2Pressed: false, pb3Pressed: false,
+            x1Active: false, x2Active: false, lampActive: false
+          });
+        } else {
+          setSimState({
+            ...simState,
+            statusMsgEn: check.en,
+            statusMsgKo: check.ko,
+            isCorrect: false
+          });
+        }
+      };
+
+      const stopSimulation = () => {
+        setSimState(prev => ({
+          ...prev,
+          isSimulating: false,
+          statusMsgEn: 'Simulation Stopped.',
+          statusMsgKo: '시뮬레이션 중지됨.',
+          x1Active: false, x2Active: false, lampActive: false
+        }));
+      };
+
+      const Terminal = ({ id, colorCls = 'bg-slate-300' }) => (
+        <div 
+          ref={el => nodeRefs.current[id] = el}
+          onMouseDown={(e) => handlePointerDown(e, id)}
+          onTouchStart={(e) => handlePointerDown(e, id)}
+          className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 border-slate-700 terminal cursor-crosshair flex items-center justify-center relative z-20 transition-transform hover:scale-125 ${colorCls} ${simState.isSimulating ? 'pointer-events-none' : ''}`}
+        >
+          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-800 opacity-50"></div>
+        </div>
+      );
+
+      return (
+        <div 
+          className="flex flex-col font-sans w-full min-h-screen"
+          onMouseMove={handlePointerMove}
+          onTouchMove={handlePointerMove}
+          onMouseUp={handlePointerUp}
+          onTouchEnd={handlePointerUp}
+          onMouseLeave={handlePointerUp}
+        >
+          {/* Header */}
+          <div className="bg-slate-800 p-3 md:p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center z-30 shadow-md gap-3 w-full sticky top-0">
+            <div className="text-center sm:text-left">
+              <h1 className="text-lg md:text-2xl font-bold text-slate-100">Lab Emulator</h1>
+              <p className="text-xs md:text-sm text-slate-400">Parallel (OR) Circuit / 병렬(OR) 회로</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2 md:gap-4 items-center">
+              <div className="bg-slate-900 rounded-lg p-1.5 md:p-2 flex gap-1.5 md:gap-2">
+                {WIRE_COLORS.map(color => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 transition-transform ${selectedColor === color ? 'scale-110 border-white' : 'border-transparent opacity-70'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+              <button onClick={resetWiring} className="bg-slate-700 hover:bg-slate-600 px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-medium transition-colors border border-slate-600">
+                Reset
+              </button>
+              {simState.isSimulating ? (
+                <button onClick={stopSimulation} className="bg-red-600 hover:bg-red-500 px-4 md:px-6 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-bold transition-colors shadow-lg shadow-red-900/50">
+                  Stop
+                </button>
+              ) : (
+                <button onClick={startSimulation} className="bg-emerald-600 hover:bg-emerald-500 px-4 md:px-6 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-bold transition-colors shadow-lg shadow-emerald-900/50">
+                  Run
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Main Content Workspace */}
+          <div className="flex-1 flex flex-col lg:flex-row relative min-h-[700px] w-full" ref={containerRef}>
+            
+            {/* SVG Layer for Wires */}
+            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style={{ minHeight: '700px' }}>
+              {wires.map(wire => {
+                const start = nodePositions[wire.startNode];
+                const end = nodePositions[wire.endNode];
+                if (!start || !end) return null;
+                return (
+                  <line 
+                    key={wire.id}
+                    x1={start.x} y1={start.y} 
+                    x2={end.x} y2={end.y} 
+                    stroke={wire.color} 
+                    strokeWidth="4"
+                    className="wire-line pointer-events-auto"
+                    onDoubleClick={() => removeWire(wire.id)}
+                    onTouchStart={(e) => {
+                       if (e.detail === 2) removeWire(wire.id);
+                    }}
+                  />
+                );
+              })}
+              {drawingWire && nodePositions[drawingWire.startNode] && (
+                <line 
+                  x1={nodePositions[drawingWire.startNode].x} 
+                  y1={nodePositions[drawingWire.startNode].y} 
+                  x2={drawingWire.mouseX} 
+                  y2={drawingWire.mouseY} 
+                  stroke={drawingWire.color} 
+                  strokeWidth="4" 
+                  strokeDasharray="8 8"
+                  className="opacity-70"
+                />
+              )}
+            </svg>
+
+            {/* Left Panel - Instructions & Schematic */}
+            <div className="w-full lg:w-1/3 bg-slate-50 border-b lg:border-b-0 lg:border-r border-slate-300 p-4 lg:p-6 text-slate-900 z-20 shadow-md">
+              <h2 className="text-sm lg:text-xl font-bold mb-1 lg:mb-2">시퀀스 제어회로와 동작 (11)</h2>
+              <h3 className="text-xs lg:text-lg font-bold text-blue-800 mb-1">5. 병렬(OR) 회로</h3>
+              <p className="text-xs lg:text-sm mb-4 lg:mb-6">
+                병렬 회로: PB1 또는 PB2를 누르면 램프 RL이 점등하고 PB3 (정지 버튼)을 누르면 RL 소등 하는 회로
+              </p>
+
+              <div className="border-2 border-slate-300 p-2 lg:p-4 rounded-xl bg-white max-w-sm mx-auto">
+                <svg viewBox="0 0 300 250" className="w-full h-auto stroke-black fill-transparent stroke-2 text-xs lg:text-sm font-sans font-medium">
+                  <line x1="20" y1="20" x2="20" y2="230" />
+                  <text x="5" y="25" className="fill-black stroke-none">R</text>
+                  <line x1="280" y1="20" x2="280" y2="230" />
+                  <text x="285" y="25" className="fill-black stroke-none">T</text>
+                  
+                  <line x1="20" y1="40" x2="50" y2="40" />
+                  <circle cx="50" cy="40" r="2" className="fill-black" />
+                  <line x1="50" y1="40" x2="50" y2="60" />
+                  <line x1="45" y1="65" x2="55" y2="65" /> 
+                  <line x1="45" y1="65" x2="45" y2="55" />
+                  <text x="60" y="55" className="fill-black stroke-none">PB3</text>
+                  <line x1="50" y1="65" x2="50" y2="80" />
+                  <circle cx="50" cy="80" r="2" className="fill-black" />
+                  
+                  <line x1="50" y1="80" x2="250" y2="80" /> 
+                  
+                  <circle cx="70" cy="80" r="2" className="fill-black" />
+                  <line x1="70" y1="80" x2="70" y2="100" />
+                  <line x1="65" y1="105" x2="75" y2="105" /> 
+                  <line x1="65" y1="100" x2="75" y2="100" /> 
+                  <text x="80" y="105" className="fill-black stroke-none">PB1</text>
+                  <line x1="70" y1="105" x2="70" y2="140" />
+                  
+                  <circle cx="110" cy="80" r="2" className="fill-black" />
+                  <line x1="110" y1="80" x2="110" y2="100" />
+                  <line x1="105" y1="105" x2="115" y2="105" /> 
+                  <line x1="105" y1="100" x2="115" y2="100" />
+                  <text x="120" y="105" className="fill-black stroke-none">X1</text>
+                  <line x1="110" y1="105" x2="110" y2="140" />
+                  
+                  <line x1="70" y1="140" x2="110" y2="140" />
+                  <circle cx="90" cy="140" r="2" className="fill-black" />
+                  <line x1="90" y1="140" x2="90" y2="180" />
+                  <circle cx="90" cy="190" r="10" />
+                  <text x="83" y="194" className="fill-black stroke-none">X1</text>
+                  <line x1="90" y1="200" x2="90" y2="230" />
+                  <circle cx="90" cy="230" r="2" className="fill-black" />
+                  <line x1="90" y1="230" x2="280" y2="230" />
+
+                  <circle cx="150" cy="80" r="2" className="fill-black" />
+                  <line x1="150" y1="80" x2="150" y2="100" />
+                  <line x1="145" y1="105" x2="155" y2="105" />
+                  <line x1="145" y1="100" x2="155" y2="100" /> 
+                  <text x="160" y="105" className="fill-black stroke-none">PB2</text>
+                  <line x1="150" y1="105" x2="150" y2="140" />
+
+                  <circle cx="190" cy="80" r="2" className="fill-black" />
+                  <line x1="190" y1="80" x2="190" y2="100" />
+                  <line x1="185" y1="105" x2="195" y2="105" />
+                  <line x1="185" y1="100" x2="195" y2="100" />
+                  <text x="200" y="105" className="fill-black stroke-none">X2</text>
+                  <line x1="190" y1="105" x2="190" y2="140" />
+                  
+                  <line x1="150" y1="140" x2="190" y2="140" />
+                  <circle cx="170" cy="140" r="2" className="fill-black" />
+                  <line x1="170" y1="140" x2="170" y2="180" />
+                  <circle cx="170" cy="190" r="10" />
+                  <text x="163" y="194" className="fill-black stroke-none">X2</text>
+                  <line x1="170" y1="200" x2="170" y2="230" />
+                  <circle cx="170" cy="230" r="2" className="fill-black" />
+
+                  <circle cx="230" cy="80" r="2" className="fill-black" />
+                  <line x1="230" y1="80" x2="230" y2="100" />
+                  <line x1="225" y1="105" x2="235" y2="105" />
+                  <line x1="225" y1="100" x2="235" y2="100" />
+                  <text x="240" y="105" className="fill-black stroke-none">X1</text>
+                  
+                  <circle cx="270" cy="80" r="2" className="fill-black" />
+                  <line x1="270" y1="80" x2="270" y2="100" />
+                  <line x1="265" y1="105" x2="275" y2="105" />
+                  <line x1="265" y1="100" x2="275" y2="100" />
+                  <text x="280" y="105" className="fill-black stroke-none">X2</text>
+                  
+                  <line x1="230" y1="105" x2="230" y2="140" />
+                  <line x1="270" y1="105" x2="270" y2="140" />
+                  <line x1="230" y1="140" x2="270" y2="140" />
+                  <circle cx="250" cy="140" r="2" className="fill-black" />
+                  
+                  <line x1="250" y1="140" x2="250" y2="180" />
+                  <circle cx="250" cy="190" r="10" />
+                  <text x="243" y="194" className="fill-black stroke-none text-red-600">RL</text>
+                  <line x1="250" y1="200" x2="250" y2="230" />
+                  <circle cx="250" cy="230" r="2" className="fill-black" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Right Panel - Physical Hardware View */}
+            <div className="w-full lg:w-2/3 p-4 lg:p-8 relative" style={{ backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)', backgroundSize: '20px 20px' }} onScroll={updatePositions}>
+              
+              <div className={`mt-2 lg:absolute lg:top-4 lg:right-4 z-20 px-3 py-2 lg:px-4 lg:py-2 mb-4 lg:mb-0 rounded-lg font-bold border-2 text-xs lg:text-base text-center lg:text-left shadow-lg bg-opacity-90 backdrop-blur-sm ${simState.isSimulating ? 'bg-emerald-900 border-emerald-500 text-emerald-300' : (simState.isCorrect ? 'bg-green-900 border-green-500 text-green-300' : 'bg-slate-800 border-slate-600 text-slate-300')}`}>
+                {simState.statusMsgEn} <br/>
+                <span className="text-[10px] lg:text-sm font-normal opacity-80">{simState.statusMsgKo}</span>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-4 lg:gap-10 mt-2 lg:mt-12 max-w-4xl mx-auto z-20 relative pb-12">
+                
+                {/* Power Panel */}
+                <div className="panel-box rounded-xl p-4 lg:p-6 w-full sm:w-48 text-center border-4 border-slate-400 order-1">
+                  <h3 className="font-bold text-slate-800 mb-2 lg:mb-4 tracking-widest text-sm lg:text-base">POWER</h3>
+                  <div className="flex justify-around items-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-red-700 font-bold text-base lg:text-lg">R</span>
+                      <Terminal id="R_OUT" colorCls="bg-red-500" />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-slate-800 font-bold text-base lg:text-lg">T</span>
+                      <Terminal id="T_OUT" colorCls="bg-slate-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Buttons Panel */}
+                <div className="panel-box rounded-xl p-2 lg:p-4 w-full md:w-auto flex-1 border-4 border-slate-400 order-2">
+                  <div className="flex h-full border-2 border-slate-400 rounded-lg bg-slate-200 divide-x-2 divide-slate-400">
+                    <div className="flex-1 flex flex-col items-center py-2 lg:py-4 px-1 lg:px-2">
+                      <div className="text-slate-800 font-bold mb-1 lg:mb-2 text-[10px] lg:text-sm text-center">PB 1 (NO)</div>
+                      <Terminal id="PB1_IN" colorCls="bg-yellow-400" />
+                      <button 
+                        onPointerDown={() => simState.isSimulating && setSimState(s => ({...s, pb1Pressed: true}))}
+                        onPointerUp={() => simState.isSimulating && setSimState(s => ({...s, pb1Pressed: false}))}
+                        onPointerLeave={() => simState.isSimulating && setSimState(s => ({...s, pb1Pressed: false}))}
+                        className={`btn-push my-2 lg:my-4 w-8 h-8 lg:w-12 lg:h-12 rounded-full border-2 lg:border-4 border-slate-400 shadow-md ${simState.pb1Pressed ? 'bg-green-600 shadow-inner' : 'bg-green-500'}`}
+                      />
+                      <Terminal id="PB1_OUT" colorCls="bg-blue-500" />
+                    </div>
+                    <div className="flex-1 flex flex-col items-center py-2 lg:py-4 px-1 lg:px-2">
+                      <div className="text-slate-800 font-bold mb-1 lg:mb-2 text-[10px] lg:text-sm text-center">PB 2 (NO)</div>
+                      <Terminal id="PB2_IN" colorCls="bg-yellow-400" />
+                      <button 
+                        onPointerDown={() => simState.isSimulating && setSimState(s => ({...s, pb2Pressed: true}))}
+                        onPointerUp={() => simState.isSimulating && setSimState(s => ({...s, pb2Pressed: false}))}
+                        onPointerLeave={() => simState.isSimulating && setSimState(s => ({...s, pb2Pressed: false}))}
+                        className={`btn-push my-2 lg:my-4 w-8 h-8 lg:w-12 lg:h-12 rounded-full border-2 lg:border-4 border-slate-400 shadow-md ${simState.pb2Pressed ? 'bg-green-600 shadow-inner' : 'bg-green-500'}`}
+                      />
+                      <Terminal id="PB2_OUT" colorCls="bg-blue-500" />
+                    </div>
+                    <div className="flex-1 flex flex-col items-center py-2 lg:py-4 px-1 lg:px-2">
+                      <div className="text-slate-800 font-bold mb-1 lg:mb-2 text-[10px] lg:text-sm text-center">PB 3 (NC)</div>
+                      <Terminal id="PB3_IN" colorCls="bg-yellow-400" />
+                      <button 
+                        onPointerDown={() => simState.isSimulating && setSimState(s => ({...s, pb3Pressed: true}))}
+                        onPointerUp={() => simState.isSimulating && setSimState(s => ({...s, pb3Pressed: false}))}
+                        onPointerLeave={() => simState.isSimulating && setSimState(s => ({...s, pb3Pressed: false}))}
+                        className={`btn-push my-2 lg:my-4 w-8 h-8 lg:w-12 lg:h-12 rounded-full border-2 lg:border-4 border-slate-400 shadow-md ${simState.pb3Pressed ? 'bg-red-700 shadow-inner' : 'bg-red-600'}`}
+                      />
+                      <Terminal id="PB3_OUT" colorCls="bg-red-500" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Relay 1 */}
+                <div className="panel-box rounded-xl p-3 lg:p-4 w-full md:w-[48%] xl:w-auto flex-1 border-4 border-slate-400 relative order-3">
+                  <div className="text-slate-800 font-bold mb-2 lg:mb-3 border-b-2 border-slate-400 pb-1 flex justify-between items-center text-sm lg:text-base">
+                    <span>RELAY 1 (X1)</span>
+                    {simState.x1Active && <div className="w-2 h-2 lg:w-3 lg:h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]"></div>}
+                  </div>
+                  <div className="flex justify-between lg:gap-4 p-2 bg-slate-300 rounded-lg border border-slate-400">
+                    <div className="flex flex-col items-center gap-3 lg:gap-6 border-r border-slate-400 pr-2 lg:pr-4">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">COIL</div>
+                      <Terminal id="X1_COIL_P" colorCls="bg-yellow-400" />
+                      <Terminal id="X1_COIL_N" colorCls="bg-slate-800" />
+                    </div>
+                    <div className="flex flex-col items-center gap-3 lg:gap-6">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">NO 1</div>
+                      <Terminal id="X1_NO1_IN" colorCls="bg-blue-500" />
+                      <Terminal id="X1_NO1_OUT" colorCls="bg-blue-500" />
+                    </div>
+                    <div className="flex flex-col items-center gap-3 lg:gap-6">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">NO 2</div>
+                      <Terminal id="X1_NO2_IN" colorCls="bg-blue-500" />
+                      <Terminal id="X1_NO2_OUT" colorCls="bg-blue-500" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Relay 2 */}
+                <div className="panel-box rounded-xl p-3 lg:p-4 w-full md:w-[48%] xl:w-auto flex-1 border-4 border-slate-400 relative order-4">
+                  <div className="text-slate-800 font-bold mb-2 lg:mb-3 border-b-2 border-slate-400 pb-1 flex justify-between items-center text-sm lg:text-base">
+                    <span>RELAY 2 (X2)</span>
+                    {simState.x2Active && <div className="w-2 h-2 lg:w-3 lg:h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]"></div>}
+                  </div>
+                  <div className="flex justify-between lg:gap-4 p-2 bg-slate-300 rounded-lg border border-slate-400">
+                    <div className="flex flex-col items-center gap-3 lg:gap-6 border-r border-slate-400 pr-2 lg:pr-4">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">COIL</div>
+                      <Terminal id="X2_COIL_P" colorCls="bg-yellow-400" />
+                      <Terminal id="X2_COIL_N" colorCls="bg-slate-800" />
+                    </div>
+                    <div className="flex flex-col items-center gap-3 lg:gap-6">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">NO 1</div>
+                      <Terminal id="X2_NO1_IN" colorCls="bg-blue-500" />
+                      <Terminal id="X2_NO1_OUT" colorCls="bg-blue-500" />
+                    </div>
+                    <div className="flex flex-col items-center gap-3 lg:gap-6">
+                      <div className="text-[10px] lg:text-xs font-bold text-slate-600">NO 2</div>
+                      <Terminal id="X2_NO2_IN" colorCls="bg-blue-500" />
+                      <Terminal id="X2_NO2_OUT" colorCls="bg-blue-500" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lamp */}
+                <div className="panel-box rounded-xl p-3 lg:p-4 w-full sm:w-32 border-4 border-slate-400 flex flex-col items-center justify-between order-5">
+                  <div className="text-slate-800 font-bold mb-2 text-sm lg:text-base">LAMP (RL)</div>
+                  <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-full border-4 border-slate-400 mb-2 lg:mb-4 transition-all duration-300 ${simState.lampActive ? 'bg-orange-400 shadow-[0_0_30px_#fb923c]' : 'bg-slate-300 shadow-inner'}`}></div>
+                  <div className="flex w-full justify-around bg-slate-300 py-2 rounded-lg border border-slate-400">
+                    <Terminal id="RL_P" colorCls="bg-green-500" />
+                    <Terminal id="RL_N" colorCls="bg-slate-800" />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
