@@ -150,7 +150,26 @@
       flex-direction: column;
       z-index: 5;
       flex-shrink: 0;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      width: 0;
+      border-right: none;
+    }
+
+    .sidebar-content {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       overflow-y: auto;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .collapsible-panel {
@@ -452,6 +471,14 @@
         border-right: none; 
         border-bottom: 1px solid var(--border); 
         max-height: 40vh;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+      }
+      .sidebar-content { width: 100%; }
+      .sidebar.collapsed {
+        width: 100%;
+        max-height: 0;
+        border-bottom: none;
+        opacity: 0;
       }
       .board-container { padding: 0.5rem; }
       header { align-items: flex-start; }
@@ -475,6 +502,7 @@
         <option value="and_circuit">4. 직렬 회로 (Series AND Circuit)</option>
         <option value="or_circuit">5. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
+      <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
       <button onclick="clearWires()">초기화 (Clear)</button>
       <button onclick="showHint()">힌트 (Hint)</button>
       <button class="primary" onclick="loadLessonTarget()">정답 불러오기 (Load Target)</button>
@@ -489,142 +517,144 @@
   <div class="workspace">
     
     <!-- Sidebar / Collapsible Menus -->
-    <div class="sidebar">
-      <details class="collapsible-panel" open>
-        <summary>회로도 (Schematic Diagram)</summary>
-        <div id="diagram-container" class="diagram-container">
-          
-          <!-- 1. a접점 회로 -->
-          <svg id="diag_a_contact" class="active" viewBox="0 0 200 160">
-            <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
-            <text x="5" y="34" class="dt bold">R</text>
-            <text x="5" y="134" class="dt bold">T</text>
-            <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
-            <path class="dw" d="M 50 50 H 70 M 50 80 L 70 65" />
-            <text x="75" y="65" class="dt">PB</text>
-            <circle cx="60" cy="115" r="15" class="dw" />
-            <text x="55" y="119" class="dt">X</text>
-            <path class="dw" d="M 140 30 V 50 M 140 80 V 100" />
-            <path class="dw" d="M 130 50 H 150 M 130 80 L 150 65" />
-            <text x="155" y="65" class="dt">X</text>
-            <circle cx="140" cy="115" r="15" class="dw" />
-            <text x="131" y="119" class="dt d-red">RL</text>
-          </svg>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <details class="collapsible-panel" open>
+          <summary>회로도 (Schematic Diagram)</summary>
+          <div id="diagram-container" class="diagram-container">
+            
+            <!-- 1. a접점 회로 -->
+            <svg id="diag_a_contact" class="active" viewBox="0 0 200 160">
+              <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
+              <text x="5" y="34" class="dt bold">R</text>
+              <text x="5" y="134" class="dt bold">T</text>
+              <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
+              <path class="dw" d="M 50 50 H 70 M 50 80 L 70 65" />
+              <text x="75" y="65" class="dt">PB</text>
+              <circle cx="60" cy="115" r="15" class="dw" />
+              <text x="55" y="119" class="dt">X</text>
+              <path class="dw" d="M 140 30 V 50 M 140 80 V 100" />
+              <path class="dw" d="M 130 50 H 150 M 130 80 L 150 65" />
+              <text x="155" y="65" class="dt">X</text>
+              <circle cx="140" cy="115" r="15" class="dw" />
+              <text x="131" y="119" class="dt d-red">RL</text>
+            </svg>
 
-          <!-- 2. b접점 회로 -->
-          <svg id="diag_b_contact" viewBox="0 0 200 160">
-            <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
-            <text x="5" y="34" class="dt bold">R</text>
-            <text x="5" y="134" class="dt bold">T</text>
-            <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
-            <path class="dw" d="M 50 50 H 70 M 50 80 H 70 L 50 50" />
-            <text x="75" y="65" class="dt">PB</text>
-            <circle cx="60" cy="115" r="15" class="dw" />
-            <text x="55" y="119" class="dt">X</text>
-            <path class="dw" d="M 140 30 V 50 M 140 80 V 100" />
-            <path class="dw" d="M 130 50 H 150 M 130 80 H 150 L 130 50" />
-            <text x="155" y="65" class="dt">X</text>
-            <circle cx="140" cy="115" r="15" class="dw" />
-            <text x="130" y="119" class="dt d-green">GL</text>
-          </svg>
+            <!-- 2. b접점 회로 -->
+            <svg id="diag_b_contact" viewBox="0 0 200 160">
+              <path class="dw" d="M 20 30 H 180 M 20 130 H 180" />
+              <text x="5" y="34" class="dt bold">R</text>
+              <text x="5" y="134" class="dt bold">T</text>
+              <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
+              <path class="dw" d="M 50 50 H 70 M 50 80 H 70 L 50 50" />
+              <text x="75" y="65" class="dt">PB</text>
+              <circle cx="60" cy="115" r="15" class="dw" />
+              <text x="55" y="119" class="dt">X</text>
+              <path class="dw" d="M 140 30 V 50 M 140 80 V 100" />
+              <path class="dw" d="M 130 50 H 150 M 130 80 H 150 L 130 50" />
+              <text x="155" y="65" class="dt">X</text>
+              <circle cx="140" cy="115" r="15" class="dw" />
+              <text x="130" y="119" class="dt d-green">GL</text>
+            </svg>
 
-          <!-- 3. c접점 회로 -->
-          <svg id="diag_c_contact" viewBox="0 0 240 160">
-            <path class="dw" d="M 20 30 H 220 M 20 130 H 220" />
-            <text x="5" y="34" class="dt bold">R</text>
-            <text x="5" y="134" class="dt bold">T</text>
-            <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
-            <path class="dw" d="M 50 50 H 70 M 50 80 L 70 65" />
-            <text x="75" y="65" class="dt">PB</text>
-            <circle cx="60" cy="115" r="15" class="dw" />
-            <text x="55" y="119" class="dt">X</text>
-            <path class="dw" d="M 120 30 V 50 M 120 80 V 100" />
-            <path class="dw" d="M 110 50 H 130 M 110 80 L 130 65" />
-            <text x="135" y="65" class="dt">X</text>
-            <circle cx="120" cy="115" r="15" class="dw" />
-            <text x="111" y="119" class="dt d-red">RL</text>
-            <path class="dw" d="M 180 30 V 50 M 180 80 V 100" />
-            <path class="dw" d="M 170 50 H 190 M 170 80 H 190 L 170 50" />
-            <text x="195" y="65" class="dt">X</text>
-            <circle cx="180" cy="115" r="15" class="dw" />
-            <text x="170" y="119" class="dt d-green">GL</text>
-          </svg>
+            <!-- 3. c접점 회로 -->
+            <svg id="diag_c_contact" viewBox="0 0 240 160">
+              <path class="dw" d="M 20 30 H 220 M 20 130 H 220" />
+              <text x="5" y="34" class="dt bold">R</text>
+              <text x="5" y="134" class="dt bold">T</text>
+              <path class="dw" d="M 60 30 V 50 M 60 80 V 100" />
+              <path class="dw" d="M 50 50 H 70 M 50 80 L 70 65" />
+              <text x="75" y="65" class="dt">PB</text>
+              <circle cx="60" cy="115" r="15" class="dw" />
+              <text x="55" y="119" class="dt">X</text>
+              <path class="dw" d="M 120 30 V 50 M 120 80 V 100" />
+              <path class="dw" d="M 110 50 H 130 M 110 80 L 130 65" />
+              <text x="135" y="65" class="dt">X</text>
+              <circle cx="120" cy="115" r="15" class="dw" />
+              <text x="111" y="119" class="dt d-red">RL</text>
+              <path class="dw" d="M 180 30 V 50 M 180 80 V 100" />
+              <path class="dw" d="M 170 50 H 190 M 170 80 H 190 L 170 50" />
+              <text x="195" y="65" class="dt">X</text>
+              <circle cx="180" cy="115" r="15" class="dw" />
+              <text x="170" y="119" class="dt d-green">GL</text>
+            </svg>
 
-          <!-- 4. 직렬 (AND) 회로 -->
-          <svg id="diag_and_circuit" viewBox="0 0 320 180">
-            <path class="dw" d="M 20 30 H 300 M 20 160 H 300" />
-            <text x="5" y="34" class="dt bold">R</text>
-            <text x="5" y="164" class="dt bold">T</text>
-            <path class="dw" d="M 40 30 V 45 M 40 65 V 80 H 260" />
-            <path class="dw" d="M 30 45 H 50 M 30 65 H 50 L 30 45" />
-            <text x="55" y="55" class="dt">PB3</text>
-            <path class="dw" d="M 80 80 V 95 M 80 125 V 135" />
-            <path class="dw" d="M 70 95 H 90 M 70 125 L 90 110" />
-            <text x="45" y="115" class="dt">PB1</text>
-            <path class="dw" d="M 80 85 H 120 V 95 M 120 125 V 130 H 80" />
-            <path class="dw" d="M 110 95 H 130 M 110 125 L 130 110" />
-            <text x="135" y="115" class="dt">X1</text>
-            <circle cx="80" cy="145" r="10" class="dw" />
-            <text x="72" y="149" class="dt">X1</text>
-            <path class="dw" d="M 170 80 V 95 M 170 125 V 135" />
-            <path class="dw" d="M 160 95 H 180 M 160 125 L 180 110" />
-            <text x="135" y="115" class="dt">PB2</text>
-            <path class="dw" d="M 170 85 H 210 V 95 M 210 125 V 130 H 170" />
-            <path class="dw" d="M 200 95 H 220 M 200 125 L 220 110" />
-            <text x="225" y="115" class="dt">X2</text>
-            <circle cx="170" cy="145" r="10" class="dw" />
-            <text x="162" y="149" class="dt">X2</text>
-            <path class="dw" d="M 260 80 V 90 M 260 110 V 115 M 260 135 V 140" />
-            <path class="dw" d="M 250 90 H 270 M 250 110 L 270 95" />
-            <text x="275" y="105" class="dt">X1</text>
-            <path class="dw" d="M 250 115 H 270 M 250 135 L 270 120" />
-            <text x="275" y="130" class="dt">X2</text>
-            <circle cx="260" cy="150" r="10" class="dw" />
-            <text x="252" y="154" class="dt d-red" style="font-size:10px;">RL</text>
-          </svg>
+            <!-- 4. 직렬 (AND) 회로 -->
+            <svg id="diag_and_circuit" viewBox="0 0 320 180">
+              <path class="dw" d="M 20 30 H 300 M 20 160 H 300" />
+              <text x="5" y="34" class="dt bold">R</text>
+              <text x="5" y="164" class="dt bold">T</text>
+              <path class="dw" d="M 40 30 V 45 M 40 65 V 80 H 260" />
+              <path class="dw" d="M 30 45 H 50 M 30 65 H 50 L 30 45" />
+              <text x="55" y="55" class="dt">PB3</text>
+              <path class="dw" d="M 80 80 V 95 M 80 125 V 135" />
+              <path class="dw" d="M 70 95 H 90 M 70 125 L 90 110" />
+              <text x="45" y="115" class="dt">PB1</text>
+              <path class="dw" d="M 80 85 H 120 V 95 M 120 125 V 130 H 80" />
+              <path class="dw" d="M 110 95 H 130 M 110 125 L 130 110" />
+              <text x="135" y="115" class="dt">X1</text>
+              <circle cx="80" cy="145" r="10" class="dw" />
+              <text x="72" y="149" class="dt">X1</text>
+              <path class="dw" d="M 170 80 V 95 M 170 125 V 135" />
+              <path class="dw" d="M 160 95 H 180 M 160 125 L 180 110" />
+              <text x="135" y="115" class="dt">PB2</text>
+              <path class="dw" d="M 170 85 H 210 V 95 M 210 125 V 130 H 170" />
+              <path class="dw" d="M 200 95 H 220 M 200 125 L 220 110" />
+              <text x="225" y="115" class="dt">X2</text>
+              <circle cx="170" cy="145" r="10" class="dw" />
+              <text x="162" y="149" class="dt">X2</text>
+              <path class="dw" d="M 260 80 V 90 M 260 110 V 115 M 260 135 V 140" />
+              <path class="dw" d="M 250 90 H 270 M 250 110 L 270 95" />
+              <text x="275" y="105" class="dt">X1</text>
+              <path class="dw" d="M 250 115 H 270 M 250 135 L 270 120" />
+              <text x="275" y="130" class="dt">X2</text>
+              <circle cx="260" cy="150" r="10" class="dw" />
+              <text x="252" y="154" class="dt d-red" style="font-size:10px;">RL</text>
+            </svg>
 
-          <!-- 5. 병렬 (OR) 회로 -->
-          <svg id="diag_or_circuit" viewBox="0 0 320 180">
-            <path class="dw" d="M 20 30 H 300 M 20 160 H 300" />
-            <text x="5" y="34" class="dt bold">R</text>
-            <text x="5" y="164" class="dt bold">T</text>
-            <path class="dw" d="M 40 30 V 45 M 40 65 V 80 H 280" />
-            <path class="dw" d="M 30 45 H 50 M 30 65 H 50 L 30 45" />
-            <text x="55" y="55" class="dt">PB3</text>
-            <path class="dw" d="M 80 80 V 95 M 80 125 V 135" />
-            <path class="dw" d="M 70 95 H 90 M 70 125 L 90 110" />
-            <text x="45" y="115" class="dt">PB1</text>
-            <path class="dw" d="M 80 85 H 120 V 95 M 120 125 V 130 H 80" />
-            <path class="dw" d="M 110 95 H 130 M 110 125 L 130 110" />
-            <text x="135" y="115" class="dt">X1</text>
-            <circle cx="80" cy="145" r="10" class="dw" />
-            <text x="72" y="149" class="dt">X1</text>
-            <path class="dw" d="M 170 80 V 95 M 170 125 V 135" />
-            <path class="dw" d="M 160 95 H 180 M 160 125 L 180 110" />
-            <text x="135" y="115" class="dt">PB2</text>
-            <path class="dw" d="M 170 85 H 210 V 95 M 210 125 V 130 H 170" />
-            <path class="dw" d="M 200 95 H 220 M 200 125 L 220 110" />
-            <text x="225" y="115" class="dt">X2</text>
-            <circle cx="170" cy="145" r="10" class="dw" />
-            <text x="162" y="149" class="dt">X2</text>
-            <path class="dw" d="M 250 80 V 95 M 250 125 V 135" />
-            <path class="dw" d="M 240 95 H 260 M 240 125 L 260 110" />
-            <text x="220" y="115" class="dt">X1</text>
-            <path class="dw" d="M 250 85 H 290 V 95 M 290 125 V 130 H 250" />
-            <path class="dw" d="M 280 95 H 300 M 280 125 L 300 110" />
-            <text x="305" y="115" class="dt">X2</text>
-            <circle cx="250" cy="145" r="10" class="dw" />
-            <text x="242" y="149" class="dt d-red" style="font-size:10px;">RL</text>
-          </svg>
-        </div>
-      </details>
+            <!-- 5. 병렬 (OR) 회로 -->
+            <svg id="diag_or_circuit" viewBox="0 0 320 180">
+              <path class="dw" d="M 20 30 H 300 M 20 160 H 300" />
+              <text x="5" y="34" class="dt bold">R</text>
+              <text x="5" y="164" class="dt bold">T</text>
+              <path class="dw" d="M 40 30 V 45 M 40 65 V 80 H 280" />
+              <path class="dw" d="M 30 45 H 50 M 30 65 H 50 L 30 45" />
+              <text x="55" y="55" class="dt">PB3</text>
+              <path class="dw" d="M 80 80 V 95 M 80 125 V 135" />
+              <path class="dw" d="M 70 95 H 90 M 70 125 L 90 110" />
+              <text x="45" y="115" class="dt">PB1</text>
+              <path class="dw" d="M 80 85 H 120 V 95 M 120 125 V 130 H 80" />
+              <path class="dw" d="M 110 95 H 130 M 110 125 L 130 110" />
+              <text x="135" y="115" class="dt">X1</text>
+              <circle cx="80" cy="145" r="10" class="dw" />
+              <text x="72" y="149" class="dt">X1</text>
+              <path class="dw" d="M 170 80 V 95 M 170 125 V 135" />
+              <path class="dw" d="M 160 95 H 180 M 160 125 L 180 110" />
+              <text x="135" y="115" class="dt">PB2</text>
+              <path class="dw" d="M 170 85 H 210 V 95 M 210 125 V 130 H 170" />
+              <path class="dw" d="M 200 95 H 220 M 200 125 L 220 110" />
+              <text x="225" y="115" class="dt">X2</text>
+              <circle cx="170" cy="145" r="10" class="dw" />
+              <text x="162" y="149" class="dt">X2</text>
+              <path class="dw" d="M 250 80 V 95 M 250 125 V 135" />
+              <path class="dw" d="M 240 95 H 260 M 240 125 L 260 110" />
+              <text x="220" y="115" class="dt">X1</text>
+              <path class="dw" d="M 250 85 H 290 V 95 M 290 125 V 130 H 250" />
+              <path class="dw" d="M 280 95 H 300 M 280 125 L 300 110" />
+              <text x="305" y="115" class="dt">X2</text>
+              <circle cx="250" cy="145" r="10" class="dw" />
+              <text x="242" y="149" class="dt d-red" style="font-size:10px;">RL</text>
+            </svg>
+          </div>
+        </details>
 
-      <details class="collapsible-panel" open>
-        <summary>연결 (Connections) (<span id="wire-count">0</span>)</summary>
-        <div id="wire-container" class="wire-list-compact">
-          <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">연결 없음 (No connections).</div>
-        </div>
-      </details>
+        <details class="collapsible-panel" open>
+          <summary>연결 (Connections) (<span id="wire-count">0</span>)</summary>
+          <div id="wire-container" class="wire-list-compact">
+            <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">연결 없음 (No connections).</div>
+          </div>
+        </details>
+      </div>
     </div>
 
     <!-- Right Side / Board -->
@@ -1099,6 +1129,21 @@
       if(isShortCircuit) return; 
       statusPanel.className = `status-bar ${isError ? 'error' : ''}`;
       statusPanel.innerHTML = msg;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-toggle-btn');
+      sidebar.classList.toggle('collapsed');
+      
+      if (sidebar.classList.contains('collapsed')) {
+        btn.innerText = '사이드바 보이기 (Show Sidebar)';
+      } else {
+        btn.innerText = '사이드바 숨기기 (Hide Sidebar)';
+      }
+      
+      // Redraw wires smoothly after layout changes width so wires remain pinned to terminals
+      setTimeout(renderWires, 300);
     }
 
     window.addEventListener('resize', renderWires);
