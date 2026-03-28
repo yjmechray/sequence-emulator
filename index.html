@@ -350,6 +350,8 @@
       align-items: flex-start;
       justify-content: flex-start;
       -webkit-overflow-scrolling: touch;
+      /* Prevent mobile pull-to-refresh while zooming */
+      overscroll-behavior-y: contain; 
     }
 
     .board {
@@ -364,6 +366,8 @@
         0 20px 25px -5px rgba(0, 0, 0, 0.1);
       margin: 0 auto;
       flex-shrink: 0;
+      transform-origin: top left;
+      will-change: transform;
     }
 
     /* SVG Layer for Wires */
@@ -711,7 +715,7 @@
               <circle cx="140" cy="220" r="3" fill="#1e293b" />
             </svg>
 
-            <!-- 3. 인터록 회로 (NEW) -->
+            <!-- 3. 인터록 회로 -->
             <svg id="diag_interlock" viewBox="0 0 480 260">
               <path class="dw" d="M 30 30 H 60 M 90 30 H 400 M 30 230 H 400" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
@@ -1147,6 +1151,10 @@
     let isShortCircuit = false;
     let mousePos = { x: 0, y: 0 };
     
+    let currentZoom = 1;
+    let initialZoom = 1;
+    let initialDistance = 0;
+    
     const state = {
       pb1: false, pb2: false, pb3: false,
       x1: false, x2: false,
@@ -1359,6 +1367,56 @@
       });
     }
 
+    // --- ZOOM LOGIC (Mobile Pinch & Desktop Wheel) ---
+    scrollContainer.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
+            currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
+            
+            board.style.transform = `scale(${currentZoom})`;
+            board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${1000 * (currentZoom - 1)}px`;
+            
+            renderWires();
+        }
+    }, { passive: false });
+
+    scrollContainer.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialZoom = currentZoom;
+      }
+    }, { passive: false });
+
+    scrollContainer.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && initialDistance > 0) {
+        e.preventDefault();
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const scaleChange = currentDistance / initialDistance;
+        currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
+        
+        board.style.transform = `scale(${currentZoom})`;
+        board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${1000 * (currentZoom - 1)}px`;
+        
+        renderWires();
+      }
+    }, { passive: false });
+
+    scrollContainer.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        initialDistance = 0;
+      }
+    });
+
     // --- 4. INTERACTION & DRAWING ---
     function handleTerminalClick(e, term) {
       // Remove any active hints when user starts interacting
@@ -1378,16 +1436,32 @@
       }
     }
 
-    board.addEventListener('mousemove', (e) => {
+    function handleMove(e) {
       if (!selectedTerminal) return;
+      
+      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
       const rect = board.getBoundingClientRect();
-      mousePos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      mousePos = { 
+          x: (clientX - rect.left) / currentZoom, 
+          y: (clientY - rect.top) / currentZoom 
+      };
+      
       const termRect = selectedTerminal.getBoundingClientRect();
-      const startX = termRect.left - rect.left + (termRect.width/2);
-      const startY = termRect.top - rect.top + (termRect.height/2);
+      const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
+      const startY = (termRect.top - rect.top) / currentZoom + (selectedTerminal.offsetHeight / 2);
       const midY = (startY + mousePos.y) / 2;
       tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${midY} L ${mousePos.x} ${midY} L ${mousePos.x} ${mousePos.y}`);
-    });
+    }
+
+    board.addEventListener('mousemove', handleMove);
+    board.addEventListener('touchmove', (e) => {
+        if (!selectedTerminal) return;
+        if (e.touches && e.touches.length > 1) return; // Allow pinch zoom to take over
+        e.preventDefault(); // Prevent scrolling while drawing a wire
+        handleMove(e);
+    }, { passive: false });
 
     function addWire(idA, idB) {
       if (wires.some(w => (w.a === idA && w.b === idB) || (w.a === idB && w.b === idA))) {
@@ -1488,10 +1562,10 @@
         const rA = tA.getBoundingClientRect();
         const rB = tB.getBoundingClientRect();
         
-        const x1 = rA.left - rect.left + (rA.width/2);
-        const y1 = rA.top - rect.top + (rA.height/2);
-        const x2 = rB.left - rect.left + (rB.width/2);
-        const y2 = rB.top - rect.top + (rB.height/2);
+        const x1 = (rA.left - rect.left) / currentZoom + (tA.offsetWidth / 2);
+        const y1 = (rA.top - rect.top) / currentZoom + (tA.offsetHeight / 2);
+        const x2 = (rB.left - rect.left) / currentZoom + (tB.offsetWidth / 2);
+        const y2 = (rB.top - rect.top) / currentZoom + (tB.offsetHeight / 2);
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('class', 'wire-path');
