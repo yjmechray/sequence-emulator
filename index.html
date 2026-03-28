@@ -236,24 +236,27 @@
 
     .wire-path {
       fill: none;
-      stroke-width: 6;
+      stroke-width: 3;
       stroke-linecap: round;
-      filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.2));
+      stroke-linejoin: round;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15));
       pointer-events: stroke;
       cursor: pointer;
-      transition: stroke-width 0.2s;
+      transition: stroke-width 0.2s, stroke 0.2s;
     }
     
     .wire-path:hover {
-      stroke-width: 9;
+      stroke-width: 6;
+      stroke: #3b82f6 !important;
     }
 
     .wire-temp {
       fill: none;
       stroke: #94a3b8;
-      stroke-width: 5;
-      stroke-dasharray: 8 8;
+      stroke-width: 3;
+      stroke-dasharray: 6 6;
       stroke-linecap: round;
+      stroke-linejoin: round;
       pointer-events: none;
     }
 
@@ -736,7 +739,7 @@
       [1, 2].forEach((num, idx) => {
         let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
         // Coil
-        relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">Coil</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
+        relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
         // 4x NO
         for(let i=1; i<=4; i++) {
           relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
@@ -799,7 +802,7 @@
       const startX = termRect.left - rect.left + (termRect.width/2) + scrollContainer.scrollLeft;
       const startY = termRect.top - rect.top + (termRect.height/2) + scrollContainer.scrollTop;
       
-      tempWire.setAttribute('d', generateBezier(startX, startY, mousePos.x, mousePos.y));
+      tempWire.setAttribute('d', generatePCBPath(startX, startY, mousePos.x, mousePos.y));
     });
 
     function addWire(idA, idB) {
@@ -827,12 +830,22 @@
       updateStatus("All wires cleared. Ready to build.");
     }
 
-    function generateBezier(x1, y1, x2, y2) {
-      const dx = Math.abs(x2 - x1);
-      const dy = Math.abs(y2 - y1);
-      const drop = Math.min(dx, 100) + 40; // Simulate gravity sag
+    function generatePCBPath(x1, y1, x2, y2, index = 0) {
+      // Create offset channels to prevent wires perfectly overlapping horizontally
+      const spread = (index % 10) * 4;
       
-      return `M ${x1} ${y1} C ${x1} ${y1 + drop}, ${x2} ${y2 + drop}, ${x2} ${y2}`;
+      let yMid;
+      // Determine logical routing channels between panels
+      if (y1 < 250 && y2 < 250) {
+        yMid = 15 + spread; // Top clearance channel
+      } else if (y1 > 250 && y2 > 250) {
+        yMid = 490 + spread; // Bottom clearance channel
+      } else {
+        yMid = 225 + spread; // Middle clearance channel between components
+      }
+      
+      // Strict orthogonal Manhattan routing
+      return `M ${x1} ${y1} L ${x1} ${yMid} L ${x2} ${yMid} L ${x2} ${y2}`;
     }
 
     function renderWires() {
@@ -841,7 +854,7 @@
       
       const rect = board.getBoundingClientRect();
       
-      wires.forEach(w => {
+      wires.forEach((w, i) => {
         const tA = document.getElementById(w.a);
         const tB = document.getElementById(w.b);
         if(!tA || !tB) return;
@@ -856,7 +869,7 @@
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('class', 'wire-path');
-        path.setAttribute('d', generateBezier(x1, y1, x2, y2));
+        path.setAttribute('d', generatePCBPath(x1, y1, x2, y2, i));
         path.setAttribute('stroke', w.color);
         path.onclick = () => removeWire(w.id);
         
