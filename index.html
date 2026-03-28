@@ -582,11 +582,12 @@
     </div>
     <div class="controls">
       <select id="lesson-select">
-        <option value="a_contact">1. a접점 회로 (a-contact Circuit)</option>
-        <option value="b_contact">2. b접점 회로 (b-contact Circuit)</option>
-        <option value="c_contact">3. c접점 회로 (c-contact Circuit)</option>
-        <option value="and_circuit">4. 직렬 회로 (Series AND Circuit)</option>
-        <option value="or_circuit">5. 병렬 회로 (Parallel OR Circuit)</option>
+        <option value="latch_circuit">1. 자기유지 회로 (Self-Holding Circuit)</option>
+        <option value="a_contact">2. a접점 회로 (a-contact Circuit)</option>
+        <option value="b_contact">3. b접점 회로 (b-contact Circuit)</option>
+        <option value="c_contact">4. c접점 회로 (c-contact Circuit)</option>
+        <option value="and_circuit">5. 직렬 회로 (Series AND Circuit)</option>
+        <option value="or_circuit">6. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
       <button class="danger" onclick="clearWires()">초기화 (Clear)</button>
@@ -602,15 +603,71 @@
 
   <div class="workspace">
     
-    <!-- Sidebar / Collapsible Menus -->
+    <!-- Sidebar / Collapsible Menus (Collapsed by Default) -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-content">
         <details class="collapsible-panel">
           <summary>회로도 (Schematic Diagram)</summary>
           <div id="diagram-container" class="diagram-container">
             
-            <!-- 1. a접점 회로 -->
-            <svg id="diag_a_contact" class="active" viewBox="0 0 200 160">
+            <!-- 1. 자기유지 회로 (NEW: Latch Circuit) -->
+            <svg id="diag_latch_circuit" class="active" viewBox="0 0 240 240">
+              <path class="dw" d="M 30 30 H 140 M 30 210 H 140" />
+
+              <!-- Parallel PB1 and Xa -->
+              <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
+              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
+              <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
+
+              <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
+              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 150 45 V 75" />
+              <text x="160" y="65" class="dt bold" style="font-size: 20px;">Xa</text>
+
+              <!-- Merge parallel -->
+              <path class="dw" d="M 80 90 H 140" />
+
+              <!-- PB2 (NC) -->
+              <path class="dw" d="M 80 90 V 105 M 80 135 V 150" />
+              <circle cx="80" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 83 105 V 135 M 83 120 H 93" />
+              <text x="98" y="125" class="dt bold" style="font-size: 20px;">PB2</text>
+
+              <!-- Split to X and L -->
+              <path class="dw" d="M 80 150 H 140" />
+
+              <!-- X Coil -->
+              <path class="dw" d="M 80 150 V 160 M 80 190 V 210" />
+              <circle cx="80" cy="175" r="15" class="dw" />
+              <text x="73" y="181" class="dt bold" style="font-size: 18px;">X</text>
+
+              <!-- L Lamp -->
+              <path class="dw" d="M 140 150 V 160 M 140 190 V 210" />
+              <circle cx="140" cy="175" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
+              <text x="133" y="181" class="dt bold" style="fill: #dc2626; font-size: 18px;">L</text>
+
+              <!-- Junctions & Terminals -->
+              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="30" cy="210" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="30" r="3" fill="#1e293b" />
+              <circle cx="140" cy="30" r="3" fill="#1e293b" />
+              <circle cx="80" cy="90" r="3" fill="#1e293b" />
+              <circle cx="140" cy="90" r="3" fill="#1e293b" />
+              <circle cx="80" cy="150" r="3" fill="#1e293b" />
+              <circle cx="140" cy="150" r="3" fill="#1e293b" />
+              <circle cx="80" cy="210" r="3" fill="#1e293b" />
+              <circle cx="140" cy="210" r="3" fill="#1e293b" />
+
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="216" class="dt bold" style="font-size: 20px;">T</text>
+            </svg>
+
+            <!-- 2. a접점 회로 -->
+            <svg id="diag_a_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
               <!-- PB -> X -->
@@ -643,7 +700,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 2. b접점 회로 -->
+            <!-- 3. b접점 회로 -->
             <svg id="diag_b_contact" viewBox="0 0 200 160">
               <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
               
@@ -679,7 +736,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 3. c접점 회로 -->
+            <!-- 4. c접점 회로 -->
             <svg id="diag_c_contact" viewBox="0 0 260 160">
               <path class="dw" d="M 30 30 H 200 M 30 80 V 130 H 200" />
               
@@ -725,7 +782,7 @@
               <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
             </svg>
 
-            <!-- 4. 직렬 (AND) 회로 -->
+            <!-- 5. 직렬 (AND) 회로 -->
             <svg id="diag_and_circuit" viewBox="0 0 400 190">
               <path class="dw" d="M 30 30 H 60 M 90 30 H 370 M 30 170 H 370" />
 
@@ -807,7 +864,7 @@
               <circle cx="350" cy="170" r="3" fill="#1e293b"/>
             </svg>
 
-            <!-- 5. 병렬 (OR) 회로 -->
+            <!-- 6. 병렬 (OR) 회로 -->
             <svg id="diag_or_circuit" viewBox="0 0 480 190">
               <!-- Top & Bottom Rails -->
               <path class="dw" d="M 30 30 H 60 M 90 30 H 450 M 30 170 H 450" />
@@ -954,6 +1011,16 @@
 
     // --- 2. LESSON DATA ---
     const lessons = {
+      latch_circuit: [
+        {a: 'pow_R', b: 'pb1_no_top'},
+        {a: 'pb1_no_top', b: 'x1_no1_top'},
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
+        {a: 'pb1_no_bot', b: 'pb2_nc_top'},
+        {a: 'pb2_nc_bot', b: 'x1_coil_top'},
+        {a: 'pb2_nc_bot', b: 'rl_top'},
+        {a: 'pow_T', b: 'x1_coil_bot'},
+        {a: 'x1_coil_bot', b: 'rl_bot'}
+      ],
       a_contact: [
         {a: 'pow_R', b: 'pb1_no_top'},
         {a: 'pb1_no_bot', b: 'x1_coil_top'},
@@ -1436,6 +1503,9 @@
 
     window.addEventListener('resize', renderWires);
     scrollContainer.addEventListener('scroll', () => { if (wires.length > 0) renderWires(); });
+
+    // Set initial diagram active based on dropdown
+    document.getElementById('diag_latch_circuit').classList.add('active');
 
     buildHardware();
   </script>
