@@ -14,7 +14,9 @@
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
       --danger: #ef4444;
+      --danger-hover: #dc2626;
       --success: #10b981;
+      --success-hover: #059669;
       
       /* Panel Colors */
       --panel-bg: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
@@ -98,6 +100,28 @@
     button.primary:hover { 
       background: var(--primary-hover); 
       box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
+    }
+    
+    button.danger {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+    button.danger:hover {
+      background: var(--danger-hover);
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4);
+    }
+
+    button.success {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    }
+    button.success:hover {
+      background: var(--success-hover);
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4);
     }
 
     /* Hint Animation */
@@ -521,8 +545,8 @@
         <option value="or_circuit">5. 병렬 회로 (Parallel OR Circuit)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
-      <button onclick="clearWires()">초기화 (Clear)</button>
-      <button onclick="showHint()">힌트 (Hint)</button>
+      <button class="danger" onclick="clearWires()">초기화 (Clear)</button>
+      <button class="success" onclick="showHint()">힌트 (Hint)</button>
       <button class="primary" onclick="loadLessonTarget()">정답 불러오기 (Load Target)</button>
     </div>
   </header>
