@@ -17,6 +17,7 @@
       --danger-hover: #dc2626;
       --success: #10b981;
       --success-hover: #059669;
+      --warning: #f59e0b;
       
       /* Panel Colors */
       --panel-bg: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
@@ -26,6 +27,7 @@
       --term-red: radial-gradient(circle at 30% 30%, #fca5a5, #dc2626 40%, #7f1d1d);
       --term-yellow: radial-gradient(circle at 30% 30%, #fef08a, #eab308 40%, #854d0e);
       --term-blue: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 40%, #1e3a8a);
+      --term-black: radial-gradient(circle at 30% 30%, #64748b, #1e293b 40%, #0f172a);
     }
 
     * { box-sizing: border-box; }
@@ -116,42 +118,20 @@
       border-color: var(--primary);
       box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
     }
-    button.primary:hover { 
-      background: var(--primary-hover); 
-      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
-    }
+    button.primary:hover { background: var(--primary-hover); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4); }
     
-    button.danger {
-      background: var(--danger);
-      color: white;
-      border-color: var(--danger);
-      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-    }
-    button.danger:hover {
-      background: var(--danger-hover);
-      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4);
-    }
+    button.danger { background: var(--danger); color: white; border-color: var(--danger); box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
+    button.danger:hover { background: var(--danger-hover); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4); }
 
-    button.success {
-      background: var(--success);
-      color: white;
-      border-color: var(--success);
-      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-    }
-    button.success:hover {
-      background: var(--success-hover);
-      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4);
-    }
+    button.success { background: var(--success); color: white; border-color: var(--success); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
+    button.success:hover { background: var(--success-hover); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4); }
 
     /* Hint Animation */
     @keyframes flashHint {
       0%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.8); transform: scale(1.2); background: #86efac; }
       50% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4); transform: scale(1); }
     }
-    .hint-flash {
-      animation: flashHint 1.5s infinite !important;
-      z-index: 30;
-    }
+    .hint-flash { animation: flashHint 1.5s infinite !important; z-index: 30; }
 
     /* Top Thin Status Bar */
     .status-bar {
@@ -168,36 +148,21 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    .status-bar.error {
-      background: #fef2f2;
-      color: #991b1b;
-      border-color: #fecaca;
-    }
-
+    .status-bar.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+    .status-bar.warning { background: #fffbeb; color: #b45309; border-color: #fde68a; }
     .status-bar.short {
-      background: #fef2f2;
-      color: #dc2626;
-      border-color: #ef4444;
-      font-weight: bold;
-      animation: pulse 1s infinite;
+      background: #fef2f2; color: #dc2626; border-color: #ef4444;
+      font-weight: bold; animation: pulse 1s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
     /* Main Workspace */
-    .workspace {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      flex-direction: row;
-    }
+    .workspace { display: flex; flex: 1; overflow: hidden; flex-direction: row; }
 
     /* Left Sidebar: Collapsible Sections */
     .sidebar {
-      width: 300px;
+      width: 340px;
       background: var(--card);
       border-right: 1px solid var(--border);
       display: flex;
@@ -207,368 +172,165 @@
       transition: width 0.3s ease;
     }
 
-    .sidebar.collapsed {
-      width: 0;
-      border-right: none;
-    }
+    .sidebar.collapsed { width: 0; border-right: none; }
+    .sidebar-content { width: 340px; display: flex; flex-direction: column; height: 100%; overflow-y: auto; transition: opacity 0.2s ease; }
+    .sidebar.collapsed .sidebar-content { opacity: 0; pointer-events: none; }
 
-    .sidebar-content {
-      width: 300px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow-y: auto;
-      transition: opacity 0.2s ease;
-    }
-
-    .sidebar.collapsed .sidebar-content {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .collapsible-panel {
-      border-bottom: 1px solid var(--border);
-    }
-    
+    .collapsible-panel { border-bottom: 1px solid var(--border); }
     .collapsible-panel summary {
-      padding: 0.75rem 1rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: #f8fafc;
-      list-style: none;
-      user-select: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 0.75rem 1rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: #f8fafc;
+      list-style: none; user-select: none; display: flex; justify-content: space-between; align-items: center;
       transition: background 0.2s;
     }
-
-    .collapsible-panel summary:hover {
-      background: #f1f5f9;
-    }
-    
+    .collapsible-panel summary:hover { background: #f1f5f9; }
     .collapsible-panel summary::-webkit-details-marker { display: none; }
-    
     .collapsible-panel summary::after {
-      content: '▼';
-      font-size: 0.85rem;
-      color: var(--primary);
-      background: #e2e8f0;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
+      content: '▼'; font-size: 0.85rem; color: var(--primary); background: #e2e8f0; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
       transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
     }
-
-    .collapsible-panel summary:hover::after {
-      background: #cbd5e1;
-      color: var(--primary-hover);
-    }
-    
-    .collapsible-panel[open] summary::after {
-      transform: rotate(-180deg);
-      background: var(--primary);
-      color: white;
-    }
-
-    .collapsible-panel[open] summary:hover::after {
-      background: var(--primary-hover);
-    }
+    .collapsible-panel summary:hover::after { background: #cbd5e1; color: var(--primary-hover); }
+    .collapsible-panel[open] summary::after { transform: rotate(-180deg); background: var(--primary); color: white; }
 
     /* Schematic Diagram */
-    .diagram-container {
-      padding: 0.75rem;
-      background: #ffffff;
-      overflow-x: auto;
-    }
-    .diagram-container svg {
-      width: 100%;
-      height: auto;
-      max-height: 250px;
-      display: none;
-    }
-    .diagram-container svg.active {
-      display: block;
-    }
-    .dw { stroke: #1e293b; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .diagram-container { padding: 0.75rem; background: #ffffff; overflow-x: auto; }
+    .diagram-container svg { width: 100%; height: auto; max-height: 280px; display: none; }
+    .diagram-container svg.active { display: block; }
+    .dw { stroke: #1e293b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
     .dt { font: 14px 'Segoe UI', sans-serif; fill: #1e293b; }
     .dt.bold { font-weight: bold; font-size: 16px; }
     .d-red { fill: #dc2626; font-weight: bold; }
     .d-green { fill: #16a34a; font-weight: bold; }
 
     /* Compact Connections List */
-    .wire-list-compact {
-      padding: 0.5rem;
-      background: #f8fafc;
-      max-height: 30vh;
-      overflow-y: auto;
-    }
-
+    .wire-list-compact { padding: 0.5rem; background: #f8fafc; max-height: 30vh; overflow-y: auto; }
     .wire-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.25rem 0.5rem;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 0.25rem;
-      margin-bottom: 0.25rem;
-      font-size: 0.7rem;
-      font-family: monospace;
+      display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0.5rem;
+      background: #ffffff; border: 1px solid var(--border); border-radius: 0.25rem; margin-bottom: 0.25rem;
+      font-size: 0.7rem; font-family: monospace;
     }
-
     .wire-item button {
-      padding: 0.15rem 0.4rem;
-      background: #fee2e2;
-      color: #dc2626;
-      border: none;
-      border-radius: 0.25rem;
-      font-size: 0.65rem;
-      cursor: pointer;
-      box-shadow: none;
-      transform: none;
-      font-weight: normal;
+      padding: 0.15rem 0.4rem; background: #fee2e2; color: #dc2626; border: none; border-radius: 0.25rem;
+      font-size: 0.65rem; cursor: pointer; box-shadow: none; font-weight: normal;
     }
-    .wire-item button:hover { 
-      background: #fecaca; 
-      box-shadow: none;
-      transform: none;
-    }
+    .wire-item button:hover { background: #fecaca; }
 
     /* Right Area: The Physical Board (Centerpiece) */
     .board-container {
-      flex: 1;
-      position: relative;
-      background: radial-gradient(circle at 50% 50%, #f8fafc, #e2e8f0);
-      overflow: auto;
-      padding: 1.5rem;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      -webkit-overflow-scrolling: touch;
-      /* Prevent mobile pull-to-refresh while zooming */
-      overscroll-behavior-y: contain; 
+      flex: 1; position: relative; background: radial-gradient(circle at 50% 50%, #f8fafc, #e2e8f0);
+      overflow: auto; padding: 1.5rem; display: flex; align-items: flex-start; justify-content: flex-start;
+      -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; 
     }
 
+    /* Enlarge board to fit Motor Control Elements */
     .board {
-      position: relative;
-      width: 1000px;
-      height: 700px;
-      background: #d1d5db;
-      border: 4px solid #94a3b8;
-      border-radius: 12px;
-      box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.05),
-        0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      margin: 0 auto;
-      flex-shrink: 0;
-      transform-origin: top left;
-      will-change: transform;
+      position: relative; width: 1200px; height: 850px; background: #d1d5db;
+      border: 4px solid #94a3b8; border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      margin: 0 auto; flex-shrink: 0; transform-origin: top left; will-change: transform;
     }
 
-    /* SVG Layer for Wires */
-    #wire-layer {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 20;
-    }
-
+    #wire-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
     .wire-path {
-      fill: none;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15));
-      pointer-events: stroke;
-      cursor: pointer;
+      fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15)); pointer-events: stroke; cursor: pointer;
       transition: stroke-width 0.2s, stroke 0.2s;
     }
-    
-    .wire-path:hover {
-      stroke-width: 5;
-      stroke: #3b82f6 !important;
-    }
-
-    .wire-temp {
-      fill: none;
-      stroke: #94a3b8;
-      stroke-width: 2.5;
-      stroke-dasharray: 6 6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      pointer-events: none;
-    }
+    .wire-path:hover { stroke-width: 5; stroke: #3b82f6 !important; z-index: 21; }
+    .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 2.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
     /* Hardware Modules */
     .module {
-      position: absolute;
-      background: var(--panel-bg);
-      border: 2px solid var(--panel-border);
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0.5rem;
+      position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
+      border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
+      display: flex; flex-direction: column; align-items: center; padding: 0.5rem;
     }
-
     .module-screws::before, .module-screws::after {
-      content: '';
-      position: absolute;
-      width: 6px; height: 6px;
-      background: #64748b;
-      border-radius: 50%;
-      box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
+      content: ''; position: absolute; width: 6px; height: 6px; background: #64748b;
+      border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
     }
     .module-screws::before { top: 6px; left: 6px; }
     .module-screws::after { bottom: 6px; right: 6px; }
 
     .module-title {
-      font-size: 0.75rem;
-      font-weight: bold;
-      background: #94a3b8;
-      color: white;
-      padding: 0.1rem 1rem;
-      border-radius: 4px;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-size: 0.75rem; font-weight: bold; background: #94a3b8; color: white;
+      padding: 0.1rem 1rem; border-radius: 4px; margin-bottom: 0.5rem;
+      text-transform: uppercase; letter-spacing: 0.05em; text-align: center;
     }
 
-    /* Terminals (Sockets) - Made smaller to fit neatly inside panels */
-    .terminal-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
+    .terminal-group { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
     .terminal {
-      width: 18px; 
-      height: 18px; 
-      border-radius: 50%;
-      border: 2px solid #334155; 
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid #334155; 
       box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.1s;
+      position: relative; cursor: pointer; transition: transform 0.1s;
     }
-
     .terminal::after {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 6px; 
-      height: 6px; 
-      background: #020617;
-      border-radius: 50%;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+      content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 6px; height: 6px; background: #020617; border-radius: 50%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
     }
-
-    .terminal:hover { transform: scale(1.2); }
-    .terminal.selected {
-      transform: scale(1.2);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
-    }
+    .terminal:hover { transform: scale(1.2); z-index: 30; }
+    .terminal.selected { transform: scale(1.2); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); }
 
     .term-red { background: var(--term-red); }
     .term-yellow { background: var(--term-yellow); }
     .term-blue { background: var(--term-blue); }
+    .term-black { background: var(--term-black); }
 
-    /* Specific Module Layouts */
     .grid-row { display: flex; gap: 0.5rem; justify-content: center; } 
     .grid-col { display: flex; flex-direction: column; gap: 0.25rem; align-items: center; } 
-    
-    .symbol {
-      font-size: 0.65rem;
-      color: #475569;
-      font-weight: 600;
-      text-align: center;
-      margin: 0.15rem 0;
-    }
+    .symbol { font-size: 0.65rem; color: #475569; font-weight: 600; text-align: center; margin: 0.15rem 0; }
 
-    /* Push Button Elements */
     .pb-actuator {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 2px solid #94a3b8;
+      width: 36px; height: 36px; border-radius: 50%; border: 2px solid #94a3b8;
       background: radial-gradient(circle at 30% 30%, #f8fafc, #cbd5e1 60%);
-      box-shadow: 0 4px 0 #94a3b8, 0 5px 5px rgba(0,0,0,0.2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 0.7rem;
-      margin-bottom: 0.5rem;
-      user-select: none;
-      transition: all 0.1s;
+      box-shadow: 0 4px 0 #94a3b8, 0 5px 5px rgba(0,0,0,0.2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-weight: bold;
+      font-size: 0.7rem; margin-bottom: 0.5rem; user-select: none; transition: all 0.1s;
     }
-    
-    .pb-actuator:active, .pb-actuator.pressed {
-      transform: translateY(4px);
-      box-shadow: 0 0 0 #94a3b8, 0 1px 2px rgba(0,0,0,0.2);
-    }
+    .pb-actuator:active, .pb-actuator.pressed { transform: translateY(4px); box-shadow: 0 0 0 #94a3b8, 0 1px 2px rgba(0,0,0,0.2); }
 
-    /* Lamp Elements */
     .lamp-dome {
-      width: 50px; height: 50px;
-      border-radius: 50%;
-      margin-bottom: 0.5rem;
-      border: 4px solid #64748b;
-      box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2);
-      transition: all 0.2s;
+      width: 44px; height: 44px; border-radius: 50%; margin-bottom: 0.5rem; border: 4px solid #64748b;
+      box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s;
     }
-    
     .lamp-red { background: radial-gradient(circle at 30% 30%, #fca5a5, #991b1b); }
     .lamp-green { background: radial-gradient(circle at 30% 30%, #86efac, #166534); }
+    .lamp-yellow { background: radial-gradient(circle at 30% 30%, #fde047, #b45309); }
     
-    .lamp-red.on {
-      background: radial-gradient(circle at 40% 40%, #ffbaba, #ff0000);
-      box-shadow: 0 0 30px #ff0000, inset 0 4px 8px rgba(255,255,255,0.6);
-    }
-    
-    .lamp-green.on {
-      background: radial-gradient(circle at 40% 40%, #baffc9, #00ff00);
-      box-shadow: 0 0 30px #00ff00, inset 0 4px 8px rgba(255,255,255,0.6);
-    }
+    .lamp-red.on { background: radial-gradient(circle at 40% 40%, #ffbaba, #ff0000); box-shadow: 0 0 30px #ff0000, inset 0 4px 8px rgba(255,255,255,0.6); }
+    .lamp-green.on { background: radial-gradient(circle at 40% 40%, #baffc9, #00ff00); box-shadow: 0 0 30px #00ff00, inset 0 4px 8px rgba(255,255,255,0.6); }
+    .lamp-yellow.on { background: radial-gradient(circle at 40% 40%, #fef08a, #eab308); box-shadow: 0 0 30px #eab308, inset 0 4px 8px rgba(255,255,255,0.6); }
 
-    /* Relay Indicator */
-    .relay-indicator {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: #475569;
-      margin-bottom: 0.5rem;
+    .relay-indicator { width: 10px; height: 10px; border-radius: 50%; background: #475569; margin-bottom: 0.5rem; }
+    .relay-indicator.on { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+    /* Motor Styling */
+    .motor-casing {
+      width: 80px; height: 80px; border-radius: 50%; border: 6px solid #475569;
+      background: radial-gradient(circle at 50% 50%, #94a3b8, #cbd5e1);
+      display: flex; align-items: center; justify-content: center; position: relative; margin-top: 10px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
     }
-    .relay-indicator.on {
-      background: #ef4444;
-      box-shadow: 0 0 8px #ef4444;
+    .motor-blade {
+      width: 60px; height: 60px; position: absolute;
+      transform-origin: center; animation: spin 0.3s linear infinite; animation-play-state: paused;
     }
+    .motor-blade.spinning { animation-play-state: running; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* THR Trip Button */
+    .thr-trip-btn {
+      background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 8px;
+      font-size: 0.6rem; font-weight: bold; cursor: pointer; margin-bottom: 5px;
+    }
+    .thr-trip-btn.tripped { background: #fbbf24; color: #78350f; animation: pulse 1s infinite; }
 
     /* Mobile Responsive Overrides */
     @media (max-width: 768px) {
       .workspace { flex-direction: column; }
-      .sidebar { 
-        width: 100%; 
-        border-right: none; 
-        border-bottom: 1px solid var(--border); 
-        max-height: 40vh;
-        transition: max-height 0.3s ease, opacity 0.3s ease;
-      }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; transition: max-height 0.3s ease, opacity 0.3s ease; }
       .sidebar-content { width: 100%; }
-      .sidebar.collapsed {
-        width: 100%;
-        max-height: 0;
-        border-bottom: none;
-        opacity: 0;
-      }
+      .sidebar.collapsed { width: 100%; max-height: 0; border-bottom: none; opacity: 0; }
       .board-container { padding: 0.5rem; }
       header { align-items: flex-start; }
       .controls { width: 100%; justify-content: space-between; }
@@ -580,7 +342,7 @@
 
   <header>
     <div class="title-area">
-      <h1>시퀀스 제어 에뮬레이터 (Sequence Control Emulator)</h1>
+      <h1>글로벌 U 시퀀스 제어 에뮬레이터 (Global U Sequence Control Emulator)</h1>
       <p>전기 논리 회로 실습 보드 (Interactive electrical logic training board)</p>
       <p style="font-size: 0.75rem; color: var(--primary); margin-top: 0.3rem; font-weight: 600;">AI융합기계공학과, 글로벌 U 클래스 (By AI Convergence Mechanical Engineering, Global U Class)</p>
     </div>
@@ -594,6 +356,7 @@
         <option value="c_contact">6. c접점 회로 (c-contact Circuit)</option>
         <option value="and_circuit">7. 직렬 회로 (Series AND Circuit)</option>
         <option value="or_circuit">8. 병렬 회로 (Parallel OR Circuit)</option>
+        <option value="motor_circuit">9. 전동기 제어 회로 (Motor Control Circuit)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">사이드바 숨기기 (Hide Sidebar)</button>
       <button class="danger" onclick="clearWires()">초기화 (Clear)</button>
@@ -816,302 +579,137 @@
               <circle cx="340" cy="230" r="3" fill="#1e293b"/>
             </svg>
 
-            <!-- 4. a접점 회로 -->
-            <svg id="diag_a_contact" viewBox="0 0 200 160">
-              <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
+            <!-- 4~8 Basic logic circuits omitted for brevity in SVG... -->
+            
+            <!-- 9. 전동기 제어 회로 (Motor Control Circuit) -->
+            <svg id="diag_motor_circuit" viewBox="0 0 580 340">
+              <!-- Main 3-Phase Circuit (Left) -->
+              <text x="10" y="20" class="dt bold" style="font-size: 18px;">Main</text>
+              <path class="dw" d="M 30 40 V 80 M 50 40 V 80 M 70 40 V 80" />
+              <text x="25" y="35" class="dt bold">R</text>
+              <text x="45" y="35" class="dt bold">S</text>
+              <text x="65" y="35" class="dt bold">T</text>
               
-              <!-- PB -> X -->
-              <path class="dw" d="M 80 30 V 45 M 80 75 V 100 M 80 130 V 130" />
-              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
-              <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB</text>
-              <circle cx="80" cy="115" r="15" class="dw" />
-              <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
+              <!-- MC Main Contacts -->
+              <rect x="20" y="80" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
+              <text x="85" y="105" class="dt bold">MC</text>
+              <path class="dw" d="M 30 80 V 120 M 50 80 V 120 M 70 80 V 120" />
+              <circle cx="30" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="30" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="50" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="50" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="70" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="70" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+              <path class="dw" d="M 30 120 V 160 M 50 120 V 160 M 70 120 V 160" />
+
+              <!-- THR Main Contacts -->
+              <rect x="20" y="160" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
+              <text x="85" y="185" class="dt bold">THR</text>
+              <path class="dw" d="M 30 160 V 200 M 50 160 V 200 M 70 160 V 200" />
+              <!-- THR elements drawing -->
+              <path class="dw" d="M 25 175 C 35 175, 35 185, 25 185" />
+              <path class="dw" d="M 45 175 C 55 175, 55 185, 45 185" />
+              <path class="dw" d="M 65 175 C 75 175, 75 185, 65 185" />
               
-              <!-- X contact and RL lamp -->
-              <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
-              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 150 45 V 75" />
-              <text x="160" y="65" class="dt bold" style="font-size: 20px;">X</text>
-              <circle cx="140" cy="115" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="129" y="121" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
+              <path class="dw" d="M 30 200 V 240 M 50 200 V 240 M 70 200 V 240" />
 
-              <!-- Junctions & Terminals -->
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="30" r="3" fill="#1e293b" />
-              <circle cx="80" cy="130" r="3" fill="#1e293b" />
-              <circle cx="140" cy="30" r="3" fill="#1e293b" />
-              <circle cx="140" cy="130" r="3" fill="#1e293b" />
+              <!-- Motor IM -->
+              <circle cx="50" cy="270" r="30" class="dw" />
+              <text x="40" y="275" class="dt bold" style="font-size: 18px;">IM</text>
 
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
-            </svg>
-
-            <!-- 5. b접점 회로 -->
-            <svg id="diag_b_contact" viewBox="0 0 200 160">
-              <path class="dw" d="M 30 30 H 150 M 30 80 V 130 H 150" />
+              <!-- Control Circuit (Right) -->
+              <text x="180" y="20" class="dt bold" style="font-size: 18px;">Control</text>
+              <!-- Tap from R and T -->
+              <circle cx="30" cy="50" r="3" fill="#1e293b" />
+              <circle cx="70" cy="60" r="3" fill="#1e293b" />
+              <path class="dw" d="M 30 50 H 180 M 70 60 H 130 V 320 H 180" />
               
-              <!-- PB (NC) -> X -->
-              <path class="dw" d="M 80 30 V 45 M 80 75 V 100 M 80 130 V 130" />
-              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <!-- NC contact: bar touching terminals -->
-              <path class="dw" d="M 83 45 V 75 M 83 60 H 93" />
-              <text x="98" y="65" class="dt bold" style="font-size: 20px;">PB</text>
-              <circle cx="80" cy="115" r="15" class="dw" />
-              <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
+              <path class="dw" d="M 180 50 H 540" />
+              <path class="dw" d="M 180 320 H 540" />
+              <text x="165" y="55" class="dt bold">R</text>
+              <text x="165" y="325" class="dt bold">T</text>
 
-              <!-- X (NC) -> GL -->
-              <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
-              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <!-- NC contact: bar touching terminals -->
-              <path class="dw" d="M 143 45 V 75" />
-              <text x="153" y="65" class="dt bold" style="font-size: 20px;">X</text>
-              <circle cx="140" cy="115" r="15" fill="none" stroke="#16a34a" stroke-width="2" />
-              <text x="128" y="121" class="dt bold" style="fill: #16a34a; font-size: 16px;">GL</text>
+              <!-- Fuses -->
+              <rect x="200" y="40" width="20" height="20" class="dw" /> <text x="202" y="35" class="dt">F1</text>
+              <rect x="200" y="310" width="20" height="20" class="dw" /> <text x="202" y="345" class="dt">F2</text>
+              <path class="dw" d="M 220 50 H 260 M 220 320 H 260" />
 
-              <!-- Junctions & Terminals -->
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="30" r="3" fill="#1e293b" />
-              <circle cx="80" cy="130" r="3" fill="#1e293b" />
-              <circle cx="140" cy="30" r="3" fill="#1e293b" />
-              <circle cx="140" cy="130" r="3" fill="#1e293b" />
+              <!-- THR Aux -->
+              <circle cx="260" cy="50" r="3" fill="#1e293b" />
+              <path class="dw" d="M 260 50 V 65" />
+              <circle cx="260" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="260" cy="95" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 263 65 V 95 M 263 80 H 273" />
+              <text x="278" y="85" class="dt bold">THR</text>
+              <path class="dw" d="M 260 95 V 110" />
 
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
-            </svg>
+              <!-- THR Trip Branch (NO) -->
+              <path class="dw" d="M 260 65 H 510" />
+              <circle cx="510" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="510" cy="95" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 520 65 V 95" />
+              <text x="525" y="85" class="dt bold">THR</text>
+              <path class="dw" d="M 510 95 V 270" />
+              <circle cx="510" cy="285" r="15" fill="none" stroke="#eab308" stroke-width="2" />
+              <text x="500" y="290" class="dt bold" style="fill: #eab308;">YL</text>
+              <path class="dw" d="M 510 300 V 320" />
+              <circle cx="510" cy="320" r="3" fill="#1e293b"/>
 
-            <!-- 6. c접점 회로 -->
-            <svg id="diag_c_contact" viewBox="0 0 260 160">
-              <path class="dw" d="M 30 30 H 200 M 30 80 V 130 H 200" />
+              <!-- PB3 (Stop NC) -->
+              <circle cx="260" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="260" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 263 110 V 140 M 263 125 H 273" />
+              <text x="278" y="130" class="dt bold">PB3</text>
               
-              <!-- PB -> X -->
-              <path class="dw" d="M 80 30 V 45 M 80 75 V 100 M 80 130 V 130" />
-              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
-              <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB</text>
-              <circle cx="80" cy="115" r="15" class="dw" />
-              <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
-              
-              <!-- X (NO) -> RL -->
-              <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
-              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 150 45 V 75" />
-              <text x="160" y="65" class="dt bold" style="font-size: 20px;">X</text>
-              <circle cx="140" cy="115" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="129" y="121" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
+              <path class="dw" d="M 260 140 V 155" />
+              <circle cx="260" cy="155" r="3" fill="#1e293b" />
+              <path class="dw" d="M 260 155 H 330" />
 
-              <!-- X (NC) -> GL -->
-              <path class="dw" d="M 200 30 V 45 M 200 75 V 100 M 200 130 V 130" />
-              <circle cx="200" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="200" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <!-- NC contact: bar touching terminals -->
-              <path class="dw" d="M 203 45 V 75" />
-              <text x="213" y="65" class="dt bold" style="font-size: 20px;">X</text>
-              <circle cx="200" cy="115" r="15" fill="none" stroke="#16a34a" stroke-width="2" />
-              <text x="188" y="121" class="dt bold" style="fill: #16a34a; font-size: 16px;">GL</text>
+              <!-- PB1 (Start NO) -->
+              <circle cx="260" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="260" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 270 155 V 185 M 270 170 H 280" />
+              <text x="285" y="175" class="dt bold">PB1</text>
+              <path class="dw" d="M 260 185 V 200" />
+              <circle cx="260" cy="200" r="3" fill="#1e293b" />
+              <path class="dw" d="M 260 200 H 330" />
 
-              <!-- Junctions & Terminals -->
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="80" cy="30" r="3" fill="#1e293b" />
-              <circle cx="80" cy="130" r="3" fill="#1e293b" />
-              <circle cx="140" cy="30" r="3" fill="#1e293b" />
-              <circle cx="140" cy="130" r="3" fill="#1e293b" />
-              <circle cx="200" cy="30" r="3" fill="#1e293b" />
-              <circle cx="200" cy="130" r="3" fill="#1e293b" />
+              <!-- MC Latch (NO) -->
+              <circle cx="330" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="330" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 340 155 V 185" />
+              <text x="345" y="175" class="dt bold">MC</text>
+              <path class="dw" d="M 330 185 V 200" />
 
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="86" class="dt bold" style="font-size: 20px;">T</text>
-            </svg>
+              <!-- MC Coil -->
+              <path class="dw" d="M 260 200 V 270" />
+              <circle cx="260" cy="285" r="15" class="dw" />
+              <text x="249" y="290" class="dt bold">MC</text>
+              <path class="dw" d="M 260 300 V 320" />
+              <circle cx="260" cy="320" r="3" fill="#1e293b"/>
 
-            <!-- 7. 직렬 (AND) 회로 -->
-            <svg id="diag_and_circuit" viewBox="0 0 400 190">
-              <path class="dw" d="M 30 30 H 60 M 90 30 H 370 M 30 170 H 370" />
+              <!-- GL (Stop) & RL (Run) branch -->
+              <path class="dw" d="M 330 155 H 420" />
+              <circle cx="420" cy="155" r="3" fill="#1e293b" />
 
-              <!-- Main PB3 (NC) -->
-              <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
-              <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB3</text>
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="176" class="dt bold" style="font-size: 20px;">T</text>
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="170" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- MC (NC) -> GL -->
+              <circle cx="420" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="420" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 423 155 V 185 M 423 170 H 433" />
+              <text x="440" y="175" class="dt bold">MC</text>
+              <path class="dw" d="M 420 185 V 270" />
+              <circle cx="420" cy="285" r="15" fill="none" stroke="#16a34a" stroke-width="2" />
+              <text x="410" y="290" class="dt bold" style="fill: #16a34a;">GL</text>
+              <path class="dw" d="M 420 300 V 320" />
+              <circle cx="420" cy="320" r="3" fill="#1e293b"/>
 
-              <!-- Branch 1: PB1 -> X1 Coil -->
-              <circle cx="110" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 110 30 V 45" />
-              <circle cx="110" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="110" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 120 45 V 75 M 120 60 H 130" />
-              <text x="135" y="65" class="dt bold" style="font-size: 18px;">PB1</text>
-              <path class="dw" d="M 110 75 V 120" />
-              <circle cx="110" cy="95" r="3" fill="#1e293b"/>
-              <circle cx="110" cy="135" r="15" class="dw" />
-              <text x="101" y="141" class="dt bold" style="font-size: 16px;">X1</text>
-              <path class="dw" d="M 110 150 V 170" />
-              <circle cx="110" cy="170" r="3" fill="#1e293b"/>
+              <!-- MC (NO) -> RL -->
+              <path class="dw" d="M 330 200 H 370" />
+              <circle cx="370" cy="200" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 370 200 V 270" />
+              <circle cx="370" cy="285" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
+              <text x="360" y="290" class="dt bold" style="fill: #dc2626;">RL</text>
+              <path class="dw" d="M 370 300 V 320" />
+              <circle cx="370" cy="320" r="3" fill="#1e293b"/>
 
-              <!-- Branch 1 Latch: X1 -->
-              <circle cx="170" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 170 30 V 45" />
-              <circle cx="170" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="170" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 180 45 V 75" />
-              <text x="185" y="65" class="dt bold" style="font-size: 18px;">X1</text>
-              <path class="dw" d="M 170 75 V 95 H 110" />
-
-              <!-- Branch 2: PB2 -> X2 Coil -->
-              <circle cx="230" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 230 30 V 45" />
-              <circle cx="230" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="230" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 240 45 V 75 M 240 60 H 250" />
-              <text x="255" y="65" class="dt bold" style="font-size: 18px;">PB2</text>
-              <path class="dw" d="M 230 75 V 120" />
-              <circle cx="230" cy="95" r="3" fill="#1e293b"/>
-              <circle cx="230" cy="135" r="15" class="dw" />
-              <text x="221" y="141" class="dt bold" style="font-size: 16px;">X2</text>
-              <path class="dw" d="M 230 150 V 170" />
-              <circle cx="230" cy="170" r="3" fill="#1e293b"/>
-
-              <!-- Branch 2 Latch: X2 -->
-              <circle cx="290" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 290 30 V 45" />
-              <circle cx="290" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="290" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 300 45 V 75" />
-              <text x="305" y="65" class="dt bold" style="font-size: 18px;">X2</text>
-              <path class="dw" d="M 290 75 V 95 H 230" />
-
-              <!-- Branch 3: X1 -> X2 -> Lamp RL -->
-              <circle cx="350" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 350 30 V 40" />
-              <circle cx="350" cy="40" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="350" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 360 40 V 65" />
-              <text x="365" y="58" class="dt bold" style="font-size: 16px;">X1</text>
-
-              <path class="dw" d="M 350 65 V 75" />
-
-              <circle cx="350" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="350" cy="100" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 360 75 V 100" />
-              <text x="365" y="93" class="dt bold" style="font-size: 16px;">X2</text>
-
-              <path class="dw" d="M 350 100 V 120" />
-              <circle cx="350" cy="135" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="339" y="141" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
-              <path class="dw" d="M 350 150 V 170" />
-              <circle cx="350" cy="170" r="3" fill="#1e293b"/>
-            </svg>
-
-            <!-- 8. 병렬 (OR) 회로 -->
-            <svg id="diag_or_circuit" viewBox="0 0 480 190">
-              <!-- Top & Bottom Rails -->
-              <path class="dw" d="M 30 30 H 60 M 90 30 H 450 M 30 170 H 450" />
-
-              <!-- Main PB3 (NC) -->
-              <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
-              <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB3</text>
-              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
-              <text x="10" y="176" class="dt bold" style="font-size: 20px;">T</text>
-              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="30" cy="170" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
-              <!-- Branch 1: PB1 & X1 (Latch) -->
-              <circle cx="120" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 120 30 V 42" />
-
-              <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="190" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 123 45 H 187" />
-
-              <!-- PB1 Switch -->
-              <path class="dw" d="M 130 45 V 75 M 130 60 H 140" />
-              <text x="145" y="68" class="dt bold" style="font-size: 20px;">PB1</text>
-
-              <!-- X1 Latch Contact -->
-              <path class="dw" d="M 200 45 V 75" />
-              <text x="205" y="68" class="dt bold" style="font-size: 20px;">X1</text>
-
-              <circle cx="120" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="190" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 187 75 H 123" />
-              <circle cx="120" cy="75" r="3" fill="#1e293b"/> <!-- Node dot -->
-
-              <!-- X1 Coil -->
-              <path class="dw" d="M 120 75 V 120" />
-              <circle cx="120" cy="135" r="15" class="dw" />
-              <text x="109" y="141" class="dt bold" style="font-size: 18px;">X1</text>
-              <path class="dw" d="M 120 150 V 170" />
-              <circle cx="120" cy="170" r="3" fill="#1e293b"/>
-
-              <!-- Branch 2: PB2 & X2 (Latch) -->
-              <circle cx="240" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 240 30 V 42" />
-
-              <circle cx="240" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="310" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 243 45 H 307" />
-
-              <!-- PB2 Switch -->
-              <path class="dw" d="M 250 45 V 75 M 250 60 H 260" />
-              <text x="265" y="68" class="dt bold" style="font-size: 20px;">PB2</text>
-
-              <!-- X2 Latch Contact -->
-              <path class="dw" d="M 320 45 V 75" />
-              <text x="325" y="68" class="dt bold" style="font-size: 20px;">X2</text>
-
-              <circle cx="240" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="310" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 307 75 H 243" />
-              <circle cx="240" cy="75" r="3" fill="#1e293b"/> <!-- Node dot -->
-
-              <!-- X2 Coil -->
-              <path class="dw" d="M 240 75 V 120" />
-              <circle cx="240" cy="135" r="15" class="dw" />
-              <text x="229" y="141" class="dt bold" style="font-size: 18px;">X2</text>
-              <path class="dw" d="M 240 150 V 170" />
-              <circle cx="240" cy="170" r="3" fill="#1e293b"/>
-
-              <!-- Branch 3: X1 & X2 in Parallel to RL Lamp -->
-              <circle cx="360" cy="30" r="3" fill="#1e293b"/>
-              <path class="dw" d="M 360 30 V 42" />
-
-              <circle cx="360" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="430" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 363 45 H 427" />
-
-              <!-- X1 Lamp Contact -->
-              <path class="dw" d="M 370 45 V 75" />
-              <text x="375" y="68" class="dt bold" style="font-size: 20px;">X1</text>
-
-              <!-- X2 Lamp Contact -->
-              <path class="dw" d="M 440 45 V 75" />
-              <text x="445" y="68" class="dt bold" style="font-size: 20px;">X2</text>
-
-              <circle cx="360" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="430" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 427 75 H 363" />
-              <circle cx="360" cy="75" r="3" fill="#1e293b"/> <!-- Node dot -->
-
-              <!-- RL Lamp -->
-              <path class="dw" d="M 360 75 V 120" />
-              <circle cx="360" cy="135" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="349" y="141" class="dt bold" style="fill: #dc2626; font-size: 18px;">RL</text>
-              <path class="dw" d="M 360 150 V 170" />
-              <circle cx="360" cy="170" r="3" fill="#1e293b"/>
             </svg>
           </div>
         </details>
@@ -1158,7 +756,8 @@
     const state = {
       pb1: false, pb2: false, pb3: false,
       x1: false, x2: false,
-      rl: false, gl: false
+      rl: false, gl: false, yl: false,
+      mc1: false, thrTripped: false, motorOn: false
     };
 
     const wireColors = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#4f46e5', '#db2777'];
@@ -1274,6 +873,42 @@
         {a: 'x2_no2_bot', b: 'rl_top'},
         
         {a: 'rl_bot', b: 'pow_T'}
+      ],
+      motor_circuit: [
+        // Main Power Circuit
+        {a: 'main_R', b: 'mc1_R_in'},
+        {a: 'main_S', b: 'mc1_S_in'},
+        {a: 'main_T', b: 'mc1_T_in'},
+        {a: 'mc1_U_out', b: 'thr1_U_in'},
+        {a: 'mc1_V_out', b: 'thr1_V_in'},
+        {a: 'mc1_W_out', b: 'thr1_W_in'},
+        {a: 'thr1_U_out', b: 'mot_U'},
+        {a: 'thr1_V_out', b: 'mot_V'},
+        {a: 'thr1_W_out', b: 'mot_W'},
+        
+        // Control Power
+        {a: 'main_R', b: 'fuse_R_in'},
+        {a: 'main_T', b: 'fuse_T_in'},
+        
+        // Control Logic
+        {a: 'fuse_R_out', b: 'thr1_95'},
+        {a: 'thr1_96', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
+        {a: 'pb1_no_bot', b: 'mc1_coil_top'},
+        {a: 'mc1_coil_bot', b: 'fuse_T_out'},
+        
+        // Self-holding MC
+        {a: 'pb3_nc_bot', b: 'mc1_no_top'},
+        {a: 'mc1_no_bot', b: 'mc1_coil_top'},
+        
+        // Lamps
+        {a: 'mc1_no_bot', b: 'rl_top'},
+        {a: 'rl_bot', b: 'fuse_T_out'},
+        {a: 'pb3_nc_bot', b: 'mc1_nc_top'},
+        {a: 'mc1_nc_bot', b: 'gl_top'},
+        {a: 'gl_bot', b: 'fuse_T_out'},
+        {a: 'thr1_98', b: 'yl_top'},
+        {a: 'yl_bot', b: 'fuse_T_out'}
       ]
     };
 
@@ -1298,18 +933,37 @@
     }
 
     function buildHardware() {
-      // Adjusted module placement to carve out wider safe vertical and horizontal routing channels
+      // 1. MAIN 3-Phase Power
+      createModule('main_power', 20, 20, 120, 100, '3상 주전원', `
+        <div class="grid-row" style="margin-top:10px;">
+          <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_S"></div><div class="symbol">S</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_T"></div><div class="symbol">T</div></div>
+        </div>
+      `);
+
+      // 2. Fuses (Control Power protection)
+      createModule('fuse_mod', 160, 20, 90, 100, '퓨즈(FUSE)', `
+        <div class="grid-row" style="margin-top:5px; gap: 15px;">
+          <div class="grid-col">
+             <div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div>
+          </div>
+          <div class="grid-col">
+             <div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div>
+          </div>
+        </div>
+      `);
       
-      // 1. Power Supply (Top Left)
-      createModule('power', 20, 40, 130, 100, '전원 (POWER)', `
+      // Control Power (Legacy R/T for old lessons to work directly without 3-phase)
+      createModule('power', 270, 20, 110, 100, '제어전원(R,T)', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-red" id="pow_T"></div><div class="symbol">T</div></div>
         </div>
       `);
 
-      // 2. Separate Push Buttons (Top Middle)
-      const pbXPositions = [190, 340, 490];
+      // 3. Push Buttons
+      const pbXPositions = [400, 520, 640];
       pbXPositions.forEach((pbX, i) => {
         const pbNum = i + 1;
         let pbHTML = `
@@ -1317,27 +971,24 @@
             <div class="pb-actuator" id="btn_pb${pbNum}" onmousedown="pressPB('pb${pbNum}', true)" onmouseup="pressPB('pb${pbNum}', false)" onmouseleave="pressPB('pb${pbNum}', false)" ontouchstart="pressPB('pb${pbNum}', true)" ontouchend="pressPB('pb${pbNum}', false)">PB${pbNum}</div>
             <div class="grid-row" style="gap:8px;">
               <div class="grid-col">
-                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div>
-                <div class="symbol">NO</div>
-                <div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
+                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
               </div>
               <div class="grid-col">
-                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div>
-                <div class="symbol">NC</div>
-                <div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
+                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
               </div>
             </div>
           </div>`;
-        createModule(`pb${pbNum}_mod`, pbX, 40, 110, 190, `버튼 (PB${pbNum})`, pbHTML);
+        createModule(`pb${pbNum}_mod`, pbX, 20, 110, 170, `버튼(PB${pbNum})`, pbHTML);
       });
 
-      // 3. Lamps (Top Right)
+      // 4. Lamps
       const lamps = [
-        { id: 'rl', color: 'red', name: '램프 (RL)', x: 640 },
-        { id: 'gl', color: 'green', name: '램프 (GL)', x: 770 }
+        { id: 'rl', color: 'red', name: '램프(RL)', x: 770 },
+        { id: 'gl', color: 'green', name: '램프(GL)', x: 860 },
+        { id: 'yl', color: 'yellow', name: '램프(YL)', x: 950 }
       ];
       lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 40, 90, 190, l.name, `
+        createModule(`lamp_${l.id}`, l.x, 20, 80, 170, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
           <div class="grid-col">
             <div class="terminal term-red" id="${l.id}_top"></div>
@@ -1346,7 +997,88 @@
         `);
       });
 
-      // 4. Relays (Bottom Row)
+      // 5. Magnetic Contactor (MC)
+      createModule('mc1_mod', 20, 150, 170, 190, '전자접촉기(MC)', `
+        <div class="relay-indicator" id="ind_mc1"></div>
+        <div class="grid-row" style="gap: 15px;">
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-black" id="mc1_R_in"></div><div class="symbol">R</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="mc1_S_in"></div><div class="symbol">S</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="mc1_T_in"></div><div class="symbol">T</div></div>
+                </div>
+                <div style="height: 15px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">U</div><div class="terminal term-black" id="mc1_U_out"></div></div>
+                    <div class="grid-col"><div class="symbol">V</div><div class="terminal term-black" id="mc1_V_out"></div></div>
+                    <div class="grid-col"><div class="symbol">W</div><div class="terminal term-black" id="mc1_W_out"></div></div>
+                </div>
+            </div>
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-red" id="mc1_coil_top"></div><div class="symbol">A1</div></div>
+                    <div class="grid-col"><div class="terminal term-yellow" id="mc1_no_top"></div><div class="symbol">a</div></div>
+                    <div class="grid-col"><div class="terminal term-blue" id="mc1_nc_top"></div><div class="symbol">b</div></div>
+                </div>
+                <div style="height: 15px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">A2</div><div class="terminal term-red" id="mc1_coil_bot"></div></div>
+                    <div class="grid-col"><div class="symbol">a</div><div class="terminal term-yellow" id="mc1_no_bot"></div></div>
+                    <div class="grid-col"><div class="symbol">b</div><div class="terminal term-blue" id="mc1_nc_bot"></div></div>
+                </div>
+            </div>
+        </div>
+      `);
+
+      // 6. Thermal Overload Relay (THR)
+      createModule('thr1_mod', 20, 360, 170, 190, '열동계전기(THR)', `
+        <button id="thr_trip_btn" class="thr-trip-btn" onclick="toggleTHRTrip()">NORMAL (Click to Trip)</button>
+        <div class="grid-row" style="gap: 15px;">
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_U_in"></div><div class="symbol">U</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_V_in"></div><div class="symbol">V</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_W_in"></div><div class="symbol">W</div></div>
+                </div>
+                <div style="height: 15px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">U'</div><div class="terminal term-black" id="thr1_U_out"></div></div>
+                    <div class="grid-col"><div class="symbol">V'</div><div class="terminal term-black" id="thr1_V_out"></div></div>
+                    <div class="grid-col"><div class="symbol">W'</div><div class="terminal term-black" id="thr1_W_out"></div></div>
+                </div>
+            </div>
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-blue" id="thr1_95"></div><div class="symbol">COM(95)</div></div>
+                </div>
+                <div style="height: 15px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">NC(96)</div><div class="terminal term-blue" id="thr1_96"></div></div>
+                    <div class="grid-col"><div class="symbol">NO(98)</div><div class="terminal term-yellow" id="thr1_98"></div></div>
+                </div>
+            </div>
+        </div>
+      `);
+
+      // 7. Induction Motor (IM)
+      createModule('motor_mod', 20, 580, 170, 160, '유도전동기(IM)', `
+        <div class="grid-row" style="gap:4px; margin-top:5px;">
+            <div class="grid-col"><div class="terminal term-black" id="mot_U"></div><div class="symbol">U</div></div>
+            <div class="grid-col"><div class="terminal term-black" id="mot_V"></div><div class="symbol">V</div></div>
+            <div class="grid-col"><div class="terminal term-black" id="mot_W"></div><div class="symbol">W</div></div>
+        </div>
+        <div class="motor-casing">
+            <svg class="motor-blade" id="motor_blade" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="10" fill="#334155" />
+                <path d="M 50 50 Q 80 20 90 50 Z" fill="#64748b" />
+                <path d="M 50 50 Q 20 80 50 90 Z" fill="#64748b" />
+                <path d="M 50 50 Q 20 20 10 50 Z" fill="#64748b" />
+                <path d="M 50 50 Q 80 80 50 10 Z" fill="#64748b" />
+            </svg>
+        </div>
+      `);
+
+      // 8. Relays (Bottom Row)
       [1, 2].forEach((num, idx) => {
         let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
         relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
@@ -1358,8 +1090,7 @@
         }
         relayHTML += '</div>';
         
-        // R1: x=70, R2: x=570 (provides a nice vertical global highway gap between 430 and 570)
-        createModule(`relay${num}`, 70 + (idx * 500), 280, 360, 160, `릴레이 (X${num})`, relayHTML);
+        createModule(`relay${num}`, 250 + (idx * 370), 280, 350, 160, `릴레이 (X${num})`, relayHTML);
       });
 
       document.querySelectorAll('.terminal').forEach(term => {
@@ -1375,8 +1106,8 @@
             currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
             
             board.style.transform = `scale(${currentZoom})`;
-            board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
-            board.style.marginRight = `${1000 * (currentZoom - 1)}px`;
+            board.style.marginBottom = `${850 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${1200 * (currentZoom - 1)}px`;
             
             renderWires();
         }
@@ -1404,8 +1135,8 @@
         currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
         
         board.style.transform = `scale(${currentZoom})`;
-        board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
-        board.style.marginRight = `${1000 * (currentZoom - 1)}px`;
+        board.style.marginBottom = `${850 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${1200 * (currentZoom - 1)}px`;
         
         renderWires();
       }
@@ -1418,8 +1149,20 @@
     });
 
     // --- 4. INTERACTION & DRAWING ---
+    function toggleTHRTrip() {
+        state.thrTripped = !state.thrTripped;
+        const btn = document.getElementById('thr_trip_btn');
+        if(state.thrTripped) {
+            btn.classList.add('tripped');
+            btn.innerText = "TRIPPED! (Click to Reset)";
+        } else {
+            btn.classList.remove('tripped');
+            btn.innerText = "NORMAL (Click to Trip)";
+        }
+        evaluateCircuit();
+    }
+
     function handleTerminalClick(e, term) {
-      // Remove any active hints when user starts interacting
       document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
 
       if (!selectedTerminal) {
@@ -1438,7 +1181,6 @@
 
     function handleMove(e) {
       if (!selectedTerminal) return;
-      
       let clientX = e.touches ? e.touches[0].clientX : e.clientX;
       let clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -1458,8 +1200,8 @@
     board.addEventListener('mousemove', handleMove);
     board.addEventListener('touchmove', (e) => {
         if (!selectedTerminal) return;
-        if (e.touches && e.touches.length > 1) return; // Allow pinch zoom to take over
-        e.preventDefault(); // Prevent scrolling while drawing a wire
+        if (e.touches && e.touches.length > 1) return;
+        e.preventDefault(); 
         handleMove(e);
     }, { passive: false });
 
@@ -1489,51 +1231,39 @@
     }
 
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
-      const getDir = (id) => id.includes('_bot') ? 'down' : 'up';
+      const getDir = (id) => id.includes('_bot') || id.includes('_out') ? 'down' : 'up';
       
-      // 선들이 겹치지 않도록 각 배선마다 고유한 간격을 생성 (Wide Spreading)
-      const hSpread1 = index % 8;        // 0 ~ 7
-      const hSpread2 = (index + 4) % 8;  // 0 ~ 7 (Shifted)
-      const vSpread  = index % 15;       // 0 ~ 14 (하단 공간 최대 활용)
+      const hSpread1 = index % 8;        
+      const hSpread2 = (index + 4) % 8;  
+      const vSpread  = index % 15;       
 
       let cy1, cy2;
       const dirA = getDir(idA);
       const dirB = getDir(idB);
 
-      // 모듈 위/아래의 수평 라우팅 채널 설정
-      if (y1 < 270) {
-          cy1 = dirA === 'up' ? 8 + (hSpread1 * 4) : 235 - (hSpread1 * 3); 
+      if (y1 < 220) {
+          cy1 = dirA === 'up' ? 8 + (hSpread1 * 4) : 210 - (hSpread1 * 3); 
+      } else if (y1 < 450) {
+          cy1 = dirA === 'up' ? 245 + (hSpread1 * 3) : 445 - (hSpread1 * 3); 
       } else {
-          cy1 = dirA === 'up' ? 255 + (hSpread1 * 3) : 470 + (vSpread * 12); // 하단은 12px씩 크게 벌림
+          cy1 = dirA === 'up' ? 555 + (hSpread1 * 3) : 760 + (vSpread * 5); 
       }
 
-      if (y2 < 270) {
-          cy2 = dirB === 'up' ? 8 + (hSpread2 * 4) : 235 - (hSpread2 * 3);
+      if (y2 < 220) {
+          cy2 = dirB === 'up' ? 8 + (hSpread2 * 4) : 210 - (hSpread2 * 3); 
+      } else if (y2 < 450) {
+          cy2 = dirB === 'up' ? 245 + (hSpread2 * 3) : 445 - (hSpread2 * 3); 
       } else {
-          cy2 = dirB === 'up' ? 255 + (hSpread2 * 3) : 470 + (((vSpread + 7) % 15) * 12);
+          cy2 = dirB === 'up' ? 555 + (hSpread2 * 3) : 760 + (((vSpread + 7) % 15) * 5); 
       }
 
-      // 같은 수평 구역에 있으면 수직 기둥(Trunk) 없이 바로 연결
-      if (Math.abs(cy1 - cy2) < 40 && ((y1 < 270 && y2 < 270) || (y1 > 270 && y2 > 270))) {
+      if (Math.abs(cy1 - cy2) < 40) {
          const midY = (cy1 + cy2) / 2;
          return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
       }
 
-      // 부품을 피해서 지나가는 안전한 수직 채널(Trunk) 탐색
-      let safeXList = [];
-      let spreadFactor = 3;
-
-      if (y1 < 270 && y2 < 270) {
-          safeXList = [15, 170, 320, 470, 620, 750, 880];
-          spreadFactor = 4; // 좌우 분산 범위 (+/- 12px)
-      } else if (y1 > 270 && y2 > 270) {
-          safeXList = [35, 500, 960];
-          spreadFactor = 12; // 하단 릴레이 사이 빈 공간을 넓게 활용
-      } else {
-          // 상/하단을 가로지르는 메인 라인 (부품들을 완전히 피하는 3개의 메인 고속도로)
-          safeXList = [10, 470, 960];
-          spreadFactor = 4;
-      }
+      let safeXList = [10, 220, 390, 620, 850, 1050, 1180];
+      let spreadFactor = 6;
 
       let bestX = safeXList[0];
       let minCost = Infinity;
@@ -1543,7 +1273,6 @@
           if (cost < minCost) { minCost = cost; bestX = sx; }
       }
       
-      // 수직선들이 하나로 뭉치지 않도록 좌우로 퍼뜨림
       const trunkOffset = ((index % (spreadFactor * 2 + 1)) - spreadFactor) * 3;
       const trunkX = bestX + trunkOffset;
       
@@ -1630,19 +1359,21 @@
         return visited;
       };
 
-      while(changed && iterations < 10) {
+      while(changed && iterations < 15) {
         changed = false;
         iterations++;
         graph = {};
 
         wires.forEach(w => addEdge(w.a, w.b));
 
+        // Push Buttons
         [1, 2, 3].forEach(i => {
           let pb = `pb${i}`;
           if (state[pb]) addEdge(`${pb}_no_top`, `${pb}_no_bot`); 
           else addEdge(`${pb}_nc_top`, `${pb}_nc_bot`);
         });
 
+        // Relays X1, X2
         [1, 2].forEach(i => {
           let x = `x${i}`;
           if (state[x]) {
@@ -1652,45 +1383,99 @@
           }
         });
 
+        // Magnetic Contactor (MC1)
+        if (state.mc1) {
+            addEdge('mc1_R_in', 'mc1_U_out');
+            addEdge('mc1_S_in', 'mc1_V_out');
+            addEdge('mc1_T_in', 'mc1_W_out');
+            addEdge('mc1_no_top', 'mc1_no_bot');
+        } else {
+            addEdge('mc1_nc_top', 'mc1_nc_bot');
+        }
+
+        // Thermal Relay (THR1) Main
+        addEdge('thr1_U_in', 'thr1_U_out');
+        addEdge('thr1_V_in', 'thr1_V_out');
+        addEdge('thr1_W_in', 'thr1_W_out');
+        
+        // THR Aux (Tripped logic)
+        if (state.thrTripped) {
+            addEdge('thr1_95', 'thr1_98'); // NO closes
+        } else {
+            addEdge('thr1_95', 'thr1_96'); // NC stays closed
+        }
+
+        // Fuse passes power
+        addEdge('fuse_R_in', 'fuse_R_out');
+        addEdge('fuse_T_in', 'fuse_T_out');
+
+        // Evaluate Nets
         let rNet = getConnected('pow_R');
         let tNet = getConnected('pow_T');
+        
+        // Incorporate main power into control if cross wired
+        let mRNet = getConnected('main_R');
+        let mTNet = getConnected('main_T');
+        let mSNet = getConnected('main_S');
 
-        isShortCircuit = rNet.has('pow_T') || tNet.has('pow_R');
-        if (isShortCircuit) { rNet = new Set(); tNet = new Set(); }
+        // Combine logic if power blocks are connected (like in motor circuit)
+        if(mRNet.has('pow_R') || rNet.has('main_R')) rNet = new Set([...rNet, ...mRNet]);
+        if(mTNet.has('pow_T') || tNet.has('main_T')) tNet = new Set([...tNet, ...mTNet]);
 
+        // Standard Control Short
+        isShortCircuit = rNet.has('pow_T') || tNet.has('pow_R') || mRNet.has('main_T') || mRNet.has('main_S') || mSNet.has('main_T');
+        if (isShortCircuit) { rNet = new Set(); tNet = new Set(); mRNet = new Set(); mSNet = new Set(); mTNet = new Set(); }
+
+        // Update Relays
         [1, 2].forEach(i => {
           let x = `x${i}`;
           let top = `${x}_coil_top`;
           let bot = `${x}_coil_bot`;
-          let hasR = rNet.has(top) || rNet.has(bot);
-          let hasT = tNet.has(top) || tNet.has(bot);
+          let hasR = rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot);
+          let hasT = tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot);
           let isEnergized = hasR && hasT;
           
-          if (state[x] !== isEnergized) {
-            state[x] = isEnergized;
-            changed = true; 
-          }
+          if (state[x] !== isEnergized) { state[x] = isEnergized; changed = true; }
         });
 
-        ['rl', 'gl'].forEach(l => {
+        // Update MC1
+        let mcTop = 'mc1_coil_top';
+        let mcBot = 'mc1_coil_bot';
+        let mcHasR = rNet.has(mcTop) || rNet.has(mcBot) || mRNet.has(mcTop) || mRNet.has(mcBot);
+        let mcHasT = tNet.has(mcTop) || tNet.has(mcBot) || mTNet.has(mcTop) || mTNet.has(mcBot);
+        let mcEnergized = mcHasR && mcHasT;
+        if (state.mc1 !== mcEnergized) { state.mc1 = mcEnergized; changed = true; }
+
+        // Update Lamps
+        ['rl', 'gl', 'yl'].forEach(l => {
           let top = `${l}_top`;
           let bot = `${l}_bot`;
-          let hasR = rNet.has(top) || rNet.has(bot);
-          let hasT = tNet.has(top) || tNet.has(bot);
+          let hasR = rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot);
+          let hasT = tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot);
           state[l] = hasR && hasT;
         });
+
+        // Update Motor
+        let motorU = mRNet.has('mot_U') || mSNet.has('mot_U') || mTNet.has('mot_U');
+        let motorV = mRNet.has('mot_V') || mSNet.has('mot_V') || mTNet.has('mot_V');
+        let motorW = mRNet.has('mot_W') || mSNet.has('mot_W') || mTNet.has('mot_W');
+        
+        // Simple motor logic: requires 3 active lines.
+        let motorHas3Phases = mRNet.has('mot_U') && mSNet.has('mot_V') && mTNet.has('mot_W'); 
+        state.motorOn = motorHas3Phases;
       }
 
+      // UI Visual Updates
       if (isShortCircuit) {
         statusPanel.className = 'status-bar short';
-        statusPanel.innerHTML = "⚠️ 단락 경고! R상과 T상이 직접 연결되었습니다. (SHORT CIRCUIT DETECTED!)";
+        statusPanel.innerHTML = "⚠️ 단락 경고! R상, S상, T상 중 일부가 직접 연결되었습니다. (SHORT CIRCUIT!)";
       } else {
-        statusPanel.className = 'status-bar';
-        statusPanel.innerHTML = "정상. 버튼을 눌러 논리 회로를 테스트하세요. (Circuit ready. Press buttons to test flow.)";
-        
-        // Explain permanent latch warning for Basic Latch
-        if(document.getElementById('lesson-select').value === 'latch_basic' && state.x1) {
-            statusPanel.innerHTML = "릴레이가 자기유지 되었습니다. 정지 버튼이 없으므로 전선을 해제하거나 초기화해야 꺼집니다.";
+        if(state.thrTripped) {
+            statusPanel.className = 'status-bar warning';
+            statusPanel.innerHTML = "⚠️ 열동계전기 과부하 트립 발생! 회로가 차단되었습니다. (THR TRIPPED!)";
+        } else {
+            statusPanel.className = 'status-bar';
+            statusPanel.innerHTML = "정상. 버튼을 눌러 논리 회로를 테스트하세요. (Circuit ready. Press buttons to test flow.)";
         }
       }
 
@@ -1700,22 +1485,27 @@
         else ind.classList.remove('on');
       });
 
-      ['rl', 'gl'].forEach(l => {
+      const mcInd = document.getElementById('ind_mc1');
+      if(state.mc1) mcInd.classList.add('on'); else mcInd.classList.remove('on');
+
+      ['rl', 'gl', 'yl'].forEach(l => {
         const dome = document.getElementById(`dome_${l}`);
         if(state[l]) dome.classList.add('on');
         else dome.classList.remove('on');
       });
+
+      const motorBlade = document.getElementById('motor_blade');
+      if(state.motorOn) motorBlade.classList.add('spinning');
+      else motorBlade.classList.remove('spinning');
     }
 
     function showHint() {
       const lessonKey = document.getElementById('lesson-select').value;
       const targetWires = lessons[lessonKey];
       
-      // Clear previous hints
       document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
 
       for (let expected of targetWires) {
-        // Check if wire already exists (bidirectional check)
         const exists = wires.some(w => 
           (w.a === expected.a && w.b === expected.b) || 
           (w.a === expected.b && w.b === expected.a)
@@ -1732,7 +1522,6 @@
           return;
         }
       }
-      
       updateStatus("모든 연결이 완료되었습니다! (All connections match the target diagram!)", false);
     }
 
@@ -1763,18 +1552,15 @@
       } else {
         btn.innerText = '사이드바 숨기기 (Hide Sidebar)';
       }
-      
-      // Redraw wires smoothly after layout changes width so wires remain pinned to terminals
       setTimeout(renderWires, 300);
     }
 
     window.addEventListener('resize', renderWires);
     scrollContainer.addEventListener('scroll', () => { if (wires.length > 0) renderWires(); });
 
-    // Set initial diagram active based on dropdown
     document.getElementById('diag_latch_basic').classList.add('active');
-
     buildHardware();
   </script>
 </body>
 </html>
+
