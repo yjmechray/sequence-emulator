@@ -222,9 +222,9 @@
       -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; 
     }
 
-    /* Enlarge board to fit Motor Control Elements */
+    /* Highly Compact Board */
     .board {
-      position: relative; width: 1250px; height: 850px; background: #d1d5db;
+      position: relative; width: 850px; height: 570px; background: #d1d5db;
       border: 4px solid #94a3b8; border-radius: 12px;
       box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       margin: 0 auto; flex-shrink: 0; transform-origin: top left; will-change: transform;
@@ -244,24 +244,24 @@
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
-      display: flex; flex-direction: column; align-items: center; padding: 0.5rem;
+      display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.4rem;
     }
     .module-screws::before, .module-screws::after {
-      content: ''; position: absolute; width: 6px; height: 6px; background: #64748b;
+      content: ''; position: absolute; width: 5px; height: 5px; background: #64748b;
       border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
     }
-    .module-screws::before { top: 6px; left: 6px; }
-    .module-screws::after { bottom: 6px; right: 6px; }
+    .module-screws::before { top: 5px; left: 5px; }
+    .module-screws::after { bottom: 5px; right: 5px; }
 
     .module-title {
-      font-size: 0.75rem; font-weight: bold; background: #94a3b8; color: white;
-      padding: 0.1rem 1rem; border-radius: 4px; margin-bottom: 0.5rem;
+      font-size: 0.7rem; font-weight: bold; background: #94a3b8; color: white;
+      padding: 0.1rem 0.6rem; border-radius: 4px; margin-bottom: 0.4rem;
       text-transform: uppercase; letter-spacing: 0.05em; text-align: center;
     }
 
-    .terminal-group { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .terminal-group { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
     .terminal {
-      width: 18px; height: 18px; border-radius: 50%; border: 2px solid #334155; 
+      width: 16px; height: 16px; border-radius: 50%; border: 2px solid #334155; 
       box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
       position: relative; cursor: pointer; transition: transform 0.1s;
     }
@@ -269,51 +269,51 @@
       content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 6px; height: 6px; background: #020617; border-radius: 50%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
     }
-    .terminal:hover { transform: scale(1.2); z-index: 30; }
-    .terminal.selected { transform: scale(1.2); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); }
+    .terminal:hover { transform: scale(1.3); z-index: 30; }
+    .terminal.selected { transform: scale(1.3); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); }
 
     .term-red { background: var(--term-red); }
     .term-yellow { background: var(--term-yellow); }
     .term-blue { background: var(--term-blue); }
     .term-black { background: var(--term-black); }
 
-    .grid-row { display: flex; gap: 0.5rem; justify-content: center; } 
-    .grid-col { display: flex; flex-direction: column; gap: 0.25rem; align-items: center; } 
-    .symbol { font-size: 0.65rem; color: #475569; font-weight: 600; text-align: center; margin: 0.15rem 0; }
+    .grid-row { display: flex; gap: 0.4rem; justify-content: center; } 
+    .grid-col { display: flex; flex-direction: column; gap: 0.2rem; align-items: center; } 
+    .symbol { font-size: 0.6rem; color: #475569; font-weight: 600; text-align: center; margin: 0.1rem 0; }
 
     .pb-actuator {
-      width: 36px; height: 36px; border-radius: 50%; border: 2px solid #94a3b8;
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #94a3b8;
       background: radial-gradient(circle at 30% 30%, #f8fafc, #cbd5e1 60%);
       box-shadow: 0 4px 0 #94a3b8, 0 5px 5px rgba(0,0,0,0.2); cursor: pointer;
       display: flex; align-items: center; justify-content: center; font-weight: bold;
-      font-size: 0.7rem; margin-bottom: 0.5rem; user-select: none; transition: all 0.1s;
+      font-size: 0.65rem; margin-bottom: 0.4rem; user-select: none; transition: all 0.1s;
     }
     .pb-actuator:active, .pb-actuator.pressed { transform: translateY(4px); box-shadow: 0 0 0 #94a3b8, 0 1px 2px rgba(0,0,0,0.2); }
 
     .lamp-dome {
-      width: 44px; height: 44px; border-radius: 50%; margin-bottom: 0.5rem; border: 4px solid #64748b;
+      width: 36px; height: 36px; border-radius: 50%; margin-bottom: 0.4rem; border: 3px solid #64748b;
       box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s;
     }
     .lamp-red { background: radial-gradient(circle at 30% 30%, #fca5a5, #991b1b); }
     .lamp-green { background: radial-gradient(circle at 30% 30%, #86efac, #166534); }
     .lamp-yellow { background: radial-gradient(circle at 30% 30%, #fde047, #b45309); }
     
-    .lamp-red.on { background: radial-gradient(circle at 40% 40%, #ffbaba, #ff0000); box-shadow: 0 0 30px #ff0000, inset 0 4px 8px rgba(255,255,255,0.6); }
-    .lamp-green.on { background: radial-gradient(circle at 40% 40%, #baffc9, #00ff00); box-shadow: 0 0 30px #00ff00, inset 0 4px 8px rgba(255,255,255,0.6); }
-    .lamp-yellow.on { background: radial-gradient(circle at 40% 40%, #fef08a, #eab308); box-shadow: 0 0 30px #eab308, inset 0 4px 8px rgba(255,255,255,0.6); }
+    .lamp-red.on { background: radial-gradient(circle at 40% 40%, #ffbaba, #ff0000); box-shadow: 0 0 25px #ff0000, inset 0 4px 8px rgba(255,255,255,0.6); }
+    .lamp-green.on { background: radial-gradient(circle at 40% 40%, #baffc9, #00ff00); box-shadow: 0 0 25px #00ff00, inset 0 4px 8px rgba(255,255,255,0.6); }
+    .lamp-yellow.on { background: radial-gradient(circle at 40% 40%, #fef08a, #eab308); box-shadow: 0 0 25px #eab308, inset 0 4px 8px rgba(255,255,255,0.6); }
 
-    .relay-indicator { width: 10px; height: 10px; border-radius: 50%; background: #475569; margin-bottom: 0.5rem; }
+    .relay-indicator { width: 8px; height: 8px; border-radius: 50%; background: #475569; margin-bottom: 0.3rem; }
     .relay-indicator.on { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
 
     /* Motor Styling */
     .motor-casing {
-      width: 80px; height: 80px; border-radius: 50%; border: 6px solid #475569;
+      width: 70px; height: 70px; border-radius: 50%; border: 5px solid #475569;
       background: radial-gradient(circle at 50% 50%, #94a3b8, #cbd5e1);
-      display: flex; align-items: center; justify-content: center; position: relative; margin-top: 10px;
+      display: flex; align-items: center; justify-content: center; position: relative; margin-top: 8px;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
     }
     .motor-blade {
-      width: 60px; height: 60px; position: absolute;
+      width: 50px; height: 50px; position: absolute;
       transform-origin: center; animation: spin 0.3s linear infinite; animation-play-state: paused;
     }
     .motor-blade.spinning { animation-play-state: running; }
@@ -321,8 +321,8 @@
 
     /* THR Trip Button */
     .thr-trip-btn {
-      background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 8px;
-      font-size: 0.6rem; font-weight: bold; cursor: pointer; margin-bottom: 5px;
+      background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 6px;
+      font-size: 0.55rem; font-weight: bold; cursor: pointer; margin-bottom: 4px;
     }
     .thr-trip-btn.tripped { background: #fbbf24; color: #78350f; animation: pulse 1s infinite; }
 
@@ -1218,33 +1218,15 @@
     }
 
     function buildHardware() {
-      createModule('main_power', 20, 20, 120, 100, '3-Phase Power', `
-        <div class="grid-row" style="margin-top:10px;">
-          <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
-          <div class="grid-col"><div class="terminal term-black" id="main_S"></div><div class="symbol">S</div></div>
-          <div class="grid-col"><div class="terminal term-black" id="main_T"></div><div class="symbol">T</div></div>
-        </div>
-      `);
-
-      createModule('fuse_mod', 155, 20, 100, 130, 'Fuse', `
-        <div class="grid-row" style="margin-top:10px; gap: 15px;">
-          <div class="grid-col">
-             <div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div>
-          </div>
-          <div class="grid-col">
-             <div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div>
-          </div>
-        </div>
-      `);
-      
-      createModule('power', 270, 20, 110, 100, 'Ctrl Power', `
+      // Top Row (Most frequently used controls)
+      createModule('power', 15, 20, 85, 90, 'Ctrl Pow', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-red" id="pow_T"></div><div class="symbol">T</div></div>
         </div>
       `);
 
-      const pbXPositions = [400, 520, 640];
+      const pbXPositions = [130, 240, 350];
       pbXPositions.forEach((pbX, i) => {
         const pbNum = i + 1;
         let pbHTML = `
@@ -1252,27 +1234,23 @@
             <div class="pb-actuator" id="btn_pb${pbNum}" onmousedown="pressPB('pb${pbNum}', true)" onmouseup="pressPB('pb${pbNum}', false)" onmouseleave="pressPB('pb${pbNum}', false)" ontouchstart="pressPB('pb${pbNum}', true)" ontouchend="pressPB('pb${pbNum}', false)">PB${pbNum}</div>
             <div class="grid-row" style="gap:8px;">
               <div class="grid-col">
-                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div>
-                <div class="symbol">NO</div>
-                <div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
+                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
               </div>
               <div class="grid-col">
-                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div>
-                <div class="symbol">NC</div>
-                <div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
+                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
               </div>
             </div>
           </div>`;
-        createModule(`pb${pbNum}_mod`, pbX, 20, 110, 170, `Button PB${pbNum}`, pbHTML);
+        createModule(`pb${pbNum}_mod`, pbX, 20, 95, 140, `Btn PB${pbNum}`, pbHTML);
       });
 
       const lamps = [
-        { id: 'rl', color: 'red', name: 'RL Lamp', x: 770 },
-        { id: 'gl', color: 'green', name: 'GL Lamp', x: 860 },
-        { id: 'yl', color: 'yellow', name: 'YL Lamp', x: 950 }
+        { id: 'rl', color: 'red', name: 'RL', x: 470 },
+        { id: 'gl', color: 'green', name: 'GL', x: 550 },
+        { id: 'yl', color: 'yellow', name: 'YL', x: 630 }
       ];
       lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 20, 80, 170, l.name, `
+        createModule(`lamp_${l.id}`, l.x, 20, 65, 140, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
           <div class="grid-col">
             <div class="terminal term-red" id="${l.id}_top"></div>
@@ -1281,7 +1259,42 @@
         `);
       });
 
-      createModule('mc1_mod', 20, 150, 170, 190, 'Contactor (MC)', `
+      createModule('fuse_mod', 710, 20, 110, 140, 'Fuse', `
+        <div class="grid-row" style="margin-top:15px; gap: 20px;">
+          <div class="grid-col">
+             <div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div>
+          </div>
+          <div class="grid-col">
+             <div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div>
+          </div>
+        </div>
+      `);
+
+      // Middle Row (Relays)
+      [1, 2].forEach((num, idx) => {
+        let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
+        relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
+        for(let i=1; i<=4; i++) {
+          relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
+        }
+        for(let i=1; i<=4; i++) {
+          relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
+        }
+        relayHTML += '</div>';
+        
+        createModule(`relay${num}`, 15 + (idx * 355), 180, 340, 150, `Relay (X${num})`, relayHTML);
+      });
+
+      // Bottom Row (Main Circuit)
+      createModule('main_power', 15, 350, 100, 100, '3-Ph Pow', `
+        <div class="grid-row" style="margin-top:10px;">
+          <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_S"></div><div class="symbol">S</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_T"></div><div class="symbol">T</div></div>
+        </div>
+      `);
+
+      createModule('mc1_mod', 130, 350, 225, 180, 'Contactor (MC)', `
         <div class="relay-indicator" id="ind_mc1"></div>
         <div class="grid-row" style="gap: 15px;">
             <div class="grid-col">
@@ -1290,7 +1303,7 @@
                     <div class="grid-col"><div class="terminal term-black" id="mc1_S_in"></div><div class="symbol">S</div></div>
                     <div class="grid-col"><div class="terminal term-black" id="mc1_T_in"></div><div class="symbol">T</div></div>
                 </div>
-                <div style="height: 15px;"></div>
+                <div style="height: 10px;"></div>
                 <div class="grid-row" style="gap:4px;">
                     <div class="grid-col"><div class="symbol">U</div><div class="terminal term-black" id="mc1_U_out"></div></div>
                     <div class="grid-col"><div class="symbol">V</div><div class="terminal term-black" id="mc1_V_out"></div></div>
@@ -1303,7 +1316,7 @@
                     <div class="grid-col"><div class="terminal term-yellow" id="mc1_no_top"></div><div class="symbol">a</div></div>
                     <div class="grid-col"><div class="terminal term-blue" id="mc1_nc_top"></div><div class="symbol">b</div></div>
                 </div>
-                <div style="height: 15px;"></div>
+                <div style="height: 10px;"></div>
                 <div class="grid-row" style="gap:4px;">
                     <div class="grid-col"><div class="symbol">A2</div><div class="terminal term-red" id="mc1_coil_bot"></div></div>
                     <div class="grid-col"><div class="symbol">a</div><div class="terminal term-yellow" id="mc1_no_bot"></div></div>
@@ -1313,7 +1326,7 @@
         </div>
       `);
 
-      createModule('thr1_mod', 20, 360, 170, 190, 'Overload (THR)', `
+      createModule('thr1_mod', 370, 350, 225, 180, 'Overload (THR)', `
         <button id="thr_trip_btn" class="thr-trip-btn" onclick="toggleTHRTrip()">NORMAL (Click to Trip)</button>
         <div class="grid-row" style="gap: 15px;">
             <div class="grid-col">
@@ -1322,7 +1335,7 @@
                     <div class="grid-col"><div class="terminal term-black" id="thr1_V_in"></div><div class="symbol">V</div></div>
                     <div class="grid-col"><div class="terminal term-black" id="thr1_W_in"></div><div class="symbol">W</div></div>
                 </div>
-                <div style="height: 15px;"></div>
+                <div style="height: 10px;"></div>
                 <div class="grid-row" style="gap:4px;">
                     <div class="grid-col"><div class="symbol">U'</div><div class="terminal term-black" id="thr1_U_out"></div></div>
                     <div class="grid-col"><div class="symbol">V'</div><div class="terminal term-black" id="thr1_V_out"></div></div>
@@ -1333,7 +1346,7 @@
                 <div class="grid-row" style="gap:4px;">
                     <div class="grid-col"><div class="terminal term-blue" id="thr1_95"></div><div class="symbol">COM(95)</div></div>
                 </div>
-                <div style="height: 15px;"></div>
+                <div style="height: 10px;"></div>
                 <div class="grid-row" style="gap:4px;">
                     <div class="grid-col"><div class="symbol">NC(96)</div><div class="terminal term-blue" id="thr1_96"></div></div>
                     <div class="grid-col"><div class="symbol">NO(98)</div><div class="terminal term-yellow" id="thr1_98"></div></div>
@@ -1342,7 +1355,7 @@
         </div>
       `);
 
-      createModule('motor_mod', 20, 580, 170, 160, 'Motor (IM)', `
+      createModule('motor_mod', 610, 350, 160, 160, 'Motor (IM)', `
         <div class="grid-row" style="gap:4px; margin-top:5px;">
             <div class="grid-col"><div class="terminal term-black" id="mot_U"></div><div class="symbol">U</div></div>
             <div class="grid-col"><div class="terminal term-black" id="mot_V"></div><div class="symbol">V</div></div>
@@ -1359,20 +1372,6 @@
         </div>
       `);
 
-      [1, 2].forEach((num, idx) => {
-        let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
-        relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
-        for(let i=1; i<=4; i++) {
-          relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
-        }
-        for(let i=1; i<=4; i++) {
-          relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
-        }
-        relayHTML += '</div>';
-        
-        createModule(`relay${num}`, 250 + (idx * 370), 280, 350, 160, `Relay (X${num})`, relayHTML);
-      });
-
       document.querySelectorAll('.terminal').forEach(term => {
         term.addEventListener('click', (e) => handleTerminalClick(e, term));
       });
@@ -1386,8 +1385,8 @@
             currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
             
             board.style.transform = `scale(${currentZoom})`;
-            board.style.marginBottom = `${850 * (currentZoom - 1)}px`;
-            board.style.marginRight = `${1200 * (currentZoom - 1)}px`;
+            board.style.marginBottom = `${570 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${850 * (currentZoom - 1)}px`;
             
             renderWires();
         }
@@ -1415,8 +1414,8 @@
         currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
         
         board.style.transform = `scale(${currentZoom})`;
-        board.style.marginBottom = `${850 * (currentZoom - 1)}px`;
-        board.style.marginRight = `${1200 * (currentZoom - 1)}px`;
+        board.style.marginBottom = `${570 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${850 * (currentZoom - 1)}px`;
         
         renderWires();
       }
@@ -1529,22 +1528,26 @@
       const isTopA = (y1 - modATop) < (modABot - y1);
       const isTopB = (y2 - modBTop) < (modBBot - y2);
 
+      // Connect stacked adjacent terminals smoothly
       if (Math.abs(x1 - x2) < 20 && Math.abs(y1 - y2) < 180 && isTopB && !isTopA) {
           return `M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`;
       }
 
-      const offset1 = (index % 8) * 5;
-      const offset2 = ((index + 4) % 8) * 5;
+      // Dynamic gap spreading to avoid bundling
+      const offset1 = (index % 5) * 4;
+      const offset2 = ((index + 3) % 5) * 4;
 
-      const cy1 = isTopA ? modATop - 15 - offset1 : modABot + 15 + offset1;
-      const cy2 = isTopB ? modBTop - 15 - offset2 : modBBot + 15 + offset2;
+      const cy1 = isTopA ? modATop - 10 - offset1 : modABot + 10 + offset1;
+      const cy2 = isTopB ? modBTop - 10 - offset2 : modBBot + 10 + offset2;
 
-      if (Math.abs(cy1 - cy2) < 40) {
+      // Avoid creating unnecessary vertical lines if they are logically in the same horizontal corridor
+      if (Math.abs(cy1 - cy2) < 30) {
           const midY = (cy1 + cy2) / 2;
           return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
       }
 
-      const safeXTrunks = [10, 147, 220, 262, 390, 515, 610, 635, 760, 855, 945, 1050, 1150];
+      // Exact predefined vertical safe gaps between columns based on the new compacted layout
+      const safeXTrunks = [10, 122, 235, 362, 475, 602, 675, 745, 830];
       let bestX = safeXTrunks[0];
       let minCost = Infinity;
 
@@ -1553,7 +1556,7 @@
           if (cost < minCost) { minCost = cost; bestX = sx; }
       }
 
-      const trunkX = bestX + ((index % 7) - 3) * 4;
+      const trunkX = bestX + ((index % 5) - 2) * 3;
 
       return `M ${x1} ${y1} L ${x1} ${cy1} L ${trunkX} ${cy1} L ${trunkX} ${cy2} L ${x2} ${cy2} L ${x2} ${y2}`;
     }
