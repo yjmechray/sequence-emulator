@@ -112,12 +112,7 @@
       transform: translateY(-1px);
     }
     
-    button.primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-    }
+    button.primary { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
     button.primary:hover { background: var(--primary-hover); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4); }
     
     button.danger { background: var(--danger); color: white; border-color: var(--danger); box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
@@ -135,17 +130,9 @@
 
     /* Top Thin Status Bar */
     .status-bar {
-      background: #eff6ff;
-      color: #1e3a8a;
-      padding: 0.4rem 1rem;
-      text-align: center;
-      font-size: 0.85rem;
-      font-weight: 500;
-      border-bottom: 1px solid #bfdbfe;
-      border-top: 1px solid #bfdbfe;
-      flex-shrink: 0;
-      z-index: 9;
-      transition: background 0.3s, color 0.3s;
+      background: #eff6ff; color: #1e3a8a; padding: 0.4rem 1rem; text-align: center;
+      font-size: 0.85rem; font-weight: 500; border-bottom: 1px solid #bfdbfe;
+      border-top: 1px solid #bfdbfe; flex-shrink: 0; z-index: 9; transition: background 0.3s, color 0.3s;
     }
 
     .status-bar.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
@@ -162,14 +149,8 @@
 
     /* Left Sidebar: Collapsible Sections */
     .sidebar {
-      width: 340px;
-      background: var(--card);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      z-index: 5;
-      flex-shrink: 0;
-      transition: width 0.3s ease;
+      width: 340px; background: var(--card); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 5; flex-shrink: 0; transition: width 0.3s ease;
     }
 
     .sidebar.collapsed { width: 0; border-right: none; }
@@ -237,14 +218,15 @@
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
       opacity: 0.85; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
     }
-    .wire-path:hover { stroke-width: 7; opacity: 1; stroke: #3b82f6 !important; z-index: 15; filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)); }
+    /* Dynamic hover pop-to-front logic is handled in JS, but style changes here */
+    .wire-path:hover { stroke-width: 7; opacity: 1; stroke: #3b82f6 !important; filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)); }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
-    /* Hardware Modules (Ensure z-index is higher than wires so they don't get overwritten) */
+    /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
-      display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.4rem; z-index: 20;
+      display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.4rem; z-index: 5;
     }
     .module-screws::before, .module-screws::after {
       content: ''; position: absolute; width: 5px; height: 5px; background: #64748b;
@@ -263,8 +245,8 @@
     .terminal {
       width: 16px; height: 16px; border-radius: 50%; border: 2px solid #334155; 
       box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
-      position: relative; cursor: pointer; transition: transform 0.1s; z-index: 30; /* Keep terminals top */
-      background-color: white; /* Ensure base color isn't transparent */
+      position: relative; cursor: pointer; transition: transform 0.1s; z-index: 30;
+      background-color: white;
     }
     .terminal::after {
       content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -388,31 +370,21 @@
               <path class="dw" d="M 30 30 H 140 M 30 150 H 140" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
               <text x="10" y="156" class="dt bold" style="font-size: 20px;">T</text>
-              
-              <!-- PB1 -->
               <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
               <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
-
-              <!-- X1 Contact (Parallel to PB1) -->
               <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 150 45 V 75" />
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">X1</text>
-
-              <!-- Merge parallel -->
               <path class="dw" d="M 80 90 H 140" />
-
-              <!-- X1 Coil -->
               <path class="dw" d="M 80 90 V 105" />
               <circle cx="80" cy="120" r="15" class="dw" />
               <text x="71" y="126" class="dt bold" style="font-size: 18px;">X1</text>
               <path class="dw" d="M 80 135 V 150" />
-
-              <!-- Junctions & Terminals -->
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
@@ -429,37 +401,29 @@
               <text x="10" y="106" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="100" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
               <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
               <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
-
               <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 150 45 V 75" />
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">Xa</text>
-
               <path class="dw" d="M 80 90 H 140" />
-
               <path class="dw" d="M 80 90 V 110 M 80 140 V 155" />
               <circle cx="80" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 83 110 V 140 M 83 125 H 93" />
               <text x="100" y="132" class="dt bold" style="font-size: 20px;">PB2</text>
-
               <path class="dw" d="M 80 155 H 140" />
-
               <path class="dw" d="M 80 155 V 165 M 80 195 V 220" />
               <circle cx="80" cy="180" r="15" class="dw" />
               <text x="73" y="186" class="dt bold" style="font-size: 18px;">X</text>
-
               <path class="dw" d="M 140 155 V 165 M 140 195 V 220" />
               <circle cx="140" cy="180" r="15" class="dw" /> 
               <text x="134" y="186" class="dt bold" style="font-size: 18px;">L</text>
-
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
               <circle cx="140" cy="30" r="3" fill="#1e293b" />
               <circle cx="80" cy="90" r="3" fill="#1e293b" />
@@ -475,35 +439,29 @@
               <text x="10" y="216" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="210" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
               <rect x="50" y="20" width="20" height="20" class="dw" /> <text x="52" y="15" class="dt">F1</text>
               <rect x="50" y="200" width="20" height="20" class="dw" /> <text x="52" y="195" class="dt">F2</text>
               <path class="dw" d="M 70 30 H 100 M 70 210 H 100" />
-              
               <path class="dw" d="M 100 30 H 120" />
               <circle cx="120" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="160" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 123 30 H 157 M 140 30 V 20 H 150" />
               <text x="125" y="15" class="dt bold">PB(STP)</text>
               <path class="dw" d="M 160 30 H 180" />
-
               <circle cx="180" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 180 30 H 420" />
-
               <path class="dw" d="M 180 30 V 60" />
               <circle cx="180" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 190 60 V 90 M 190 75 H 200" />
               <text x="205" y="80" class="dt bold">PB(ST)</text>
               <path class="dw" d="M 180 90 V 120" />
-              
               <circle cx="180" cy="120" r="3" fill="#1e293b" />
               <path class="dw" d="M 180 120 V 140" />
               <circle cx="180" cy="155" r="15" class="dw" />
               <text x="169" y="161" class="dt bold">MC</text>
               <path class="dw" d="M 180 170 V 210" />
               <circle cx="180" cy="210" r="3" fill="#1e293b" />
-
               <circle cx="260" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 260 30 V 60" />
               <circle cx="260" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -511,7 +469,6 @@
               <path class="dw" d="M 270 60 V 90" />
               <text x="275" y="80" class="dt bold">MC-a</text>
               <path class="dw" d="M 260 90 V 120 H 180" />
-
               <circle cx="340" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 340 30 V 60" />
               <circle cx="340" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -523,7 +480,6 @@
               <text x="330" y="161" class="dt bold" style="fill: #16a34a;">GL</text>
               <path class="dw" d="M 340 170 V 210" />
               <circle cx="340" cy="210" r="3" fill="#1e293b" />
-
               <circle cx="420" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 420 30 V 60" />
               <circle cx="420" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -542,82 +498,67 @@
               <path class="dw" d="M 30 30 H 60 M 90 30 H 400 M 30 230 H 400" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
               <text x="10" y="236" class="dt bold" style="font-size: 20px;">T</text>
-
               <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
               <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB3</text>
-
               <circle cx="120" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 120 30 V 45" />
               <path class="dw" d="M 120 45 H 180" />
-
               <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 130 45 V 75 M 130 60 H 140" />
               <text x="85" y="66" class="dt bold" style="font-size: 18px;">PB1</text>
               <path class="dw" d="M 190 45 V 75" />
               <text x="195" y="66" class="dt bold" style="font-size: 18px;">X1</text>
-
               <circle cx="120" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 120 75 H 180" />
               <circle cx="120" cy="75" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 120 75 V 105" />
               <circle cx="120" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="120" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 123 105 V 135 M 123 120 H 133" />
               <text x="140" y="126" class="dt bold" style="font-size: 18px;">X2</text>
-
               <path class="dw" d="M 120 135 V 150" />
               <circle cx="120" cy="150" r="3" fill="#1e293b"/>
               <path class="dw" d="M 120 150 H 180" />
-
               <path class="dw" d="M 120 150 V 170" />
               <circle cx="120" cy="185" r="15" class="dw" />
               <text x="109" y="191" class="dt bold" style="font-size: 16px;">X1</text>
               <path class="dw" d="M 120 200 V 230" />
               <circle cx="120" cy="230" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 180 150 V 170" />
               <circle cx="180" cy="185" r="15" class="dw" />
               <text x="173" y="191" class="dt bold" style="font-size: 16px;">R</text>
               <path class="dw" d="M 180 200 V 230" />
               <circle cx="180" cy="230" r="3" fill="#1e293b"/>
-
               <circle cx="280" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 280 30 V 45" />
               <path class="dw" d="M 280 45 H 340" />
-
               <circle cx="280" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="340" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 290 45 V 75 M 290 60 H 300" />
               <text x="245" y="66" class="dt bold" style="font-size: 18px;">PB2</text>
               <path class="dw" d="M 350 45 V 75" />
               <text x="355" y="66" class="dt bold" style="font-size: 18px;">X2</text>
-
               <circle cx="280" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="340" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 280 75 H 340" />
               <circle cx="280" cy="75" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 280 75 V 105" />
               <circle cx="280" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="280" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 283 105 V 135 M 283 120 H 293" />
               <text x="300" y="126" class="dt bold" style="font-size: 18px;">X1</text>
-
               <path class="dw" d="M 280 135 V 150" />
               <circle cx="280" cy="150" r="3" fill="#1e293b"/>
               <path class="dw" d="M 280 150 H 340" />
-
               <path class="dw" d="M 280 150 V 170" />
               <circle cx="280" cy="185" r="15" class="dw" />
               <text x="269" y="191" class="dt bold" style="font-size: 16px;">X2</text>
               <path class="dw" d="M 280 200 V 230" />
               <circle cx="280" cy="230" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 340 150 V 170" />
               <circle cx="340" cy="185" r="15" class="dw" />
               <text x="332" y="191" class="dt bold" style="font-size: 16px;">G</text>
@@ -635,7 +576,6 @@
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB</text>
               <circle cx="80" cy="115" r="15" class="dw" />
               <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
-              
               <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -643,7 +583,6 @@
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">X</text>
               <circle cx="140" cy="115" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
               <text x="129" y="121" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
-
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
@@ -664,7 +603,6 @@
               <text x="98" y="65" class="dt bold" style="font-size: 20px;">PB</text>
               <circle cx="80" cy="115" r="15" class="dw" />
               <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
-
               <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -672,7 +610,6 @@
               <text x="153" y="65" class="dt bold" style="font-size: 20px;">X</text>
               <circle cx="140" cy="115" r="15" fill="none" stroke="#16a34a" stroke-width="2" />
               <text x="128" y="121" class="dt bold" style="fill: #16a34a; font-size: 16px;">GL</text>
-
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
@@ -693,7 +630,6 @@
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB</text>
               <circle cx="80" cy="115" r="15" class="dw" />
               <text x="73" y="121" class="dt bold" style="font-size: 18px;">X</text>
-              
               <path class="dw" d="M 140 30 V 45 M 140 75 V 100 M 140 130 V 130" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -701,7 +637,6 @@
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">X</text>
               <circle cx="140" cy="115" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
               <text x="129" y="121" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
-
               <path class="dw" d="M 200 30 V 45 M 200 75 V 100 M 200 130 V 130" />
               <circle cx="200" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="200" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -709,7 +644,6 @@
               <text x="213" y="65" class="dt bold" style="font-size: 20px;">X</text>
               <circle cx="200" cy="115" r="15" fill="none" stroke="#16a34a" stroke-width="2" />
               <text x="188" y="121" class="dt bold" style="fill: #16a34a; font-size: 16px;">GL</text>
-
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="80" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
@@ -733,7 +667,6 @@
               <text x="10" y="176" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="170" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
               <circle cx="110" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 110 30 V 45" />
               <circle cx="110" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -746,7 +679,6 @@
               <text x="101" y="141" class="dt bold" style="font-size: 16px;">X1</text>
               <path class="dw" d="M 110 150 V 170" />
               <circle cx="110" cy="170" r="3" fill="#1e293b"/>
-
               <circle cx="170" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 170 30 V 45" />
               <circle cx="170" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -754,7 +686,6 @@
               <path class="dw" d="M 180 45 V 75" />
               <text x="185" y="65" class="dt bold" style="font-size: 18px;">X1</text>
               <path class="dw" d="M 170 75 V 95 H 110" />
-
               <circle cx="230" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 230 30 V 45" />
               <circle cx="230" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -767,7 +698,6 @@
               <text x="221" y="141" class="dt bold" style="font-size: 16px;">X2</text>
               <path class="dw" d="M 230 150 V 170" />
               <circle cx="230" cy="170" r="3" fill="#1e293b"/>
-
               <circle cx="290" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 290 30 V 45" />
               <circle cx="290" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -775,21 +705,17 @@
               <path class="dw" d="M 300 45 V 75" />
               <text x="305" y="65" class="dt bold" style="font-size: 18px;">X2</text>
               <path class="dw" d="M 290 75 V 95 H 230" />
-
               <circle cx="350" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 350 30 V 40" />
               <circle cx="350" cy="40" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="350" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 360 40 V 65" />
               <text x="365" y="58" class="dt bold" style="font-size: 16px;">X1</text>
-
               <path class="dw" d="M 350 65 V 75" />
-
               <circle cx="350" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="350" cy="100" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 360 75 V 100" />
               <text x="365" y="93" class="dt bold" style="font-size: 16px;">X2</text>
-
               <path class="dw" d="M 350 100 V 120" />
               <circle cx="350" cy="135" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
               <text x="339" y="141" class="dt bold" style="fill: #dc2626; font-size: 16px;">RL</text>
@@ -808,7 +734,6 @@
               <text x="10" y="176" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="170" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
               <circle cx="120" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 120 30 V 42" />
               <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -827,7 +752,6 @@
               <text x="109" y="141" class="dt bold" style="font-size: 18px;">X1</text>
               <path class="dw" d="M 120 150 V 170" />
               <circle cx="120" cy="170" r="3" fill="#1e293b"/>
-
               <circle cx="240" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 240 30 V 42" />
               <circle cx="240" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -846,7 +770,6 @@
               <text x="229" y="141" class="dt bold" style="font-size: 18px;">X2</text>
               <path class="dw" d="M 240 150 V 170" />
               <circle cx="240" cy="170" r="3" fill="#1e293b"/>
-
               <circle cx="360" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 360 30 V 42" />
               <circle cx="360" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -874,42 +797,33 @@
               <text x="25" y="35" class="dt bold">R</text>
               <text x="45" y="35" class="dt bold">S</text>
               <text x="65" y="35" class="dt bold">T</text>
-              
               <rect x="20" y="80" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
               <text x="85" y="105" class="dt bold">MC</text>
               <path class="dw" d="M 30 80 V 120 M 50 80 V 120 M 70 80 V 120" />
               <circle cx="30" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="30" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="50" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="50" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="70" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="70" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
               <path class="dw" d="M 30 120 V 160 M 50 120 V 160 M 70 120 V 160" />
-
               <rect x="20" y="160" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
               <text x="85" y="185" class="dt bold">THR</text>
               <path class="dw" d="M 30 160 V 200 M 50 160 V 200 M 70 160 V 200" />
               <path class="dw" d="M 25 175 C 35 175, 35 185, 25 185" />
               <path class="dw" d="M 45 175 C 55 175, 55 185, 45 185" />
               <path class="dw" d="M 65 175 C 75 175, 75 185, 65 185" />
-              
               <path class="dw" d="M 30 200 V 240 M 50 200 V 240 M 70 200 V 240" />
-
               <circle cx="50" cy="270" r="30" class="dw" />
               <text x="40" y="275" class="dt bold" style="font-size: 18px;">IM</text>
-
               <text x="180" y="20" class="dt bold" style="font-size: 18px;">Control</text>
               <circle cx="30" cy="50" r="3" fill="#1e293b" />
               <circle cx="70" cy="60" r="3" fill="#1e293b" />
               <path class="dw" d="M 30 50 H 180 M 70 60 H 130 V 320 H 180" />
-              
               <path class="dw" d="M 180 50 H 540" />
               <path class="dw" d="M 180 320 H 540" />
               <text x="165" y="55" class="dt bold">R</text>
               <text x="165" y="325" class="dt bold">T</text>
-
               <rect x="200" y="40" width="20" height="20" class="dw" /> <text x="202" y="35" class="dt">F1</text>
               <rect x="200" y="310" width="20" height="20" class="dw" /> <text x="202" y="345" class="dt">F2</text>
               <path class="dw" d="M 220 50 H 260 M 220 320 H 260" />
-
               <circle cx="260" cy="50" r="3" fill="#1e293b" />
               <path class="dw" d="M 260 50 V 65" />
               <circle cx="260" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -917,7 +831,6 @@
               <path class="dw" d="M 263 65 V 95 M 263 80 H 273" />
               <text x="278" y="85" class="dt bold">THR</text>
               <path class="dw" d="M 260 95 V 110" />
-
               <path class="dw" d="M 260 65 H 510" />
               <circle cx="510" cy="65" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="510" cy="95" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -928,16 +841,13 @@
               <text x="500" y="290" class="dt bold" style="fill: #eab308;">YL</text>
               <path class="dw" d="M 510 300 V 320" />
               <circle cx="510" cy="320" r="3" fill="#1e293b"/>
-
               <circle cx="260" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="260" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 263 110 V 140 M 263 125 H 273" />
               <text x="278" y="130" class="dt bold">PB3</text>
-              
               <path class="dw" d="M 260 140 V 155" />
               <circle cx="260" cy="155" r="3" fill="#1e293b" />
               <path class="dw" d="M 260 155 H 330" />
-
               <circle cx="260" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="260" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 270 155 V 185 M 270 170 H 280" />
@@ -945,22 +855,18 @@
               <path class="dw" d="M 260 185 V 200" />
               <circle cx="260" cy="200" r="3" fill="#1e293b" />
               <path class="dw" d="M 260 200 H 330" />
-
               <circle cx="330" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="330" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 340 155 V 185" />
               <text x="345" y="175" class="dt bold">MC</text>
               <path class="dw" d="M 330 185 V 200" />
-
               <path class="dw" d="M 260 200 V 270" />
               <circle cx="260" cy="285" r="15" class="dw" />
               <text x="249" y="290" class="dt bold">MC</text>
               <path class="dw" d="M 260 300 V 320" />
               <circle cx="260" cy="320" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 330 155 H 420" />
               <circle cx="420" cy="155" r="3" fill="#1e293b" />
-
               <circle cx="420" cy="155" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="420" cy="185" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 423 155 V 185 M 423 170 H 433" />
@@ -970,7 +876,6 @@
               <text x="410" y="290" class="dt bold" style="fill: #16a34a;">GL</text>
               <path class="dw" d="M 420 300 V 320" />
               <circle cx="420" cy="320" r="3" fill="#1e293b"/>
-
               <path class="dw" d="M 330 200 H 370" />
               <circle cx="370" cy="200" r="3" fill="#1e293b"/>
               <path class="dw" d="M 370 200 V 270" />
@@ -1072,21 +977,18 @@
       ],
       interlock: [
         {a: 'pow_R', b: 'pb3_nc_top'},
-        
         {a: 'pb3_nc_bot', b: 'pb1_no_top'},
         {a: 'pb1_no_top', b: 'x1_no1_top'},
         {a: 'pb1_no_bot', b: 'x1_no1_bot'},
         {a: 'pb1_no_bot', b: 'x2_nc1_top'},
         {a: 'x2_nc1_bot', b: 'x1_coil_top'},
         {a: 'x2_nc1_bot', b: 'rl_top'},
-
         {a: 'pb3_nc_bot', b: 'pb2_no_top'},
         {a: 'pb2_no_top', b: 'x2_no1_top'},
         {a: 'pb2_no_bot', b: 'x2_no1_bot'},
         {a: 'pb2_no_bot', b: 'x1_nc1_top'},
         {a: 'x1_nc1_bot', b: 'x2_coil_top'},
         {a: 'x1_nc1_bot', b: 'gl_top'},
-        
         {a: 'pow_T', b: 'x1_coil_bot'},
         {a: 'x1_coil_bot', b: 'rl_bot'},
         {a: 'rl_bot', b: 'x2_coil_bot'},
@@ -1126,13 +1028,11 @@
         {a: 'x1_coil_bot', b: 'pow_T'},
         {a: 'pb3_nc_bot', b: 'x1_no1_top'},
         {a: 'x1_no1_bot', b: 'x1_coil_top'},
-        
         {a: 'pb3_nc_bot', b: 'pb2_no_top'},
         {a: 'pb2_no_bot', b: 'x2_coil_top'},
         {a: 'x2_coil_bot', b: 'pow_T'},
         {a: 'pb3_nc_bot', b: 'x2_no1_top'},
         {a: 'x2_no1_bot', b: 'x2_coil_top'},
-        
         {a: 'pb3_nc_bot', b: 'x1_no2_top'},
         {a: 'x1_no2_bot', b: 'x2_no2_top'}, 
         {a: 'x2_no2_bot', b: 'rl_top'},
@@ -1140,31 +1040,23 @@
       ],
       or_circuit: [
         {a: 'pow_R', b: 'pb3_nc_top'},
-        
-        // Branch 1: PB1 || X1 -> X1 coil
         {a: 'pb3_nc_bot', b: 'pb1_no_top'},
         {a: 'pb1_no_bot', b: 'x1_coil_top'},
         {a: 'x1_coil_bot', b: 'pow_T'},
         {a: 'pb3_nc_bot', b: 'x1_no1_top'},
         {a: 'x1_no1_bot', b: 'x1_coil_top'},
-        
-        // Branch 2: PB2 || X2 -> X2 coil
         {a: 'pb3_nc_bot', b: 'pb2_no_top'},
         {a: 'pb2_no_bot', b: 'x2_coil_top'},
         {a: 'x2_coil_bot', b: 'pow_T'},
         {a: 'pb3_nc_bot', b: 'x2_no1_top'},
         {a: 'x2_no1_bot', b: 'x2_coil_top'},
-        
-        // Branch 3: X1 || X2 -> Lamp RL
         {a: 'pb3_nc_bot', b: 'x1_no2_top'},
         {a: 'x1_no2_bot', b: 'rl_top'},
         {a: 'pb3_nc_bot', b: 'x2_no2_top'}, 
         {a: 'x2_no2_bot', b: 'rl_top'},
-        
         {a: 'rl_bot', b: 'pow_T'}
       ],
       motor_circuit: [
-        // Main Power Circuit
         {a: 'main_R', b: 'mc1_R_in'},
         {a: 'main_S', b: 'mc1_S_in'},
         {a: 'main_T', b: 'mc1_T_in'},
@@ -1174,23 +1066,15 @@
         {a: 'thr1_U_out', b: 'mot_U'},
         {a: 'thr1_V_out', b: 'mot_V'},
         {a: 'thr1_W_out', b: 'mot_W'},
-        
-        // Control Power
         {a: 'main_R', b: 'fuse_R_in'},
         {a: 'main_T', b: 'fuse_T_in'},
-        
-        // Control Logic
         {a: 'fuse_R_out', b: 'thr1_95'},
         {a: 'thr1_96', b: 'pb3_nc_top'},
         {a: 'pb3_nc_bot', b: 'pb1_no_top'},
         {a: 'pb1_no_bot', b: 'mc1_coil_top'},
         {a: 'mc1_coil_bot', b: 'fuse_T_out'},
-        
-        // Self-holding MC
         {a: 'pb3_nc_bot', b: 'mc1_no_top'},
         {a: 'mc1_no_bot', b: 'mc1_coil_top'},
-        
-        // Lamps
         {a: 'mc1_no_bot', b: 'rl_top'},
         {a: 'rl_bot', b: 'fuse_T_out'},
         {a: 'pb3_nc_bot', b: 'mc1_nc_top'},
@@ -1222,7 +1106,7 @@
     }
 
     function buildHardware() {
-      // Top Row (Most frequently used controls)
+      // Top Row
       createModule('power', 20, 20, 90, 90, 'Ctrl Pow', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
@@ -1237,59 +1121,44 @@
           <div class="grid-col">
             <div class="pb-actuator" id="btn_pb${pbNum}" onmousedown="pressPB('pb${pbNum}', true)" onmouseup="pressPB('pb${pbNum}', false)" onmouseleave="pressPB('pb${pbNum}', false)" ontouchstart="pressPB('pb${pbNum}', true)" ontouchend="pressPB('pb${pbNum}', false)">PB${pbNum}</div>
             <div class="grid-row" style="gap:8px;">
-              <div class="grid-col">
-                <div class="terminal term-yellow" id="pb${pbNum}_no_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div>
-              </div>
-              <div class="grid-col">
-                <div class="terminal term-blue" id="pb${pbNum}_nc_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div>
-              </div>
+              <div class="grid-col"><div class="terminal term-yellow" id="pb${pbNum}_no_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div></div>
+              <div class="grid-col"><div class="terminal term-blue" id="pb${pbNum}_nc_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div></div>
             </div>
           </div>`;
         createModule(`pb${pbNum}_mod`, pbX, 20, 95, 140, `Btn PB${pbNum}`, pbHTML);
       });
 
       const lamps = [
-        { id: 'rl', color: 'red', name: 'RL', x: 510 },
-        { id: 'gl', color: 'green', name: 'GL', x: 600 },
-        { id: 'yl', color: 'yellow', name: 'YL', x: 690 }
+        { id: 'rl', color: 'red', name: 'RL', x: 505 },
+        { id: 'gl', color: 'green', name: 'GL', x: 595 },
+        { id: 'yl', color: 'yellow', name: 'YL', x: 685 }
       ];
       lamps.forEach(l => {
         createModule(`lamp_${l.id}`, l.x, 20, 65, 140, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
-          <div class="grid-col">
-            <div class="terminal term-red" id="${l.id}_top"></div>
-            <div class="terminal term-red" id="${l.id}_bot"></div>
-          </div>
+          <div class="grid-col"><div class="terminal term-red" id="${l.id}_top"></div><div class="terminal term-red" id="${l.id}_bot"></div></div>
         `);
       });
 
       createModule('fuse_mod', 780, 20, 110, 140, 'Fuse', `
         <div class="grid-row" style="margin-top:15px; gap: 20px;">
-          <div class="grid-col">
-             <div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div>
-          </div>
-          <div class="grid-col">
-             <div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div>
-          </div>
+          <div class="grid-col"><div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div></div>
+          <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div></div>
         </div>
       `);
 
-      // Middle Row (Relays)
+      // Middle Row
       [1, 2].forEach((num, idx) => {
         let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
         relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
-        for(let i=1; i<=4; i++) {
-          relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
-        }
-        for(let i=1; i<=4; i++) {
-          relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
-        }
+        for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
+        for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
         relayHTML += '</div>';
         
         createModule(`relay${num}`, 20 + (idx * 370), 190, 350, 150, `Relay (X${num})`, relayHTML);
       });
 
-      // Bottom Row (Main Circuit)
+      // Bottom Row
       createModule('main_power', 20, 380, 100, 100, '3-Ph Pow', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
@@ -1330,7 +1199,7 @@
         </div>
       `);
 
-      createModule('thr1_mod', 400, 380, 225, 180, 'Overload (THR)', `
+      createModule('thr1_mod', 405, 380, 225, 180, 'Overload (THR)', `
         <button id="thr_trip_btn" class="thr-trip-btn" onclick="toggleTHRTrip()">NORMAL (Click to Trip)</button>
         <div class="grid-row" style="gap: 15px;">
             <div class="grid-col">
@@ -1359,7 +1228,7 @@
         </div>
       `);
 
-      createModule('motor_mod', 650, 380, 160, 160, 'Motor (IM)', `
+      createModule('motor_mod', 660, 380, 160, 160, 'Motor (IM)', `
         <div class="grid-row" style="gap:4px; margin-top:5px;">
             <div class="grid-col"><div class="terminal term-black" id="mot_U"></div><div class="symbol">U</div></div>
             <div class="grid-col"><div class="terminal term-black" id="mot_V"></div><div class="symbol">V</div></div>
@@ -1389,7 +1258,7 @@
             currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
             
             board.style.transform = `scale(${currentZoom})`;
-            board.style.marginBottom = `${650 * (currentZoom - 1)}px`;
+            board.style.marginBottom = `${630 * (currentZoom - 1)}px`;
             board.style.marginRight = `${950 * (currentZoom - 1)}px`;
             
             renderWires();
@@ -1399,10 +1268,7 @@
     scrollContainer.addEventListener('touchstart', (e) => {
       if (e.touches.length === 2) {
         e.preventDefault();
-        initialDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
+        initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         initialZoom = currentZoom;
       }
     }, { passive: false });
@@ -1410,37 +1276,28 @@
     scrollContainer.addEventListener('touchmove', (e) => {
       if (e.touches.length === 2 && initialDistance > 0) {
         e.preventDefault();
-        const currentDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
+        const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         const scaleChange = currentDistance / initialDistance;
         currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
         
         board.style.transform = `scale(${currentZoom})`;
-        board.style.marginBottom = `${650 * (currentZoom - 1)}px`;
+        board.style.marginBottom = `${630 * (currentZoom - 1)}px`;
         board.style.marginRight = `${950 * (currentZoom - 1)}px`;
         
         renderWires();
       }
     }, { passive: false });
 
-    scrollContainer.addEventListener('touchend', (e) => {
-      if (e.touches.length < 2) {
-        initialDistance = 0;
-      }
-    });
+    scrollContainer.addEventListener('touchend', (e) => { if (e.touches.length < 2) initialDistance = 0; });
 
     // --- 4. INTERACTION & DRAWING ---
     function toggleTHRTrip() {
         state.thrTripped = !state.thrTripped;
         const btn = document.getElementById('thr_trip_btn');
         if(state.thrTripped) {
-            btn.classList.add('tripped');
-            btn.innerText = "TRIPPED! (Click to Reset)";
+            btn.classList.add('tripped'); btn.innerText = "TRIPPED! (Click to Reset)";
         } else {
-            btn.classList.remove('tripped');
-            btn.innerText = "NORMAL (Click to Trip)";
+            btn.classList.remove('tripped'); btn.innerText = "NORMAL (Click to Trip)";
         }
         evaluateCircuit();
     }
@@ -1453,9 +1310,7 @@
         term.classList.add('selected');
         updateStatus("Select a second terminal to connect the wire. (두 번째 단자를 선택하세요.)");
       } else {
-        if (selectedTerminal !== term) {
-          addWire(selectedTerminal.id, term.id);
-        }
+        if (selectedTerminal !== term) { addWire(selectedTerminal.id, term.id); }
         selectedTerminal.classList.remove('selected');
         selectedTerminal = null;
         tempWire.setAttribute('d', '');
@@ -1468,10 +1323,7 @@
       let clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
       const rect = board.getBoundingClientRect();
-      mousePos = { 
-          x: (clientX - rect.left) / currentZoom, 
-          y: (clientY - rect.top) / currentZoom 
-      };
+      mousePos = { x: (clientX - rect.left) / currentZoom, y: (clientY - rect.top) / currentZoom };
       
       const termRect = selectedTerminal.getBoundingClientRect();
       const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
@@ -1513,59 +1365,44 @@
       updateStatus("All wires cleared. Ready to build. (초기화 완료.)");
     }
 
+    // Orthogonal safe-routing algorithm to completely avoid panels
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
-      const tA = document.getElementById(idA);
-      const tB = document.getElementById(idB);
-      if(!tA || !tB) return `M ${x1} ${y1} L ${x2} ${y2}`;
+      const getDir = (id) => id.includes('_bot') || id.includes('_out') ? 'down' : 'up';
+      const dirA = getDir(idA);
+      const dirB = getDir(idB);
 
-      const modA = tA.closest('.module');
-      const modB = tB.closest('.module');
-      const boardRect = board.getBoundingClientRect();
-      const rA = modA.getBoundingClientRect();
-      const rB = modB.getBoundingClientRect();
+      // 1. Determine Horizontal Corridors (Wiring Ducts) based on row positioning
+      let baseYA, baseYB;
+      
+      if (y1 < 175) baseYA = dirA === 'up' ? 12 : 175;
+      else if (y1 < 360) baseYA = dirA === 'up' ? 175 : 360;
+      else baseYA = dirA === 'up' ? 360 : 585;
 
-      const modATop = (rA.top - boardRect.top) / currentZoom;
-      const modABot = (rA.bottom - boardRect.top) / currentZoom;
-      const modBTop = (rB.top - boardRect.top) / currentZoom;
-      const modBBot = (rB.bottom - boardRect.top) / currentZoom;
+      if (y2 < 175) baseYB = dirB === 'up' ? 12 : 175;
+      else if (y2 < 360) baseYB = dirB === 'up' ? 175 : 360;
+      else baseYB = dirB === 'up' ? 360 : 585;
 
-      const isTopA = (y1 - modATop) < (modABot - y1);
-      const isTopB = (y2 - modBTop) < (modBBot - y2);
+      // Dynamic spreading to avoid wire bundling
+      const offsetY = ((index % 8) * 4) - 14; 
+      const cyA = baseYA + offsetY;
+      const cyB = baseYB + offsetY;
 
-      // Connect stacked adjacent terminals smoothly
-      if (Math.abs(x1 - x2) < 20 && Math.abs(y1 - y2) < 120 && isTopB && !isTopA) {
-          return `M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`;
+      // If they belong to the same corridor, traverse horizontally directly
+      if (Math.abs(baseYA - baseYB) < 10) {
+          return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
       }
 
-      // Dynamic gap spreading to avoid bundling
-      const spreadY1 = (index % 6) * 5;
-      const spreadY2 = ((index + 3) % 6) * 5;
-
-      const cy1 = isTopA ? modATop - 15 - spreadY1 : modABot + 15 + spreadY1;
-      const cy2 = isTopB ? modBTop - 15 - spreadY2 : modBBot + 15 + spreadY2;
-
-      // Avoid creating unnecessary vertical lines if they are logically in the same horizontal corridor
-      if (Math.abs(cy1 - cy2) < 40) {
-          const midY = (cy1 + cy2) / 2;
-          return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+      // 2. Select Safe Vertical Trunk
+      let vx;
+      if ((x1 + x2) / 2 > 400) {
+          // Right Margin Trunk
+          vx = 900 + ((index % 12) * 4);
+      } else {
+          // Left Margin Trunk
+          vx = 6 + ((index % 4) * 2);
       }
 
-      // Exact predefined vertical safe gaps between columns based on the new compacted layout
-      const safeXTrunks = [5, 120, 235, 350, 465, 555, 630, 725, 880];
-      let bestX = safeXTrunks[0];
-      let minCost = Infinity;
-
-      for (let sx of safeXTrunks) {
-          let cost = Math.abs(x1 - sx) + Math.abs(x2 - sx);
-          if ((sx >= Math.min(x1, x2)) && (sx <= Math.max(x1, x2))) {
-              cost -= 500; // Heavily prefer trunks that lie between the two modules
-          }
-          if (cost < minCost) { minCost = cost; bestX = sx; }
-      }
-
-      const trunkX = bestX + ((index % 7) - 3) * 4;
-
-      return `M ${x1} ${y1} L ${x1} ${cy1} L ${trunkX} ${cy1} L ${trunkX} ${cy2} L ${x2} ${cy2} L ${x2} ${y2}`;
+      return `M ${x1} ${y1} L ${x1} ${cyA} L ${vx} ${cyA} L ${vx} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
     }
 
     function renderWires() {
@@ -1589,6 +1426,9 @@
         path.setAttribute('class', 'wire-path');
         path.setAttribute('d', generatePCBPath(w.a, x1, y1, w.b, x2, y2, i));
         path.setAttribute('stroke', w.color);
+        
+        // Hover to front for debugging
+        path.addEventListener('mouseenter', function() { this.parentNode.appendChild(this); });
         path.onclick = () => removeWire(w.id);
         
         wireLayer.appendChild(path);
@@ -1639,10 +1479,7 @@
         while(queue.length > 0) {
           let node = queue.shift();
           graph[node].forEach(neighbor => {
-            if(!visited.has(neighbor)) {
-              visited.add(neighbor);
-              queue.push(neighbor);
-            }
+            if(!visited.has(neighbor)) { visited.add(neighbor); queue.push(neighbor); }
           });
         }
         return visited;
@@ -1707,7 +1544,6 @@
         let mTNet = getConnected('main_T');
         let mSNet = getConnected('main_S');
 
-        // Combine logic if power blocks are connected (like in motor circuit)
         if(mRNet.has('pow_R') || rNet.has('main_R')) rNet = new Set([...rNet, ...mRNet]);
         if(mTNet.has('pow_T') || tNet.has('main_T')) tNet = new Set([...tNet, ...mTNet]);
 
@@ -1723,7 +1559,6 @@
           let hasR = rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot);
           let hasT = tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot);
           let isEnergized = hasR && hasT;
-          
           if (state[x] !== isEnergized) { state[x] = isEnergized; changed = true; }
         });
 
@@ -1745,11 +1580,6 @@
         });
 
         // Update Motor
-        let motorU = mRNet.has('mot_U') || mSNet.has('mot_U') || mTNet.has('mot_U');
-        let motorV = mRNet.has('mot_V') || mSNet.has('mot_V') || mTNet.has('mot_V');
-        let motorW = mRNet.has('mot_W') || mSNet.has('mot_W') || mTNet.has('mot_W');
-        
-        // Simple motor logic: requires 3 active lines.
         let motorHas3Phases = mRNet.has('mot_U') && mSNet.has('mot_V') && mTNet.has('mot_W'); 
         state.motorOn = motorHas3Phases;
       }
@@ -1779,8 +1609,7 @@
 
       ['rl', 'gl', 'yl'].forEach(l => {
         const dome = document.getElementById(`dome_${l}`);
-        if(state[l]) dome.classList.add('on');
-        else dome.classList.remove('on');
+        if(state[l]) dome.classList.add('on'); else dome.classList.remove('on');
       });
 
       const motorBlade = document.getElementById('motor_blade');
@@ -1819,9 +1648,7 @@
       const targetWires = lessons[lessonKey];
       clearWires();
       
-      targetWires.forEach((w, i) => {
-        setTimeout(() => { addWire(w.a, w.b); }, i * 100); 
-      });
+      targetWires.forEach((w, i) => { setTimeout(() => { addWire(w.a, w.b); }, i * 100); });
       updateStatus(`Loaded target layout. (정답을 불러왔습니다.)`);
     }
 
@@ -1836,11 +1663,8 @@
       const btn = document.getElementById('sidebar-toggle-btn');
       sidebar.classList.toggle('collapsed');
       
-      if (sidebar.classList.contains('collapsed')) {
-        btn.innerText = 'Show Sidebar (사이드바 보이기)';
-      } else {
-        btn.innerText = 'Hide Sidebar (사이드바 숨기기)';
-      }
+      if (sidebar.classList.contains('collapsed')) { btn.innerText = 'Show Sidebar (사이드바 보이기)'; } 
+      else { btn.innerText = 'Hide Sidebar (사이드바 숨기기)'; }
       setTimeout(renderWires, 300);
     }
 
