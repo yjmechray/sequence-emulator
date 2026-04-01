@@ -1,4 +1,5 @@
 <!-- Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem -->
+<!-- ALL GLORY AND HONOR BE TO GOD! -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -216,10 +217,8 @@
     .wire-path {
       fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
-      opacity: 0.85; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
+      opacity: 0.75; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
     }
-    /* Dynamic hover pop-to-front logic is handled in JS, but style changes here */
-    .wire-path:hover { stroke-width: 7; opacity: 1; stroke: #3b82f6 !important; filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)); }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
     /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
@@ -1114,7 +1113,7 @@
         </div>
       `);
 
-      const pbXPositions = [140, 260, 380];
+      const pbXPositions = [140, 260, 400];
       pbXPositions.forEach((pbX, i) => {
         const pbNum = i + 1;
         let pbHTML = `
@@ -1129,9 +1128,9 @@
       });
 
       const lamps = [
-        { id: 'rl', color: 'red', name: 'RL', x: 505 },
-        { id: 'gl', color: 'green', name: 'GL', x: 595 },
-        { id: 'yl', color: 'yellow', name: 'YL', x: 685 }
+        { id: 'rl', color: 'red', name: 'RL', x: 520 },
+        { id: 'gl', color: 'green', name: 'GL', x: 600 },
+        { id: 'yl', color: 'yellow', name: 'YL', x: 680 }
       ];
       lamps.forEach(l => {
         createModule(`lamp_${l.id}`, l.x, 20, 65, 140, l.name, `
@@ -1140,7 +1139,7 @@
         `);
       });
 
-      createModule('fuse_mod', 780, 20, 110, 140, 'Fuse', `
+      createModule('fuse_mod', 760, 20, 110, 140, 'Fuse', `
         <div class="grid-row" style="margin-top:15px; gap: 20px;">
           <div class="grid-col"><div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div></div>
           <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div></div>
@@ -1328,8 +1327,9 @@
       const termRect = selectedTerminal.getBoundingClientRect();
       const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
       const startY = (termRect.top - rect.top) / currentZoom + (selectedTerminal.offsetHeight / 2);
-      const midY = (startY + mousePos.y) / 2;
-      tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${midY} L ${mousePos.x} ${midY} L ${mousePos.x} ${mousePos.y}`);
+      
+      // Use simple L line for temporary wire
+      tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${(startY + mousePos.y)/2} L ${mousePos.x} ${(startY + mousePos.y)/2} L ${mousePos.x} ${mousePos.y}`);
     }
 
     board.addEventListener('mousemove', handleMove);
@@ -1365,44 +1365,54 @@
       updateStatus("All wires cleared. Ready to build. (초기화 완료.)");
     }
 
-    // Orthogonal safe-routing algorithm to completely avoid panels
+    // Completely avoids traversing over panels or terminals using orthogonal safety routing
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
       const getDir = (id) => id.includes('_bot') || id.includes('_out') ? 'down' : 'up';
       const dirA = getDir(idA);
       const dirB = getDir(idB);
 
-      // 1. Determine Horizontal Corridors (Wiring Ducts) based on row positioning
-      let baseYA, baseYB;
+      // Determine precise Y corridor avoiding panels entirely
+      function getCY(y, dir, idx) {
+          if (y < 175) return dir === 'up' ? 2 + (idx % 4) * 4 : 162 + (idx % 6) * 4;
+          if (y < 360) return dir === 'up' ? 162 + (idx % 6) * 4 : 342 + (idx % 8) * 4;
+          return dir === 'up' ? 342 + (idx % 8) * 4 : 565 + (idx % 12) * 4;
+      }
+
+      let cyA = getCY(y1, dirA, index);
+      let cyB = getCY(y2, dirB, index);
       
-      if (y1 < 175) baseYA = dirA === 'up' ? 12 : 175;
-      else if (y1 < 360) baseYA = dirA === 'up' ? 175 : 360;
-      else baseYA = dirA === 'up' ? 360 : 585;
+      // Boundary clamp to keep visible
+      cyA = Math.max(5, Math.min(cyA, 625));
+      cyB = Math.max(5, Math.min(cyB, 625));
 
-      if (y2 < 175) baseYB = dirB === 'up' ? 12 : 175;
-      else if (y2 < 360) baseYB = dirB === 'up' ? 175 : 360;
-      else baseYB = dirB === 'up' ? 360 : 585;
+      const getCorridorId = (y, dir) => {
+          if (y < 175) return dir === 'up' ? 0 : 1;
+          if (y < 360) return dir === 'up' ? 1 : 2;
+          return dir === 'up' ? 2 : 3;
+      };
 
-      // Dynamic spreading to avoid wire bundling
-      const offsetY = ((index % 8) * 4) - 14; 
-      const cyA = baseYA + offsetY;
-      const cyB = baseYB + offsetY;
-
-      // If they belong to the same corridor, traverse horizontally directly
-      if (Math.abs(baseYA - baseYB) < 10) {
+      // If they belong to the identical safe Y corridor, connect horizontally
+      if (getCorridorId(y1, dirA) === getCorridorId(y2, dirB)) {
           return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
       }
 
-      // 2. Select Safe Vertical Trunk
-      let vx;
-      if ((x1 + x2) / 2 > 400) {
-          // Right Margin Trunk
-          vx = 900 + ((index % 12) * 4);
-      } else {
-          // Left Margin Trunk
-          vx = 6 + ((index % 4) * 2);
+      // Vertical safe trunks exactly fitting panel gaps or margins
+      const trunkGroups = [10, 383, 920];
+      let bestGroup = trunkGroups[0];
+      let minCost = Infinity;
+      const targetX = (x1 + x2) / 2;
+      
+      for (let g of trunkGroups) {
+          let cost = Math.abs(targetX - g);
+          if (cost < minCost) { minCost = cost; bestGroup = g; }
       }
 
-      return `M ${x1} ${y1} L ${x1} ${cyA} L ${vx} ${cyA} L ${vx} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
+      let trunkX;
+      if (bestGroup === 10) trunkX = 4 + (index % 4) * 4;           // Left margin 
+      else if (bestGroup === 383) trunkX = 377 + (index % 4) * 4;   // Perfect middle gap
+      else trunkX = 900 + (index % 5) * 10;                         // Safe right margin
+
+      return `M ${x1} ${y1} L ${x1} ${cyA} L ${trunkX} ${cyA} L ${trunkX} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
     }
 
     function renderWires() {
@@ -1426,11 +1436,22 @@
         path.setAttribute('class', 'wire-path');
         path.setAttribute('d', generatePCBPath(w.a, x1, y1, w.b, x2, y2, i));
         path.setAttribute('stroke', w.color);
+        path.setAttribute('data-original-color', w.color);
         
-        // Hover to front for debugging
-        path.addEventListener('mouseenter', function() { this.parentNode.appendChild(this); });
+        // Debugging Hover: highlight wire & pop to front
+        path.addEventListener('mouseenter', function() { 
+            this.style.stroke = '#3b82f6';
+            this.style.opacity = '1';
+            this.style.strokeWidth = '6';
+            this.parentNode.appendChild(this); 
+        });
+        path.addEventListener('mouseleave', function() { 
+            this.style.stroke = this.getAttribute('data-original-color');
+            this.style.opacity = '0.75';
+            this.style.strokeWidth = '3.5';
+        });
+
         path.onclick = () => removeWire(w.id);
-        
         wireLayer.appendChild(path);
       });
 
