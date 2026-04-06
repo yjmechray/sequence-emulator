@@ -121,32 +121,6 @@
     button.success { background: var(--success); color: white; border-color: var(--success); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
     button.success:hover { background: var(--success-hover); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4); }
 
-    /* Fullscreen Floating Button */
-    .fullscreen-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 100;
-      padding: 0.75rem 1.25rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 2rem;
-      font-weight: bold;
-      font-size: 1rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .fullscreen-btn:hover {
-      background: var(--primary-hover);
-      transform: scale(1.05);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-    }
-
     /* Hint Animation */
     @keyframes flashHint {
       0%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.8); transform: scale(1.2); background: #86efac; }
@@ -246,7 +220,7 @@
     }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
-    /* Hardware Modules */
+    /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
@@ -343,7 +317,6 @@
       header { align-items: flex-start; }
       .controls { width: 100%; justify-content: space-between; }
       select { flex: 1; }
-      .fullscreen-btn { bottom: 10px; right: 10px; padding: 0.5rem 1rem; font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -941,10 +914,6 @@
     </div>
   </div>
 
-  <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullScreen()">
-    ⛶ Fullscreen (전체화면)
-  </button>
-
   <script>
     // Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem
     // --- 1. ARCHITECTURE & DEFINITIONS ---
@@ -1288,27 +1257,6 @@
         term.addEventListener('click', (e) => handleTerminalClick(e, term));
       });
     }
-
-    // --- FULLSCREEN LOGIC ---
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-        document.getElementById('fullscreen-btn').innerHTML = "🗕 Exit Fullscreen (전체화면 종료)";
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-          document.getElementById('fullscreen-btn').innerHTML = "⛶ Fullscreen (전체화면)";
-        }
-      }
-    }
-    
-    document.addEventListener('fullscreenchange', (event) => {
-      if (!document.fullscreenElement) {
-        document.getElementById('fullscreen-btn').innerHTML = "⛶ Fullscreen (전체화면)";
-      }
-    });
 
     // --- ZOOM LOGIC (Mobile Pinch & Desktop Wheel) ---
     scrollContainer.addEventListener('wheel', (e) => {
