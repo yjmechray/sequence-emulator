@@ -18,6 +18,7 @@
       --success: #10b981;
       --success-hover: #059669;
       --warning: #f59e0b;
+      --warning-hover: #d97706;
       
       /* Panel Colors */
       --panel-bg: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
@@ -117,6 +118,9 @@
     
     button.danger { background: var(--danger); color: white; border-color: var(--danger); box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
     button.danger:hover { background: var(--danger-hover); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4); }
+
+    button.warning { background: var(--warning); color: white; border-color: var(--warning); box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); }
+    button.warning:hover { background: var(--warning-hover); box-shadow: 0 4px 6px rgba(245, 158, 11, 0.4); }
 
     button.success { background: var(--success); color: white; border-color: var(--success); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
     button.success:hover { background: var(--success-hover); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4); }
@@ -218,6 +222,7 @@
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
       opacity: 0.75; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
     }
+    .wire-path:hover { stroke-width: 7; opacity: 1; stroke: #3b82f6 !important; z-index: 15; filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)); }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
     /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
@@ -342,6 +347,7 @@
         <option value="motor_circuit">10. Motor Control Circuit (전동기 제어 회로)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">Hide Sidebar (사이드바 숨기기)</button>
+      <button class="warning" onclick="undoWire()">Undo (실행 취소)</button>
       <button class="danger" onclick="clearWires()">Clear (초기화)</button>
       <button class="success" onclick="showHint()">Hint (힌트)</button>
       <button class="primary" onclick="loadLessonTarget()">Load Target (정답 불러오기)</button>
@@ -409,29 +415,37 @@
               <text x="10" y="106" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="100" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+
               <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
               <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
+
               <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 150 45 V 75" />
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">Xa</text>
+
               <path class="dw" d="M 80 90 H 140" />
+
               <path class="dw" d="M 80 90 V 110 M 80 140 V 155" />
               <circle cx="80" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 83 110 V 140 M 83 125 H 93" />
               <text x="100" y="132" class="dt bold" style="font-size: 20px;">PB2</text>
+
               <path class="dw" d="M 80 155 H 140" />
+
               <path class="dw" d="M 80 155 V 165 M 80 195 V 220" />
               <circle cx="80" cy="180" r="15" class="dw" />
               <text x="73" y="186" class="dt bold" style="font-size: 18px;">X</text>
+
               <path class="dw" d="M 140 155 V 165 M 140 195 V 220" />
               <circle cx="140" cy="180" r="15" class="dw" /> 
               <text x="134" y="186" class="dt bold" style="font-size: 18px;">L</text>
+
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
               <circle cx="140" cy="30" r="3" fill="#1e293b" />
               <circle cx="80" cy="90" r="3" fill="#1e293b" />
@@ -447,29 +461,35 @@
               <text x="10" y="216" class="dt bold" style="font-size: 20px;">T</text>
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="210" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+
               <rect x="50" y="20" width="20" height="20" class="dw" /> <text x="52" y="15" class="dt">F1</text>
               <rect x="50" y="200" width="20" height="20" class="dw" /> <text x="52" y="195" class="dt">F2</text>
               <path class="dw" d="M 70 30 H 100 M 70 210 H 100" />
+              
               <path class="dw" d="M 100 30 H 120" />
               <circle cx="120" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="160" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 123 30 H 157 M 140 30 V 20 H 150" />
               <text x="125" y="15" class="dt bold">PB(STP)</text>
               <path class="dw" d="M 160 30 H 180" />
+
               <circle cx="180" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 180 30 H 420" />
+
               <path class="dw" d="M 180 30 V 60" />
               <circle cx="180" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 190 60 V 90 M 190 75 H 200" />
               <text x="205" y="80" class="dt bold">PB(ST)</text>
               <path class="dw" d="M 180 90 V 120" />
+              
               <circle cx="180" cy="120" r="3" fill="#1e293b" />
               <path class="dw" d="M 180 120 V 140" />
               <circle cx="180" cy="155" r="15" class="dw" />
               <text x="169" y="161" class="dt bold">MC</text>
               <path class="dw" d="M 180 170 V 210" />
               <circle cx="180" cy="210" r="3" fill="#1e293b" />
+
               <circle cx="260" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 260 30 V 60" />
               <circle cx="260" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -477,6 +497,7 @@
               <path class="dw" d="M 270 60 V 90" />
               <text x="275" y="80" class="dt bold">MC-a</text>
               <path class="dw" d="M 260 90 V 120 H 180" />
+
               <circle cx="340" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 340 30 V 60" />
               <circle cx="340" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -488,6 +509,7 @@
               <text x="330" y="161" class="dt bold" style="fill: #16a34a;">GL</text>
               <path class="dw" d="M 340 170 V 210" />
               <circle cx="340" cy="210" r="3" fill="#1e293b" />
+
               <circle cx="420" cy="30" r="3" fill="#1e293b" />
               <path class="dw" d="M 420 30 V 60" />
               <circle cx="420" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -506,67 +528,93 @@
               <path class="dw" d="M 30 30 H 60 M 90 30 H 400 M 30 230 H 400" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
               <text x="10" y="236" class="dt bold" style="font-size: 20px;">T</text>
+
               <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
               <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB3</text>
+
               <circle cx="120" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 120 30 V 45" />
               <path class="dw" d="M 120 45 H 180" />
+
               <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- PB1 -->
               <path class="dw" d="M 130 45 V 75 M 130 60 H 140" />
               <text x="85" y="66" class="dt bold" style="font-size: 18px;">PB1</text>
+              <!-- X1 (NO) -->
               <path class="dw" d="M 190 45 V 75" />
               <text x="195" y="66" class="dt bold" style="font-size: 18px;">X1</text>
+
               <circle cx="120" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="180" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 120 75 H 180" />
               <circle cx="120" cy="75" r="3" fill="#1e293b"/>
+
+              <!-- X2 (NC) -->
               <path class="dw" d="M 120 75 V 105" />
               <circle cx="120" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="120" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 123 105 V 135 M 123 120 H 133" />
               <text x="140" y="126" class="dt bold" style="font-size: 18px;">X2</text>
+
               <path class="dw" d="M 120 135 V 150" />
               <circle cx="120" cy="150" r="3" fill="#1e293b"/>
               <path class="dw" d="M 120 150 H 180" />
+
+              <!-- X1 Coil -->
               <path class="dw" d="M 120 150 V 170" />
               <circle cx="120" cy="185" r="15" class="dw" />
               <text x="109" y="191" class="dt bold" style="font-size: 16px;">X1</text>
               <path class="dw" d="M 120 200 V 230" />
               <circle cx="120" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- R Lamp -->
               <path class="dw" d="M 180 150 V 170" />
               <circle cx="180" cy="185" r="15" class="dw" />
               <text x="173" y="191" class="dt bold" style="font-size: 16px;">R</text>
               <path class="dw" d="M 180 200 V 230" />
               <circle cx="180" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- Branch 2 (Right) -->
               <circle cx="280" cy="30" r="3" fill="#1e293b"/>
               <path class="dw" d="M 280 30 V 45" />
               <path class="dw" d="M 280 45 H 340" />
+
               <circle cx="280" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="340" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- PB2 -->
               <path class="dw" d="M 290 45 V 75 M 290 60 H 300" />
               <text x="245" y="66" class="dt bold" style="font-size: 18px;">PB2</text>
+              <!-- X2 (NO) -->
               <path class="dw" d="M 350 45 V 75" />
               <text x="355" y="66" class="dt bold" style="font-size: 18px;">X2</text>
+
               <circle cx="280" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="340" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 280 75 H 340" />
               <circle cx="280" cy="75" r="3" fill="#1e293b"/>
+
+              <!-- X1 (NC) -->
               <path class="dw" d="M 280 75 V 105" />
               <circle cx="280" cy="105" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="280" cy="135" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 283 105 V 135 M 283 120 H 293" />
               <text x="300" y="126" class="dt bold" style="font-size: 18px;">X1</text>
+
               <path class="dw" d="M 280 135 V 150" />
               <circle cx="280" cy="150" r="3" fill="#1e293b"/>
               <path class="dw" d="M 280 150 H 340" />
+
+              <!-- X2 Coil -->
               <path class="dw" d="M 280 150 V 170" />
               <circle cx="280" cy="185" r="15" class="dw" />
               <text x="269" y="191" class="dt bold" style="font-size: 16px;">X2</text>
               <path class="dw" d="M 280 200 V 230" />
               <circle cx="280" cy="230" r="3" fill="#1e293b"/>
+
+              <!-- G Lamp -->
               <path class="dw" d="M 340 150 V 170" />
               <circle cx="340" cy="185" r="15" class="dw" />
               <text x="332" y="191" class="dt bold" style="font-size: 16px;">G</text>
@@ -1371,6 +1419,17 @@
       renderWires();
       evaluateCircuit();
       updateStatus("All wires cleared. Ready to build. (초기화 완료.)");
+    }
+
+    function undoWire() {
+      if (wires.length > 0) {
+        wires.pop();
+        renderWires();
+        evaluateCircuit();
+        updateStatus("Last wire removed. (마지막 전선이 삭제되었습니다.)");
+      } else {
+        updateStatus("No wires to remove. (삭제할 전선이 없습니다.)");
+      }
     }
 
     // Completely avoids traversing over panels or terminals using orthogonal safety routing
