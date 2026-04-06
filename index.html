@@ -223,6 +223,19 @@
       opacity: 0.75; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
     }
     .wire-path:hover { stroke-width: 7; opacity: 1; stroke: #3b82f6 !important; z-index: 15; filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)); }
+    
+    /* Short Circuit Wire Animation */
+    @keyframes shortBlink {
+      0%, 100% { stroke: #ef4444; filter: drop-shadow(0 0 10px #ef4444); }
+      50% { stroke: #fca5a5; filter: drop-shadow(0 0 2px #ef4444); }
+    }
+    .wire-shorted {
+      animation: shortBlink 0.3s infinite !important;
+      stroke-width: 6 !important;
+      opacity: 1 !important;
+      z-index: 50;
+    }
+
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
     /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
@@ -433,6 +446,7 @@
               <path class="dw" d="M 80 90 V 110 M 80 140 V 155" />
               <circle cx="80" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <!-- NC contact bar touches -->
               <path class="dw" d="M 83 110 V 140 M 83 125 H 93" />
               <text x="100" y="132" class="dt bold" style="font-size: 20px;">PB2</text>
 
@@ -986,7 +1000,8 @@
       pb1: false, pb2: false, pb3: false,
       x1: false, x2: false,
       rl: false, gl: false, yl: false,
-      mc1: false, thrTripped: false, motorOn: false
+      mc1: false, thrTripped: false, motorOn: false,
+      shortedNodes: new Set()
     };
 
     const wireColors = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#4f46e5', '#db2777'];
@@ -1504,8 +1519,10 @@
         });
         path.addEventListener('mouseleave', function() { 
             this.style.stroke = this.getAttribute('data-original-color');
-            this.style.opacity = '0.75';
-            this.style.strokeWidth = '3.5';
+            if(!this.classList.contains('wire-shorted')) {
+                this.style.opacity = '0.75';
+                this.style.strokeWidth = '3.5';
+            }
         });
 
         path.onclick = () => removeWire(w.id);
@@ -1627,7 +1644,12 @@
 
         // Standard Control Short
         isShortCircuit = rNet.has('pow_T') || tNet.has('pow_R') || mRNet.has('main_T') || mRNet.has('main_S') || mSNet.has('main_T');
-        if (isShortCircuit) { rNet = new Set(); tNet = new Set(); mRNet = new Set(); mSNet = new Set(); mTNet = new Set(); }
+        if (isShortCircuit) { 
+            state.shortedNodes = new Set([...rNet, ...tNet, ...mRNet, ...mSNet, ...mTNet]);
+            rNet = new Set(); tNet = new Set(); mRNet = new Set(); mSNet = new Set(); mTNet = new Set(); 
+        } else {
+            state.shortedNodes = new Set();
+        }
 
         // Update Relays
         [1, 2].forEach(i => {
@@ -1693,6 +1715,18 @@
       const motorBlade = document.getElementById('motor_blade');
       if(state.motorOn) motorBlade.classList.add('spinning');
       else motorBlade.classList.remove('spinning');
+
+      // Apply short circuit visual to wires
+      const paths = document.querySelectorAll('.wire-path');
+      wires.forEach((w, index) => {
+          if (paths[index]) {
+              if (isShortCircuit && state.shortedNodes.has(w.a) && state.shortedNodes.has(w.b)) {
+                  paths[index].classList.add('wire-shorted');
+              } else {
+                  paths[index].classList.remove('wire-shorted');
+              }
+          }
+      });
     }
 
     function showHint() {
