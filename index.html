@@ -1,5 +1,4 @@
 <!-- Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem -->
-<!-- ALL GLORY AND HONOR BE TO GOD! -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,6 +121,32 @@
     button.success { background: var(--success); color: white; border-color: var(--success); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
     button.success:hover { background: var(--success-hover); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4); }
 
+    /* Fullscreen Floating Button */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 0.75rem 1.25rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 2rem;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .fullscreen-btn:hover {
+      background: var(--primary-hover);
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    }
+
     /* Hint Animation */
     @keyframes flashHint {
       0%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.8); transform: scale(1.2); background: #86efac; }
@@ -221,7 +246,7 @@
     }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
 
-    /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
+    /* Hardware Modules */
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
@@ -318,6 +343,7 @@
       header { align-items: flex-start; }
       .controls { width: 100%; justify-content: space-between; }
       select { flex: 1; }
+      .fullscreen-btn { bottom: 10px; right: 10px; padding: 0.5rem 1rem; font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -369,21 +395,31 @@
               <path class="dw" d="M 30 30 H 140 M 30 150 H 140" />
               <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
               <text x="10" y="156" class="dt bold" style="font-size: 20px;">T</text>
+              
+              <!-- PB1 -->
               <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
               <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
               <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
+
+              <!-- X1 Contact (Parallel to PB1) -->
               <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
               <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <path class="dw" d="M 150 45 V 75" />
               <text x="160" y="65" class="dt bold" style="font-size: 20px;">X1</text>
+
+              <!-- Merge parallel -->
               <path class="dw" d="M 80 90 H 140" />
+
+              <!-- X1 Coil -->
               <path class="dw" d="M 80 90 V 105" />
               <circle cx="80" cy="120" r="15" class="dw" />
               <text x="71" y="126" class="dt bold" style="font-size: 18px;">X1</text>
               <path class="dw" d="M 80 135 V 150" />
+
+              <!-- Junctions & Terminals -->
               <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="30" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="80" cy="30" r="3" fill="#1e293b" />
@@ -905,6 +941,10 @@
     </div>
   </div>
 
+  <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullScreen()">
+    ⛶ Fullscreen (전체화면)
+  </button>
+
   <script>
     // Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem
     // --- 1. ARCHITECTURE & DEFINITIONS ---
@@ -1113,7 +1153,7 @@
         </div>
       `);
 
-      const pbXPositions = [140, 260, 400];
+      const pbXPositions = [140, 260, 380];
       pbXPositions.forEach((pbX, i) => {
         const pbNum = i + 1;
         let pbHTML = `
@@ -1128,9 +1168,9 @@
       });
 
       const lamps = [
-        { id: 'rl', color: 'red', name: 'RL', x: 520 },
+        { id: 'rl', color: 'red', name: 'RL', x: 510 },
         { id: 'gl', color: 'green', name: 'GL', x: 600 },
-        { id: 'yl', color: 'yellow', name: 'YL', x: 680 }
+        { id: 'yl', color: 'yellow', name: 'YL', x: 690 }
       ];
       lamps.forEach(l => {
         createModule(`lamp_${l.id}`, l.x, 20, 65, 140, l.name, `
@@ -1139,7 +1179,7 @@
         `);
       });
 
-      createModule('fuse_mod', 760, 20, 110, 140, 'Fuse', `
+      createModule('fuse_mod', 780, 20, 110, 140, 'Fuse', `
         <div class="grid-row" style="margin-top:15px; gap: 20px;">
           <div class="grid-col"><div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div></div>
           <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div></div>
@@ -1249,6 +1289,27 @@
       });
     }
 
+    // --- FULLSCREEN LOGIC ---
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+        document.getElementById('fullscreen-btn').innerHTML = "🗕 Exit Fullscreen (전체화면 종료)";
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+          document.getElementById('fullscreen-btn').innerHTML = "⛶ Fullscreen (전체화면)";
+        }
+      }
+    }
+    
+    document.addEventListener('fullscreenchange', (event) => {
+      if (!document.fullscreenElement) {
+        document.getElementById('fullscreen-btn').innerHTML = "⛶ Fullscreen (전체화면)";
+      }
+    });
+
     // --- ZOOM LOGIC (Mobile Pinch & Desktop Wheel) ---
     scrollContainer.addEventListener('wheel', (e) => {
         if (e.ctrlKey) {
@@ -1328,7 +1389,6 @@
       const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
       const startY = (termRect.top - rect.top) / currentZoom + (selectedTerminal.offsetHeight / 2);
       
-      // Use simple L line for temporary wire
       tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${(startY + mousePos.y)/2} L ${mousePos.x} ${(startY + mousePos.y)/2} L ${mousePos.x} ${mousePos.y}`);
     }
 
@@ -1371,48 +1431,38 @@
       const dirA = getDir(idA);
       const dirB = getDir(idB);
 
-      // Determine precise Y corridor avoiding panels entirely
-      function getCY(y, dir, idx) {
-          if (y < 175) return dir === 'up' ? 2 + (idx % 4) * 4 : 162 + (idx % 6) * 4;
-          if (y < 360) return dir === 'up' ? 162 + (idx % 6) * 4 : 342 + (idx % 8) * 4;
-          return dir === 'up' ? 342 + (idx % 8) * 4 : 565 + (idx % 12) * 4;
-      }
-
-      let cyA = getCY(y1, dirA, index);
-      let cyB = getCY(y2, dirB, index);
+      // 1. Determine Horizontal Corridors (Wiring Ducts) based on row positioning
+      let baseYA, baseYB;
       
-      // Boundary clamp to keep visible
-      cyA = Math.max(5, Math.min(cyA, 625));
-      cyB = Math.max(5, Math.min(cyB, 625));
+      if (y1 < 175) baseYA = dirA === 'up' ? 12 : 175;
+      else if (y1 < 360) baseYA = dirA === 'up' ? 175 : 360;
+      else baseYA = dirA === 'up' ? 360 : 585;
 
-      const getCorridorId = (y, dir) => {
-          if (y < 175) return dir === 'up' ? 0 : 1;
-          if (y < 360) return dir === 'up' ? 1 : 2;
-          return dir === 'up' ? 2 : 3;
-      };
+      if (y2 < 175) baseYB = dirB === 'up' ? 12 : 175;
+      else if (y2 < 360) baseYB = dirB === 'up' ? 175 : 360;
+      else baseYB = dirB === 'up' ? 360 : 585;
 
-      // If they belong to the identical safe Y corridor, connect horizontally
-      if (getCorridorId(y1, dirA) === getCorridorId(y2, dirB)) {
+      // Dynamic spreading to avoid wire bundling
+      const offsetY = ((index % 8) * 4) - 14; 
+      const cyA = baseYA + offsetY;
+      const cyB = baseYB + offsetY;
+
+      // If they belong to the same corridor, traverse horizontally directly
+      if (Math.abs(baseYA - baseYB) < 10) {
           return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
       }
 
-      // Vertical safe trunks exactly fitting panel gaps or margins
-      const trunkGroups = [10, 383, 920];
-      let bestGroup = trunkGroups[0];
-      let minCost = Infinity;
-      const targetX = (x1 + x2) / 2;
-      
-      for (let g of trunkGroups) {
-          let cost = Math.abs(targetX - g);
-          if (cost < minCost) { minCost = cost; bestGroup = g; }
+      // 2. Select Safe Vertical Trunk
+      let vx;
+      if ((x1 + x2) / 2 > 400) {
+          // Right Margin Trunk
+          vx = 900 + ((index % 12) * 4);
+      } else {
+          // Left Margin Trunk
+          vx = 6 + ((index % 4) * 2);
       }
 
-      let trunkX;
-      if (bestGroup === 10) trunkX = 4 + (index % 4) * 4;           // Left margin 
-      else if (bestGroup === 383) trunkX = 377 + (index % 4) * 4;   // Perfect middle gap
-      else trunkX = 900 + (index % 5) * 10;                         // Safe right margin
-
-      return `M ${x1} ${y1} L ${x1} ${cyA} L ${trunkX} ${cyA} L ${trunkX} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
+      return `M ${x1} ${y1} L ${x1} ${cyA} L ${vx} ${cyA} L ${vx} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
     }
 
     function renderWires() {
