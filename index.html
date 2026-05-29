@@ -465,68 +465,68 @@
           <summary>Connections (연결) (<span id="wire-count">0</span>)</summary>
           <div id="wire-container" class="wire-list-compact">
             <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections (연결 없음).</div>
-          </div>
-        </details>
-      </div>
-    </div>
-
-    <!-- Right Side / Board -->
-    <div class="board-container" id="scroll-container">
-      <div class="board" id="board">
-        <svg id="wire-layer">
-          <path id="temp-wire" class="wire-temp" d="" />
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem
-    const board = document.getElementById('board');
-    const wireLayer = document.getElementById('wire-layer');
-    const tempWire = document.getElementById('temp-wire');
-    const statusPanel = document.getElementById('status-panel');
-    const wireContainer = document.getElementById('wire-container');
-    const scrollContainer = document.getElementById('scroll-container');
-    const lessonSelect = document.getElementById('lesson-select');
-
-    let wires = [];
-    let selectedTerminal = null;
-    let isShortCircuit = false;
-    let mousePos = { x: 0, y: 0 };
-    
-    let currentZoom = 1;
-    let initialZoom = 1;
-    let initialDistance = 0;
-    
-    const state = {
-      pb1: false, pb2: false, pb3: false,
-      x1: false, x2: false,
-      rl: false, gl: false, yl: false,
-      mc1: false, mc2: false, thrTripped: false, motorDirection: 'none',
-      shortedNodes: new Set()
-    };
-
-    const wireColors = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#4f46e5', '#db2777'];
-
-    const lessons = {
+      or_circuit: [
+        {a: 'pow_R', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
+        {a: 'pb1_no_bot', b: 'x1_coil_top'},
+        {a: 'x1_coil_bot', b: 'pow_T'},
+        {a: 'pb3_nc_bot', b: 'x1_no1_top'},
+        {a: 'x1_no1_bot', b: 'x1_coil_top'},
+        {a: 'pb3_nc_bot', b: 'pb2_no_top'},
+        {a: 'pb2_no_bot', b: 'x2_coil_top'},
+        {a: 'x2_coil_bot', b: 'pow_T'},
+        {a: 'pb3_nc_bot', b: 'x2_no1_top'},
+        {a: 'x2_no1_bot', b: 'x2_coil_top'},
+        {a: 'pb3_nc_bot', b: 'x1_no2_top'},
+        {a: 'x1_no2_bot', b: 'rl_top'},
+        {a: 'pb3_nc_bot', b: 'x2_no2_top'}, 
+        {a: 'x2_no2_bot', b: 'rl_top'},
+        {a: 'rl_bot', b: 'pow_T'}
+      ],
+      motor_circuit: [
+        {a: 'main_R', b: 'mc1_R_in'},
+        {a: 'main_S', b: 'mc1_S_in'},
+        {a: 'main_T', b: 'mc1_T_in'},
+        {a: 'mc1_U_out', b: 'thr1_U_in'},
+        {a: 'mc1_V_out', b: 'thr1_V_in'},
+        {a: 'mc1_W_out', b: 'thr1_W_in'},
+        {a: 'thr1_U_out', b: 'mot_U'},
+        {a: 'thr1_V_out', b: 'mot_V'},
+        {a: 'thr1_W_out', b: 'mot_W'},
+        {a: 'main_R', b: 'fuse_R_in'},
+        {a: 'main_T', b: 'fuse_T_in'},
+        {a: 'fuse_R_out', b: 'thr1_95'},
+        {a: 'thr1_96', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
+        {a: 'pb1_no_bot', b: 'mc1_coil_top'},
+        {a: 'mc1_coil_bot', b: 'fuse_T_out'},
+        {a: 'pb3_nc_bot', b: 'mc1_no_top'},
+        {a: 'mc1_no_bot', b: 'mc1_coil_top'},
+        {a: 'mc1_no_bot', b: 'rl_top'},
+        {a: 'rl_bot', b: 'fuse_T_out'},
+        {a: 'pb3_nc_bot', b: 'mc1_nc_top'},
+        {a: 'mc1_nc_bot', b: 'gl_top'},
+        {a: 'gl_bot', b: 'fuse_T_out'},
+        {a: 'thr1_98', b: 'yl_top'},
+        {a: 'yl_bot', b: 'fuse_T_out'}
+      ],
       motor_fwd_rev: [
         {a: 'main_R', b: 'mc1_R_in'}, {a: 'main_S', b: 'mc1_S_in'}, {a: 'main_T', b: 'mc1_T_in'},
         {a: 'mc1_R_in', b: 'mc2_R_in'}, {a: 'mc1_S_in', b: 'mc2_S_in'}, {a: 'mc1_T_in', b: 'mc2_T_in'},
         {a: 'mc1_U_out', b: 'thr1_U_in'}, {a: 'mc1_V_out', b: 'thr1_V_in'}, {a: 'mc1_W_out', b: 'thr1_W_in'},
-        {a: 'mc2_U_out', b: 'mc1_W_out'}, {a: 'mc2_V_out', b: 'mc1_V_out'}, {a: 'mc2_W_out', b: 'mc1_U_out'}, // phase swap
+        {a: 'mc2_U_out', b: 'mc1_W_out'}, {a: 'mc2_V_out', b: 'mc1_V_out'}, {a: 'mc2_W_out', b: 'mc1_U_out'},
         {a: 'thr1_U_out', b: 'mot_U'}, {a: 'thr1_V_out', b: 'mot_V'}, {a: 'thr1_W_out', b: 'mot_W'},
         {a: 'main_R', b: 'fuse_R_in'}, {a: 'main_T', b: 'fuse_T_in'},
-        {a: 'fuse_R_out', b: 'pb1_nc_top'},
-        {a: 'pb1_nc_bot', b: 'pb2_no_top'}, {a: 'pb1_nc_bot', b: 'pb3_no_top'},
-        {a: 'pb2_no_top', b: 'mc1_no_top'}, {a: 'pb2_no_bot', b: 'mc1_no_bot'},
-        {a: 'pb2_no_bot', b: 'mc2_nc_top'}, {a: 'mc2_nc_bot', b: 'mc1_coil_top'},
-        {a: 'mc1_no_bot', b: 'rl_top'},
-        {a: 'pb3_no_top', b: 'mc2_no_top'}, {a: 'pb3_no_bot', b: 'mc2_no_bot'},
-        {a: 'pb3_no_bot', b: 'mc1_nc_top'}, {a: 'mc1_nc_bot', b: 'mc2_coil_top'},
-        {a: 'mc2_no_bot', b: 'gl_top'},
+        {a: 'fuse_R_out', b: 'thr1_95'}, {a: 'thr1_96', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb3_nc_bot', b: 'pb2_no_top'},
+        {a: 'pb1_no_top', b: 'mc1_no_top'}, {a: 'pb2_no_top', b: 'mc2_no_top'},
+        {a: 'pb1_no_bot', b: 'mc1_no_bot'}, {a: 'pb2_no_bot', b: 'mc2_no_bot'},
+        {a: 'pb1_no_bot', b: 'mc2_nc_top'}, {a: 'pb2_no_bot', b: 'mc1_nc_top'},
+        {a: 'mc2_nc_bot', b: 'mc1_coil_top'}, {a: 'mc1_nc_bot', b: 'mc2_coil_top'},
+        {a: 'mc1_no_bot', b: 'rl_top'}, {a: 'mc2_no_bot', b: 'gl_top'},
         {a: 'mc1_coil_bot', b: 'fuse_T_out'}, {a: 'mc2_coil_bot', b: 'fuse_T_out'},
-        {a: 'rl_bot', b: 'fuse_T_out'}, {a: 'gl_bot', b: 'fuse_T_out'}
+        {a: 'rl_bot', b: 'fuse_T_out'}, {a: 'gl_bot', b: 'fuse_T_out'},
+        {a: 'thr1_98', b: 'yl_top'}, {a: 'yl_bot', b: 'fuse_T_out'}
       ]
     };
 
@@ -817,13 +817,13 @@
         const y2 = (rB.top - rect.top) / currentZoom + (tB.offsetHeight / 2);
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('id', w.id);
         path.setAttribute('class', 'wire-path');
         path.setAttribute('d', generatePCBPath(w.a, x1, y1, w.b, x2, y2, i));
         path.setAttribute('stroke', w.color);
         path.setAttribute('data-original-color', w.color);
         
-        path.addEventListener('mouseenter', function() { 
-            this.style.stroke = '#3b82f6'; this.style.opacity = '1'; this.style.strokeWidth = '7';
+        // Debugging Hover: highlight wire & pop to front
             this.parentNode.appendChild(this); 
         });
         path.addEventListener('mouseleave', function() { 
@@ -831,49 +831,49 @@
             if(!this.classList.contains('wire-shorted')) { this.style.opacity = '0.75'; this.style.strokeWidth = '3.5'; }
         });
 
-        path.onclick = () => removeWire(w.id);
-        wireLayer.appendChild(path);
-      });
-      document.getElementById('wire-count').innerText = wires.length;
-    }
-
-    // --- 5. LOGIC ENGINE (PHYSICS/GRAPH SOLVER) ---
-    function pressPB(id, isPressed) {
-      state[id] = isPressed; const btn = document.getElementById(`btn_${id}`);
-      if(isPressed) btn.classList.add('pressed'); else btn.classList.remove('pressed');
-      evaluateCircuit();
-    }
-
-    function evaluateCircuit() {
-      let changed = true; let iterations = 0; let graph = {};
-      
-      const addEdge = (u, v) => {
-        if(!u || !v) return;
-        if(!graph[u]) graph[u] = []; if(!graph[v]) graph[v] = [];
-        graph[u].push(v); graph[v].push(u);
-      };
-
-      const getConnected = (startNode) => {
-        let visited = new Set();
-        if(!graph[startNode]) return visited;
-        let queue = [startNode]; visited.add(startNode);
-        while(queue.length > 0) {
-          let node = queue.shift();
-          graph[node].forEach(neighbor => { if(!visited.has(neighbor)) { visited.add(neighbor); queue.push(neighbor); } });
+        // THR Aux (Tripped logic)
+        if (state.thrTripped) {
+            addEdge('thr1_95', 'thr1_98'); // NO closes
+        } else {
+            addEdge('thr1_95', 'thr1_96'); // NC stays closed
         }
-        return visited;
-      };
 
-      while(changed && iterations < 15) {
-        changed = false; iterations++; graph = {};
-        wires.forEach(w => addEdge(w.a, w.b));
+        // Fuse passes power
+        addEdge('fuse_R_in', 'fuse_R_out');
+        addEdge('fuse_T_in', 'fuse_T_out');
 
-        [1, 2, 3].forEach(i => {
-          let pb = `pb${i}`;
-          if (state[pb]) addEdge(`${pb}_no_top`, `${pb}_no_bot`); 
-          else addEdge(`${pb}_nc_top`, `${pb}_nc_bot`);
-        });
+        // Evaluate Nets
+        let rNet = getConnected('pow_R');
+        let tNet = getConnected('pow_T');
+        
+        // Incorporate main power into control if cross wired
+        let mRNet = getConnected('main_R');
+        let mTNet = getConnected('main_T');
+        let mSNet = getConnected('main_S');
 
+        if(mRNet.has('pow_R') || rNet.has('main_R')) {
+            const merged = new Set([...rNet, ...mRNet]);
+            rNet = merged; mRNet = merged;
+        }
+        if(mTNet.has('pow_T') || tNet.has('main_T')) {
+            const merged = new Set([...tNet, ...mTNet]);
+            tNet = merged; mTNet = merged;
+        }
+
+        // Strict short circuit check across all combinations of main phases
+        isShortCircuit = 
+            rNet.has('pow_T') || rNet.has('main_S') || rNet.has('main_T') ||
+            tNet.has('pow_R') || tNet.has('main_R') || tNet.has('main_S') ||
+            mRNet.has('pow_T') || mRNet.has('main_S') || mRNet.has('main_T') ||
+            mSNet.has('pow_R') || mSNet.has('pow_T') || mSNet.has('main_R') || mSNet.has('main_T') ||
+            mTNet.has('pow_R') || mTNet.has('main_R') || mTNet.has('main_S');
+            
+        if (isShortCircuit) { 
+            state.shortedNodes = new Set([...rNet, ...tNet, ...mRNet, ...mSNet, ...mTNet]);
+            rNet = new Set(); tNet = new Set(); mRNet = new Set(); mSNet = new Set(); mTNet = new Set(); 
+        } else { state.shortedNodes = new Set(); }
+
+        // Update Relays
         [1, 2].forEach(i => {
           let x = `x${i}`;
           if (state[x]) { for(let j=1; j<=4; j++) addEdge(`${x}_no${j}_top`, `${x}_no${j}_bot`); } 
@@ -918,38 +918,18 @@
         });
 
         ['rl', 'gl', 'yl'].forEach(l => {
-          let top = `${l}_top`; let bot = `${l}_bot`;
-          state[l] = (rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot)) && (tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot));
-        });
-
-        // Motor Phase Rotation Logic
-        let u_has_R = mRNet.has('mot_U'); let v_has_S = mSNet.has('mot_V'); let w_has_T = mTNet.has('mot_W');
-        let u_has_T = mTNet.has('mot_U'); let w_has_R = mRNet.has('mot_W');
-        
-        if (u_has_R && v_has_S && w_has_T) state.motorDirection = 'cw';
-        else if (u_has_T && v_has_S && w_has_R) state.motorDirection = 'ccw';
-        else state.motorDirection = 'none';
-      }
-
-      if (isShortCircuit) {
-        statusPanel.className = 'status-bar short'; statusPanel.innerHTML = "⚠️ SHORT CIRCUIT! Phase lines crossed. (단락 경고!)";
-      } else {
-        if(state.thrTripped) { statusPanel.className = 'status-bar warning'; statusPanel.innerHTML = "⚠️ THR TRIPPED! (과부하 차단!)"; } 
-        else { statusPanel.className = 'status-bar'; statusPanel.innerHTML = "Circuit ready. Press buttons. (정상. 버튼을 눌러 테스트하세요.)"; }
-      }
-
-      [1, 2].forEach(i => { const ind = document.getElementById(`ind_x${i}`); if(state[`x${i}`]) ind.classList.add('on'); else ind.classList.remove('on'); });
-      ['mc1', 'mc2'].forEach(mc => { const ind = document.getElementById(`ind_${mc}`); if(state[mc]) ind.classList.add('on'); else ind.classList.remove('on'); });
-      ['rl', 'gl', 'yl'].forEach(l => { const dome = document.getElementById(`dome_${l}`); if(state[l]) dome.classList.add('on'); else dome.classList.remove('on'); });
+        const dome = document.getElementById(`dome_${l}`);
+        if(state[l]) dome.classList.add('on'); else dome.classList.remove('on');
+      });
 
       const motorBlade = document.getElementById('motor_blade');
       motorBlade.className.baseVal = "motor-blade" + (state.motorDirection === 'cw' ? " spinning-cw" : (state.motorDirection === 'ccw' ? " spinning-ccw" : ""));
 
-      const paths = document.querySelectorAll('.wire-path');
-      wires.forEach((w, index) => {
-          if (paths[index]) {
-              if (isShortCircuit && state.shortedNodes.has(w.a) && state.shortedNodes.has(w.b)) paths[index].classList.add('wire-shorted');
-              else paths[index].classList.remove('wire-shorted');
+      wires.forEach(w => {
+          const path = document.getElementById(w.id);
+          if (path) {
+              if (isShortCircuit && state.shortedNodes.has(w.a) && state.shortedNodes.has(w.b)) path.classList.add('wire-shorted');
+              else path.classList.remove('wire-shorted');
           }
       });
     }
@@ -981,12 +961,16 @@
     }
 
     function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('collapsed');
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-toggle-btn');
+      sidebar.classList.toggle('collapsed');
+      
+      if (sidebar.classList.contains('collapsed')) { btn.innerText = 'Show Sidebar (사이드바 보이기)'; } 
+      else { btn.innerText = 'Hide Sidebar (사이드바 숨기기)'; }
       setTimeout(renderWires, 300);
     }
 
     window.addEventListener('resize', renderWires);
-    scrollContainer.addEventListener('scroll', () => { if (wires.length > 0) renderWires(); });
 
     document.getElementById('diag_latch_basic').classList.add('active');
     buildHardware();
