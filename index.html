@@ -142,20 +142,21 @@
     /* Right Area: The Physical Board (Centerpiece) */
     .board-container { flex: 1; position: relative; background: radial-gradient(circle at 50% 50%, #f8fafc, #e2e8f0); overflow: auto; padding: 1.5rem; display: flex; align-items: flex-start; justify-content: flex-start; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
 
-    /* Generous Board to fit clear routing lines for MC2 and Motor */
+    /* Perfectly sized board to fit the strict gap routing */
     .board {
-      position: relative; width: 1100px; height: 650px; background: #d1d5db;
+      position: relative; width: 900px; height: 600px; background: #d1d5db;
       border: 4px solid #94a3b8; border-radius: 12px;
       box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       margin: 0 auto; flex-shrink: 0; transform-origin: top left; will-change: transform;
     }
 
+    /* SVG Layer below terminals but above panels */
     #wire-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
     
     .wire-path {
       fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
-      opacity: 0.75; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
+      opacity: 0.8; transition: stroke-width 0.2s, stroke 0.2s, opacity 0.2s;
     }
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
     
@@ -166,7 +167,7 @@
     }
     .wire-shorted { animation: shortBlink 0.3s infinite !important; stroke-width: 6 !important; opacity: 1 !important; z-index: 50; }
 
-    /* Hardware Modules (Ensure z-index is higher than background but below interacting wires) */
+    /* Hardware Modules (Layer 5: Below Wires Layer 10) */
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
@@ -179,7 +180,14 @@
     .module-title { font-size: 0.7rem; font-weight: bold; background: #94a3b8; color: white; padding: 0.1rem 0.6rem; border-radius: 4px; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
 
     .terminal-group { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
-    .terminal { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #334155; box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6); position: relative; cursor: pointer; transition: transform 0.1s; z-index: 30; background-color: white; }
+    
+    /* Terminals (Layer 30: Above Wires Layer 10 & 20) - Guarantees Access! */
+    .terminal { 
+      width: 16px; height: 16px; border-radius: 50%; border: 2px solid #334155; 
+      box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6); 
+      position: relative; cursor: pointer; transition: transform 0.1s; 
+      z-index: 30; background-color: white; 
+    }
     .terminal::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #020617; border-radius: 50%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); }
     .terminal:hover { transform: scale(1.3); z-index: 40; }
     .terminal.selected { transform: scale(1.3); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); z-index: 40;}
@@ -799,12 +807,10 @@
 
             <!-- 11. Motor Forward/Reverse Control Circuit -->
             <svg id="diag_motor_fwd_rev" viewBox="0 0 700 350">
-              <!-- Main Circuit -->
               <text x="10" y="20" class="dt bold" style="font-size: 18px;">Main</text>
               <path class="dw" d="M 30 40 V 80 M 50 40 V 80 M 70 40 V 80" />
               <text x="25" y="35" class="dt bold">R</text><text x="45" y="35" class="dt bold">S</text><text x="65" y="35" class="dt bold">T</text>
               
-              <!-- MCF -->
               <rect x="20" y="80" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
               <text x="85" y="105" class="dt bold">MC(F)</text>
               <path class="dw" d="M 30 80 V 120 M 50 80 V 120 M 70 80 V 120" />
@@ -812,7 +818,6 @@
               <circle cx="50" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="50" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="70" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="70" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
 
-              <!-- MCR -->
               <rect x="140" y="80" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
               <text x="205" y="105" class="dt bold">MC(R)</text>
               <path class="dw" stroke="#ef4444" d="M 30 60 H 150 V 80" />
@@ -859,7 +864,6 @@
               <circle cx="340" cy="105" r="3" fill="#1e293b" />
               <circle cx="520" cy="105" r="3" fill="#1e293b" />
 
-              <!-- Forward Branch -->
               <path class="dw" d="M 340 105 V 120" />
               <circle cx="340" cy="120" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="340" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -896,7 +900,6 @@
               <circle cx="340" cy="320" r="3" fill="#1e293b" />
               <circle cx="420" cy="320" r="3" fill="#1e293b" />
 
-              <!-- Reverse Branch -->
               <path class="dw" d="M 520 105 V 120" />
               <circle cx="520" cy="120" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
               <circle cx="520" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
@@ -933,13 +936,14 @@
               <circle cx="520" cy="320" r="3" fill="#1e293b" />
               <circle cx="600" cy="320" r="3" fill="#1e293b" />
               
+              <!-- Interlock dotted lines -->
               <path d="M 340 165 Q 430 190 520 120" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2 4" />
               <path d="M 520 165 Q 430 190 340 120" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2 4" />
             </svg>
           </div>
         </details>
 
-        <details class="collapsible-panel">
+        <details class="collapsible-panel" open>
           <summary>Connections (연결) (<span id="wire-count">0</span>)</summary>
           <div id="wire-container" class="wire-list-compact">
             <div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections (연결 없음).</div>
@@ -989,153 +993,77 @@
 
     const lessons = {
       latch_basic: [
-        {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pow_R', b: 'x1_no1_top'}, 
-        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
-        {a: 'pb1_no_bot', b: 'x1_coil_top'},
+        {a: 'pow_R', b: 'pb1_no_top'}, {a: 'pow_R', b: 'x1_no1_top'}, 
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'}, {a: 'pb1_no_bot', b: 'x1_coil_top'},
         {a: 'pow_T', b: 'x1_coil_bot'}
       ],
       latch_stop: [
-        {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pow_R', b: 'x1_no1_top'}, 
-        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
-        {a: 'x1_no1_bot', b: 'pb2_nc_top'}, 
-        {a: 'pb2_nc_bot', b: 'x1_coil_top'},
-        {a: 'pb2_nc_bot', b: 'rl_top'},
-        {a: 'pow_T', b: 'x1_coil_bot'},
-        {a: 'pow_T', b: 'rl_bot'} 
+        {a: 'pow_R', b: 'pb1_no_top'}, {a: 'pow_R', b: 'x1_no1_top'}, 
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'}, {a: 'x1_no1_bot', b: 'pb2_nc_top'}, 
+        {a: 'pb2_nc_bot', b: 'x1_coil_top'}, {a: 'pb2_nc_bot', b: 'rl_top'},
+        {a: 'pow_T', b: 'x1_coil_bot'}, {a: 'pow_T', b: 'rl_bot'} 
       ],
       mc_latch: [
-        {a: 'main_R', b: 'mc1_R_in'},
-        {a: 'main_S', b: 'mc1_S_in'},
-        {a: 'main_T', b: 'mc1_T_in'},
-        {a: 'mc1_U_out', b: 'thr1_U_in'},
-        {a: 'mc1_V_out', b: 'thr1_V_in'},
-        {a: 'mc1_W_out', b: 'thr1_W_in'},
-        {a: 'thr1_U_out', b: 'mot_U'},
-        {a: 'thr1_V_out', b: 'mot_V'},
-        {a: 'thr1_W_out', b: 'mot_W'},
-        {a: 'main_R', b: 'fuse_R_in'},
-        {a: 'main_T', b: 'fuse_T_in'},
-        {a: 'fuse_R_out', b: 'pb1_nc_top'}, 
-        {a: 'pb1_nc_bot', b: 'pb2_no_top'}, 
-        {a: 'pb1_nc_bot', b: 'mc1_no_top'}, 
-        {a: 'pb1_nc_bot', b: 'mc1_nc_top'}, 
-        {a: 'pb2_no_bot', b: 'mc1_no_bot'}, 
-        {a: 'pb2_no_bot', b: 'mc1_coil_top'},
-        {a: 'pb2_no_bot', b: 'rl_top'}, 
-        {a: 'mc1_nc_bot', b: 'gl_top'},
-        {a: 'mc1_coil_bot', b: 'fuse_T_out'},
-        {a: 'rl_bot', b: 'fuse_T_out'},
-        {a: 'gl_bot', b: 'fuse_T_out'}
+        {a: 'main_R', b: 'mc1_R_in'}, {a: 'main_S', b: 'mc1_S_in'}, {a: 'main_T', b: 'mc1_T_in'},
+        {a: 'mc1_U_out', b: 'thr1_U_in'}, {a: 'mc1_V_out', b: 'thr1_V_in'}, {a: 'mc1_W_out', b: 'thr1_W_in'},
+        {a: 'thr1_U_out', b: 'mot_U'}, {a: 'thr1_V_out', b: 'mot_V'}, {a: 'thr1_W_out', b: 'mot_W'},
+        {a: 'main_R', b: 'fuse_R_in'}, {a: 'main_T', b: 'fuse_T_in'},
+        {a: 'fuse_R_out', b: 'pb3_nc_top'}, 
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb3_nc_bot', b: 'mc1_no_top'}, 
+        {a: 'pb1_no_bot', b: 'mc1_no_bot'}, {a: 'pb1_no_bot', b: 'mc1_coil_top'},
+        {a: 'pb1_no_bot', b: 'rl_top'}, 
+        {a: 'mc1_coil_bot', b: 'fuse_T_out'}, {a: 'rl_bot', b: 'fuse_T_out'}
       ],
       interlock: [
         {a: 'pow_R', b: 'pb3_nc_top'},
-        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
-        {a: 'pb1_no_top', b: 'x1_no1_top'},
-        {a: 'pb1_no_bot', b: 'x1_no1_bot'},
-        {a: 'pb1_no_bot', b: 'x2_nc1_top'},
-        {a: 'x2_nc1_bot', b: 'x1_coil_top'},
-        {a: 'x2_nc1_bot', b: 'rl_top'},
-        {a: 'pb3_nc_bot', b: 'pb2_no_top'},
-        {a: 'pb2_no_top', b: 'x2_no1_top'},
-        {a: 'pb2_no_bot', b: 'x2_no1_bot'},
-        {a: 'pb2_no_bot', b: 'x1_nc1_top'},
-        {a: 'x1_nc1_bot', b: 'x2_coil_top'},
-        {a: 'x1_nc1_bot', b: 'gl_top'},
-        {a: 'pow_T', b: 'x1_coil_bot'},
-        {a: 'x1_coil_bot', b: 'rl_bot'},
-        {a: 'rl_bot', b: 'x2_coil_bot'},
-        {a: 'x2_coil_bot', b: 'gl_bot'}
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb1_no_top', b: 'x1_no1_top'},
+        {a: 'pb1_no_bot', b: 'x1_no1_bot'}, {a: 'pb1_no_bot', b: 'x2_nc1_top'},
+        {a: 'x2_nc1_bot', b: 'x1_coil_top'}, {a: 'x2_nc1_bot', b: 'rl_top'},
+        {a: 'pb3_nc_bot', b: 'pb2_no_top'}, {a: 'pb2_no_top', b: 'x2_no1_top'},
+        {a: 'pb2_no_bot', b: 'x2_no1_bot'}, {a: 'pb2_no_bot', b: 'x1_nc1_top'},
+        {a: 'x1_nc1_bot', b: 'x2_coil_top'}, {a: 'x1_nc1_bot', b: 'gl_top'},
+        {a: 'pow_T', b: 'x1_coil_bot'}, {a: 'x1_coil_bot', b: 'rl_bot'},
+        {a: 'rl_bot', b: 'x2_coil_bot'}, {a: 'x2_coil_bot', b: 'gl_bot'}
       ],
       a_contact: [
-        {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pb1_no_bot', b: 'x1_coil_top'},
-        {a: 'x1_coil_bot', b: 'pow_T'},
-        {a: 'pow_R', b: 'x1_no1_top'},
-        {a: 'x1_no1_bot', b: 'rl_top'},
-        {a: 'rl_bot', b: 'pow_T'}
+        {a: 'pow_R', b: 'pb1_no_top'}, {a: 'pb1_no_bot', b: 'x1_coil_top'}, {a: 'x1_coil_bot', b: 'pow_T'},
+        {a: 'pow_R', b: 'x1_no1_top'}, {a: 'x1_no1_bot', b: 'rl_top'}, {a: 'rl_bot', b: 'pow_T'}
       ],
       b_contact: [
-        {a: 'pow_R', b: 'pb1_nc_top'},
-        {a: 'pb1_nc_bot', b: 'x1_coil_top'},
-        {a: 'x1_coil_bot', b: 'pow_T'},
-        {a: 'pow_R', b: 'x1_nc1_top'},
-        {a: 'x1_nc1_bot', b: 'gl_top'},
-        {a: 'gl_bot', b: 'pow_T'}
+        {a: 'pow_R', b: 'pb1_nc_top'}, {a: 'pb1_nc_bot', b: 'x1_coil_top'}, {a: 'x1_coil_bot', b: 'pow_T'},
+        {a: 'pow_R', b: 'x1_nc1_top'}, {a: 'x1_nc1_bot', b: 'gl_top'}, {a: 'gl_bot', b: 'pow_T'}
       ],
       c_contact: [
-        {a: 'pow_R', b: 'pb1_no_top'},
-        {a: 'pb1_no_bot', b: 'x1_coil_top'},
-        {a: 'x1_coil_bot', b: 'pow_T'},
-        {a: 'pow_R', b: 'x1_no1_top'},
-        {a: 'x1_no1_bot', b: 'rl_top'},
-        {a: 'rl_bot', b: 'pow_T'},
-        {a: 'pow_R', b: 'x1_nc1_top'},
-        {a: 'x1_nc1_bot', b: 'gl_top'},
-        {a: 'gl_bot', b: 'pow_T'}
+        {a: 'pow_R', b: 'pb1_no_top'}, {a: 'pb1_no_bot', b: 'x1_coil_top'}, {a: 'x1_coil_bot', b: 'pow_T'},
+        {a: 'pow_R', b: 'x1_no1_top'}, {a: 'x1_no1_bot', b: 'rl_top'}, {a: 'rl_bot', b: 'pow_T'},
+        {a: 'pow_R', b: 'x1_nc1_top'}, {a: 'x1_nc1_bot', b: 'gl_top'}, {a: 'gl_bot', b: 'pow_T'}
       ],
       and_circuit: [
-        {a: 'pow_R', b: 'pb3_nc_top'},
-        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
-        {a: 'pb1_no_bot', b: 'x1_coil_top'},
-        {a: 'x1_coil_bot', b: 'pow_T'},
-        {a: 'pb3_nc_bot', b: 'x1_no1_top'},
-        {a: 'x1_no1_bot', b: 'x1_coil_top'},
-        {a: 'pb3_nc_bot', b: 'pb2_no_top'},
-        {a: 'pb2_no_bot', b: 'x2_coil_top'},
-        {a: 'x2_coil_bot', b: 'pow_T'},
-        {a: 'pb3_nc_bot', b: 'x2_no1_top'},
-        {a: 'x2_no1_bot', b: 'x2_coil_top'},
-        {a: 'pb3_nc_bot', b: 'x1_no2_top'},
-        {a: 'x1_no2_bot', b: 'x2_no2_top'}, 
-        {a: 'x2_no2_bot', b: 'rl_top'},
-        {a: 'rl_bot', b: 'pow_T'}
+        {a: 'pow_R', b: 'pb3_nc_top'}, {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb1_no_bot', b: 'x1_coil_top'},
+        {a: 'x1_coil_bot', b: 'pow_T'}, {a: 'pb3_nc_bot', b: 'x1_no1_top'}, {a: 'x1_no1_bot', b: 'x1_coil_top'},
+        {a: 'pb3_nc_bot', b: 'pb2_no_top'}, {a: 'pb2_no_bot', b: 'x2_coil_top'}, {a: 'x2_coil_bot', b: 'pow_T'},
+        {a: 'pb3_nc_bot', b: 'x2_no1_top'}, {a: 'x2_no1_bot', b: 'x2_coil_top'}, {a: 'pb3_nc_bot', b: 'x1_no2_top'},
+        {a: 'x1_no2_bot', b: 'x2_no2_top'}, {a: 'x2_no2_bot', b: 'rl_top'}, {a: 'rl_bot', b: 'pow_T'}
       ],
       or_circuit: [
-        {a: 'pow_R', b: 'pb3_nc_top'},
-        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
-        {a: 'pb1_no_bot', b: 'x1_coil_top'},
-        {a: 'x1_coil_bot', b: 'pow_T'},
-        {a: 'pb3_nc_bot', b: 'x1_no1_top'},
-        {a: 'x1_no1_bot', b: 'x1_coil_top'},
-        {a: 'pb3_nc_bot', b: 'pb2_no_top'},
-        {a: 'pb2_no_bot', b: 'x2_coil_top'},
-        {a: 'x2_coil_bot', b: 'pow_T'},
-        {a: 'pb3_nc_bot', b: 'x2_no1_top'},
-        {a: 'x2_no1_bot', b: 'x2_coil_top'},
-        {a: 'pb3_nc_bot', b: 'x1_no2_top'},
-        {a: 'x1_no2_bot', b: 'rl_top'},
-        {a: 'pb3_nc_bot', b: 'x2_no2_top'}, 
-        {a: 'x2_no2_bot', b: 'rl_top'},
+        {a: 'pow_R', b: 'pb3_nc_top'}, {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb1_no_bot', b: 'x1_coil_top'},
+        {a: 'x1_coil_bot', b: 'pow_T'}, {a: 'pb3_nc_bot', b: 'x1_no1_top'}, {a: 'x1_no1_bot', b: 'x1_coil_top'},
+        {a: 'pb3_nc_bot', b: 'pb2_no_top'}, {a: 'pb2_no_bot', b: 'x2_coil_top'}, {a: 'x2_coil_bot', b: 'pow_T'},
+        {a: 'pb3_nc_bot', b: 'x2_no1_top'}, {a: 'x2_no1_bot', b: 'x2_coil_top'}, {a: 'pb3_nc_bot', b: 'x1_no2_top'},
+        {a: 'x1_no2_bot', b: 'rl_top'}, {a: 'pb3_nc_bot', b: 'x2_no2_top'}, {a: 'x2_no2_bot', b: 'rl_top'},
         {a: 'rl_bot', b: 'pow_T'}
       ],
       motor_circuit: [
-        {a: 'main_R', b: 'mc1_R_in'},
-        {a: 'main_S', b: 'mc1_S_in'},
-        {a: 'main_T', b: 'mc1_T_in'},
-        {a: 'mc1_U_out', b: 'thr1_U_in'},
-        {a: 'mc1_V_out', b: 'thr1_V_in'},
-        {a: 'mc1_W_out', b: 'thr1_W_in'},
-        {a: 'thr1_U_out', b: 'mot_U'},
-        {a: 'thr1_V_out', b: 'mot_V'},
-        {a: 'thr1_W_out', b: 'mot_W'},
-        {a: 'main_R', b: 'fuse_R_in'},
-        {a: 'main_T', b: 'fuse_T_in'},
-        {a: 'fuse_R_out', b: 'thr1_95'},
-        {a: 'thr1_96', b: 'pb3_nc_top'},
-        {a: 'pb3_nc_bot', b: 'pb1_no_top'},
-        {a: 'pb1_no_bot', b: 'mc1_coil_top'},
-        {a: 'mc1_coil_bot', b: 'fuse_T_out'},
-        {a: 'pb3_nc_bot', b: 'mc1_no_top'},
-        {a: 'mc1_no_bot', b: 'mc1_coil_top'},
-        {a: 'mc1_no_bot', b: 'rl_top'},
-        {a: 'rl_bot', b: 'fuse_T_out'},
-        {a: 'pb3_nc_bot', b: 'mc1_nc_top'},
-        {a: 'mc1_nc_bot', b: 'gl_top'},
-        {a: 'gl_bot', b: 'fuse_T_out'},
-        {a: 'thr1_98', b: 'yl_top'},
-        {a: 'yl_bot', b: 'fuse_T_out'}
+        {a: 'main_R', b: 'mc1_R_in'}, {a: 'main_S', b: 'mc1_S_in'}, {a: 'main_T', b: 'mc1_T_in'},
+        {a: 'mc1_U_out', b: 'thr1_U_in'}, {a: 'mc1_V_out', b: 'thr1_V_in'}, {a: 'mc1_W_out', b: 'thr1_W_in'},
+        {a: 'thr1_U_out', b: 'mot_U'}, {a: 'thr1_V_out', b: 'mot_V'}, {a: 'thr1_W_out', b: 'mot_W'},
+        {a: 'main_R', b: 'fuse_R_in'}, {a: 'main_T', b: 'fuse_T_in'},
+        {a: 'fuse_R_out', b: 'thr1_95'}, {a: 'thr1_96', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb1_no_bot', b: 'mc1_coil_top'}, {a: 'mc1_coil_bot', b: 'fuse_T_out'},
+        {a: 'pb3_nc_bot', b: 'mc1_no_top'}, {a: 'mc1_no_bot', b: 'mc1_coil_top'},
+        {a: 'mc1_no_bot', b: 'rl_top'}, {a: 'rl_bot', b: 'fuse_T_out'},
+        {a: 'pb3_nc_bot', b: 'mc1_nc_top'}, {a: 'mc1_nc_bot', b: 'gl_top'}, {a: 'gl_bot', b: 'fuse_T_out'},
+        {a: 'thr1_98', b: 'yl_top'}, {a: 'yl_bot', b: 'fuse_T_out'}
       ],
       motor_fwd_rev: [
         {a: 'main_R', b: 'mc1_R_in'}, {a: 'main_S', b: 'mc1_S_in'}, {a: 'main_T', b: 'mc1_T_in'},
@@ -1157,13 +1085,6 @@
       ]
     };
 
-    lessonSelect.addEventListener('change', (e) => {
-      document.querySelectorAll('#diagram-container svg').forEach(svg => svg.classList.remove('active'));
-      const activeSvg = document.getElementById('diag_' + e.target.value);
-      if(activeSvg) activeSvg.classList.add('active');
-      clearWires();
-    });
-
     function createModule(id, x, y, width, height, title, contentHTML) {
       const mod = document.createElement('div');
       mod.className = 'module module-screws';
@@ -1177,56 +1098,59 @@
     }
 
     function buildHardware() {
-      createModule('power', 20, 20, 90, 90, 'Ctrl Pow', `
+      // Row 1: Power & Controls
+      createModule('power', 25, 20, 80, 130, 'Ctrl Pow', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-red" id="pow_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-red" id="pow_T"></div><div class="symbol">T</div></div>
         </div>
       `);
 
-      const pbXPositions = [140, 260, 380];
+      const pbXPositions = [115, 205, 295];
       pbXPositions.forEach((pbX, i) => {
         const pbNum = i + 1;
-        let pbHTML = `
+        createModule(`pb${pbNum}_mod`, pbX, 20, 80, 130, `PB${pbNum}`, `
           <div class="grid-col">
             <div class="pb-actuator" id="btn_pb${pbNum}" onmousedown="pressPB('pb${pbNum}', true)" onmouseup="pressPB('pb${pbNum}', false)" onmouseleave="pressPB('pb${pbNum}', false)" ontouchstart="pressPB('pb${pbNum}', true)" ontouchend="pressPB('pb${pbNum}', false)">PB${pbNum}</div>
             <div class="grid-row" style="gap:8px;">
               <div class="grid-col"><div class="terminal term-yellow" id="pb${pbNum}_no_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="pb${pbNum}_no_bot"></div></div>
               <div class="grid-col"><div class="terminal term-blue" id="pb${pbNum}_nc_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="pb${pbNum}_nc_bot"></div></div>
             </div>
-          </div>`;
-        createModule(`pb${pbNum}_mod`, pbX, 20, 95, 140, `Btn PB${pbNum}`, pbHTML);
+          </div>`);
       });
 
       const lamps = [
-        { id: 'rl', color: 'red', name: 'RL', x: 510 },
-        { id: 'gl', color: 'green', name: 'GL', x: 600 },
-        { id: 'yl', color: 'yellow', name: 'YL', x: 690 }
+        { id: 'rl', color: 'red', name: 'RL', x: 405 },
+        { id: 'gl', color: 'green', name: 'GL', x: 485 },
+        { id: 'yl', color: 'yellow', name: 'YL', x: 565 }
       ];
       lamps.forEach(l => {
-        createModule(`lamp_${l.id}`, l.x, 20, 65, 140, l.name, `
+        createModule(`lamp_${l.id}`, l.x, 20, 70, 130, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
           <div class="grid-col"><div class="terminal term-red" id="${l.id}_top"></div><div class="terminal term-red" id="${l.id}_bot"></div></div>
         `);
       });
 
-      createModule('fuse_mod', 780, 20, 110, 140, 'Fuse', `
+      createModule('fuse_mod', 645, 20, 110, 130, 'Fuse', `
         <div class="grid-row" style="margin-top:15px; gap: 20px;">
           <div class="grid-col"><div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div></div>
           <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div></div>
         </div>
       `);
 
+      // Row 2: Relays
       [1, 2].forEach((num, idx) => {
         let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
         relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
         for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
         for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
         relayHTML += '</div>';
-        createModule(`relay${num}`, 20 + (idx * 370), 190, 350, 150, `Relay (X${num})`, relayHTML);
+        
+        createModule(`relay${num}`, 25 + (idx * 380), 180, 350, 150, `Relay (X${num})`, relayHTML);
       });
 
-      createModule('main_power', 20, 380, 100, 100, '3-Ph Pow', `
+      // Row 3: Motor Power
+      createModule('main_power', 25, 360, 90, 100, '3-Ph Pow', `
         <div class="grid-row" style="margin-top:10px;">
           <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
           <div class="grid-col"><div class="terminal term-black" id="main_S"></div><div class="symbol">S</div></div>
@@ -1235,7 +1159,7 @@
       `);
 
       const createMC = (id, name, x) => {
-          createModule(`${id}_mod`, x, 380, 225, 180, name, `
+          createModule(`${id}_mod`, x, 360, 225, 180, name, `
             <div class="relay-indicator" id="ind_${id}"></div>
             <div class="grid-row" style="gap: 15px;">
                 <div class="grid-col">
@@ -1268,10 +1192,9 @@
           `);
       };
 
-      createMC('mc1', 'MC1 (FWD)', 140);
-      createMC('mc2', 'MC2 (REV)', 385);
+      createMC('mc1', 'MC1 (FWD)', 125);
 
-      createModule('thr1_mod', 630, 380, 225, 180, 'Overload (THR)', `
+      createModule('thr1_mod', 405, 360, 230, 180, 'Overload (THR)', `
         <button id="thr_trip_btn" class="thr-trip-btn" onclick="toggleTHRTrip()">NORMAL (Click to Trip)</button>
         <div class="grid-row" style="gap: 15px;">
             <div class="grid-col">
@@ -1300,7 +1223,7 @@
         </div>
       `);
 
-      createModule('motor_mod', 875, 380, 160, 160, 'Motor (IM)', `
+      createModule('motor_mod', 645, 360, 110, 160, 'Motor (IM)', `
         <div class="grid-row" style="gap:4px; margin-top:5px;">
             <div class="grid-col"><div class="terminal term-black" id="mot_U"></div><div class="symbol">U</div></div>
             <div class="grid-col"><div class="terminal term-black" id="mot_V"></div><div class="symbol">V</div></div>
@@ -1329,13 +1252,12 @@
             const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
             currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
             board.style.transform = `scale(${currentZoom})`;
-            board.style.marginBottom = `${650 * (currentZoom - 1)}px`;
-            board.style.marginRight = `${1100 * (currentZoom - 1)}px`;
+            board.style.marginBottom = `${600 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${900 * (currentZoom - 1)}px`;
             renderWires();
         }
     }, { passive: false });
 
-    // Touch logic
     scrollContainer.addEventListener('touchstart', (e) => {
       if (e.touches.length === 2) {
         e.preventDefault();
@@ -1351,14 +1273,14 @@
         const scaleChange = currentDistance / initialDistance;
         currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
         board.style.transform = `scale(${currentZoom})`;
-        board.style.marginBottom = `${650 * (currentZoom - 1)}px`;
-        board.style.marginRight = `${1100 * (currentZoom - 1)}px`;
+        board.style.marginBottom = `${600 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${900 * (currentZoom - 1)}px`;
         renderWires();
       }
     }, { passive: false });
 
     scrollContainer.addEventListener('touchend', (e) => { if (e.touches.length < 2) initialDistance = 0; });
-    
+
     // --- 4. INTERACTION & DRAWING ---
     function toggleTHRTrip() {
         state.thrTripped = !state.thrTripped;
@@ -1418,38 +1340,46 @@
     function clearWires() { wires = []; document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash')); renderWires(); evaluateCircuit(); updateStatus("All wires cleared. Ready to build. (초기화 완료.)"); }
     function undoWire() { if (wires.length > 0) { wires.pop(); renderWires(); evaluateCircuit(); updateStatus("Last wire removed. (마지막 전선 삭제.)"); } }
 
+    // Completely avoids traversing over panels or terminals using orthogonal safety routing
     function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
       const getDir = (id) => id.includes('_bot') || id.includes('_out') ? 'down' : 'up';
       const dirA = getDir(idA);
       const dirB = getDir(idB);
 
       let baseYA, baseYB;
-      if (y1 < 175) baseYA = dirA === 'up' ? 12 : 175;
-      else if (y1 < 360) baseYA = dirA === 'up' ? 175 : 360;
-      else baseYA = dirA === 'up' ? 360 : 585;
+      if (y1 < 150) baseYA = dirA === 'up' ? 8 : 165;
+      else if (y1 < 330) baseYA = dirA === 'up' ? 165 : 345;
+      else baseYA = dirA === 'up' ? 345 : 555;
 
-      if (y2 < 175) baseYB = dirB === 'up' ? 12 : 175;
-      else if (y2 < 360) baseYB = dirB === 'up' ? 175 : 360;
-      else baseYB = dirB === 'up' ? 360 : 585;
+      if (y2 < 150) baseYB = dirB === 'up' ? 8 : 165;
+      else if (y2 < 330) baseYB = dirB === 'up' ? 165 : 345;
+      else baseYB = dirB === 'up' ? 345 : 555;
 
-      const offsetY = ((index % 8) * 4) - 14; 
+      const getCorridor = (y, dir) => {
+          if (dir === 'up') return y < 150 ? 0 : (y < 330 ? 1 : 2);
+          return y < 150 ? 1 : (y < 330 ? 2 : 3);
+      };
+
+      const offsetY = ((index % 6) - 2.5) * 4; 
       const cyA = baseYA + offsetY;
       const cyB = baseYB + offsetY;
 
-      if (Math.abs(baseYA - baseYB) < 10) {
+      // Same horizontal corridor
+      if (getCorridor(y1, dirA) === getCorridor(y2, dirB)) {
           return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
       }
 
-      // 1100px board safe trunks
-      const safeXTrunks = [5, 130, 245, 375, 485, 620, 865, 1050];
+      // Safe Vertical Trunks positioned perfectly in panel gaps
+      const safeXTrunks = [12, 390, 775];
       let bestX = safeXTrunks[0];
       let minCost = Infinity;
       const tX = (x1+x2)/2;
       for (let sx of safeXTrunks) {
           let cost = Math.abs(tX - sx);
+          if (sx >= Math.min(x1, x2) && sx <= Math.max(x1, x2)) cost -= 1000;
           if (cost < minCost) { minCost = cost; bestX = sx; }
       }
-      const trunkX = bestX + ((index % 5) - 2) * 4;
+      const trunkX = bestX + ((index % 6) - 2.5) * 4;
       return `M ${x1} ${y1} L ${x1} ${cyA} L ${trunkX} ${cyA} L ${trunkX} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
     }
 
@@ -1481,7 +1411,7 @@
         });
         path.addEventListener('mouseleave', function() { 
             this.style.stroke = this.getAttribute('data-original-color');
-            if(!this.classList.contains('wire-shorted')) { this.style.opacity = '0.75'; this.style.strokeWidth = '3.5'; }
+            if(!this.classList.contains('wire-shorted')) { this.style.opacity = '0.8'; this.style.strokeWidth = '3.5'; }
         });
 
         path.onclick = () => removeWire(w.id);
@@ -1550,6 +1480,8 @@
 
         // MCs logic
         ['mc1', 'mc2'].forEach(mc => {
+            const mcMod = document.getElementById(`${mc}_mod`);
+            if(!mcMod) return;
             if (state[mc]) {
                 addEdge(`${mc}_R_in`, `${mc}_U_out`); addEdge(`${mc}_S_in`, `${mc}_V_out`); addEdge(`${mc}_T_in`, `${mc}_W_out`);
                 addEdge(`${mc}_no_top`, `${mc}_no_bot`);
@@ -1592,6 +1524,8 @@
         });
 
         ['mc1', 'mc2'].forEach(mc => {
+            const mcMod = document.getElementById(`${mc}_mod`);
+            if(!mcMod) return;
             let top = `${mc}_coil_top`; let bot = `${mc}_coil_bot`;
             let isEnergized = (rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot)) && (tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot));
             if (state[mc] !== isEnergized) { state[mc] = isEnergized; changed = true; }
@@ -1637,7 +1571,9 @@
     }
 
     function showHint() {
-      const targetWires = lessons[document.getElementById('lesson-select').value];
+      let targetWires = lessons[document.getElementById('lesson-select').value];
+      if(!targetWires && document.getElementById('lesson-select').value === "motor_fwd_rev") targetWires = [];
+      if(!targetWires) return;
       document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
       for (let expected of targetWires) {
         const exists = wires.some(w => (w.a === expected.a && w.b === expected.b) || (w.a === expected.b && w.b === expected.a));
@@ -1653,7 +1589,14 @@
 
     function loadLessonTarget() {
       clearWires();
-      lessons[document.getElementById('lesson-select').value].forEach((w, i) => { setTimeout(() => { addWire(w.a, w.b); }, i * 50); });
+      let targetWires = lessons[document.getElementById('lesson-select').value];
+      if(!targetWires && document.getElementById('lesson-select').value === "motor_fwd_rev") {
+          // If motor_fwd_rev isn't in lesson object for some reason, build dynamically
+          targetWires = []; // Handled previously, just safety check
+      }
+      if(!targetWires) return;
+      targetWires.forEach((w, i) => { setTimeout(() => { addWire(w.a, w.b); }, i * 50); });
+      updateStatus(`Loaded target layout. (정답을 불러왔습니다.)`);
     }
 
     function updateStatus(msg, isError = false) {
@@ -1673,6 +1616,28 @@
     }
 
     window.addEventListener('resize', renderWires);
+
+    // Provide missing motor_fwd_rev logic correctly to prevent previous crash
+    if(!lessons['motor_fwd_rev']) {
+        lessons['motor_fwd_rev'] = [
+        {a: 'main_R', b: 'mc1_R_in'}, {a: 'main_S', b: 'mc1_S_in'}, {a: 'main_T', b: 'mc1_T_in'},
+        {a: 'mc1_R_in', b: 'mc2_R_in'}, {a: 'mc1_S_in', b: 'mc2_S_in'}, {a: 'mc1_T_in', b: 'mc2_T_in'},
+        {a: 'mc1_U_out', b: 'thr1_U_in'}, {a: 'mc1_V_out', b: 'thr1_V_in'}, {a: 'mc1_W_out', b: 'thr1_W_in'},
+        {a: 'mc2_U_out', b: 'mc1_W_out'}, {a: 'mc2_V_out', b: 'mc1_V_out'}, {a: 'mc2_W_out', b: 'mc1_U_out'},
+        {a: 'thr1_U_out', b: 'mot_U'}, {a: 'thr1_V_out', b: 'mot_V'}, {a: 'thr1_W_out', b: 'mot_W'},
+        {a: 'main_R', b: 'fuse_R_in'}, {a: 'main_T', b: 'fuse_T_in'},
+        {a: 'fuse_R_out', b: 'thr1_95'}, {a: 'thr1_96', b: 'pb3_nc_top'},
+        {a: 'pb3_nc_bot', b: 'pb1_no_top'}, {a: 'pb3_nc_bot', b: 'pb2_no_top'},
+        {a: 'pb1_no_top', b: 'mc1_no_top'}, {a: 'pb2_no_top', b: 'mc2_no_top'},
+        {a: 'pb1_no_bot', b: 'mc1_no_bot'}, {a: 'pb2_no_bot', b: 'mc2_no_bot'},
+        {a: 'pb1_no_bot', b: 'mc2_nc_top'}, {a: 'pb2_no_bot', b: 'mc1_nc_top'},
+        {a: 'mc2_nc_bot', b: 'mc1_coil_top'}, {a: 'mc1_nc_bot', b: 'mc2_coil_top'},
+        {a: 'mc1_no_bot', b: 'rl_top'}, {a: 'mc2_no_bot', b: 'gl_top'},
+        {a: 'mc1_coil_bot', b: 'fuse_T_out'}, {a: 'mc2_coil_bot', b: 'fuse_T_out'},
+        {a: 'rl_bot', b: 'fuse_T_out'}, {a: 'gl_bot', b: 'fuse_T_out'},
+        {a: 'thr1_98', b: 'yl_top'}, {a: 'yl_bot', b: 'fuse_T_out'}
+      ];
+    }
 
     document.getElementById('diag_latch_basic').classList.add('active');
     buildHardware();
