@@ -1488,6 +1488,19 @@
         wireLayer.appendChild(path);
       });
       document.getElementById('wire-count').innerText = wires.length;
+      
+      if (wires.length === 0) {
+        wireContainer.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections (연결 없음).</div>`;
+      } else {
+        wireContainer.innerHTML = wires.map(w => `
+          <div class="wire-item">
+            <span style="border-left: 4px solid ${w.color}; padding-left: 6px;">
+              ${w.a.toUpperCase().replace(/_/g, ' ')} ↔ ${w.b.toUpperCase().replace(/_/g, ' ')}
+            </span>
+            <button onclick="removeWire('${w.id}')">Remove</button>
+          </div>
+        `).join('');
+      }
     }
 
     // --- 5. LOGIC ENGINE (PHYSICS/GRAPH SOLVER) ---
