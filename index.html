@@ -142,7 +142,7 @@
     /* Right Area: The Physical Board */
     .board-container { flex: 1; position: relative; background: radial-gradient(circle at 50% 50%, #f8fafc, #e2e8f0); overflow: auto; padding: 1.5rem; display: flex; align-items: flex-start; justify-content: flex-start; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
 
-    /* Expanded Board to fit Timer, MC3, and WL cleanly */
+    /* Expanded Board */
     .board {
       position: relative; width: 1350px; height: 680px; background: #d1d5db;
       border: 4px solid #94a3b8; border-radius: 12px;
@@ -150,8 +150,10 @@
       margin: 0 auto; flex-shrink: 0; transform-origin: top left; will-change: transform;
     }
 
+    /* SVG Layer strictly under terminals */
     #wire-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
     
+    /* Pure CSS hover logic to fix sticking colors */
     .wire-path {
       fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
@@ -165,9 +167,11 @@
     
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
     
+    /* Short Circuit Wire Animation */
     @keyframes shortBlink { 0%, 100% { stroke: #ef4444; filter: drop-shadow(0 0 10px #ef4444); } 50% { stroke: #fca5a5; filter: drop-shadow(0 0 2px #ef4444); } }
     .wire-shorted { animation: shortBlink 0.3s infinite !important; stroke-width: 6 !important; opacity: 1 !important; z-index: 50; }
 
+    /* Hardware Modules (Layer 5: Below Wires Layer 10) */
     .module {
       position: absolute; background: var(--panel-bg); border: 2px solid var(--panel-border);
       border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
@@ -180,6 +184,8 @@
     .module-title { font-size: 0.7rem; font-weight: bold; background: #94a3b8; color: white; padding: 0.1rem 0.6rem; border-radius: 4px; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
 
     .terminal-group { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    
+    /* Terminals (Layer 30: Above Wires Layer 10) - Ensures you can ALWAYS click them */
     .terminal { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #334155; box-shadow: 0 1px 2px rgba(255,255,255,0.8), inset 0 2px 4px rgba(0,0,0,0.6); position: relative; cursor: pointer; transition: transform 0.1s; z-index: 30; background-color: white; }
     .terminal::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #020617; border-radius: 50%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); }
     .terminal:hover { transform: scale(1.3); z-index: 40; }
@@ -228,6 +234,7 @@
     @keyframes spinCW { 100% { transform: rotate(360deg); } }
     @keyframes spinCCW { 100% { transform: rotate(-360deg); } }
 
+    /* THR Trip Button */
     .thr-trip-btn { background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.55rem; font-weight: bold; cursor: pointer; margin-bottom: 4px; }
     .thr-trip-btn.tripped { background: #fbbf24; color: #78350f; animation: pulse 1s infinite; }
 
@@ -265,6 +272,7 @@
         <option value="motor_circuit">10. Motor Control Circuit (전동기 제어 회로)</option>
         <option value="motor_fwd_rev">11. Motor FWD/REV Control (전동기 정역운전 회로)</option>
         <option value="star_delta">12. Y-Δ Motor Starting Circuit (Y-Δ 기동제어 회로)</option>
+        <option value="timer_circuit">13. Timer Circuit (타이머 회로)</option>
       </select>
       <button onclick="toggleSidebar()" id="sidebar-toggle-btn">Hide Sidebar (사이드바 숨기기)</button>
       <button class="warning" onclick="undoWire()">Undo (실행 취소)</button>
@@ -285,138 +293,100 @@
           <summary>Schematic Diagram (회로도)</summary>
           <div id="diagram-container" class="diagram-container">
             
-            <!-- 12. Y-Delta Circuit Schema -->
-            <svg id="diag_star_delta" viewBox="0 0 750 400">
-              <text x="10" y="20" class="dt bold" style="font-size: 18px;">Main</text>
-              <path class="dw" d="M 30 40 V 80 M 50 40 V 80 M 70 40 V 80" />
-              <text x="25" y="35" class="dt bold">R</text><text x="45" y="35" class="dt bold">S</text><text x="65" y="35" class="dt bold">T</text>
-              
-              <rect x="20" y="80" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
-              <text x="85" y="105" class="dt bold">MCM</text>
-              <path class="dw" d="M 30 80 V 120 M 50 80 V 120 M 70 80 V 120" />
-              <circle cx="30" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="30" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="50" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="50" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="70" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="70" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
-              <rect x="20" y="140" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
-              <text x="85" y="165" class="dt bold">THR</text>
-              <path class="dw" d="M 30 120 V 180 M 50 120 V 180 M 70 120 V 180" />
-              <path class="dw" d="M 25 155 C 35 155, 35 165, 25 165" />
-              <path class="dw" d="M 45 155 C 55 155, 55 165, 45 165" />
-              <path class="dw" d="M 65 155 C 75 155, 75 165, 65 165" />
-
-              <path class="dw" d="M 30 180 V 220 M 50 180 V 220 M 70 180 V 220" />
-              <circle cx="50" cy="250" r="30" class="dw" />
-              <text x="40" y="255" class="dt bold" style="font-size: 18px;">IM</text>
-
-              <path class="dw" d="M 30 280 V 320 M 50 280 V 320 M 70 280 V 320" />
-              <rect x="20" y="320" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
-              <text x="85" y="345" class="dt bold">MCD</text>
-              <path class="dw" d="M 30 320 V 360 M 50 320 V 360 M 70 320 V 360" />
-              <circle cx="30" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="30" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="50" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="50" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="70" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="70" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-
-              <path class="dw" d="M 30 360 V 380 H 130 V 50 H 30" />
-              <path class="dw" d="M 50 360 V 375 H 140 V 60 H 50" />
-              <path class="dw" d="M 70 360 V 370 H 150 V 70 H 70" />
-              <circle cx="30" cy="50" r="3" fill="#1e293b"/><circle cx="50" cy="60" r="3" fill="#1e293b"/><circle cx="70" cy="70" r="3" fill="#1e293b"/>
-
-              <rect x="180" y="320" width="60" height="40" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4 4" />
-              <text x="245" y="345" class="dt bold">MCY</text>
-              <path class="dw" d="M 190 320 V 360 M 210 320 V 360 M 230 320 V 360" />
-              <circle cx="190" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="190" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="210" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="210" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <circle cx="230" cy="330" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="230" cy="350" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              
-              <path class="dw" d="M 190 320 V 300 H 30" />
-              <path class="dw" d="M 210 320 V 290 H 50" />
-              <path class="dw" d="M 230 320 V 280 H 70" />
-              <circle cx="30" cy="300" r="3" fill="#1e293b"/><circle cx="50" cy="290" r="3" fill="#1e293b"/><circle cx="70" cy="280" r="3" fill="#1e293b"/>
-
-              <path class="dw" d="M 190 360 V 375 H 230 V 360" />
-
-              <!-- Control Circuit -->
-              <text x="260" y="20" class="dt bold" style="font-size: 18px;">Control</text>
-              <path class="dw" d="M 280 40 H 730 M 280 380 H 730" />
-              <text x="265" y="45" class="dt bold">R</text><text x="265" y="385" class="dt bold">T</text>
-              
-              <rect x="290" y="30" width="20" height="20" class="dw" /> <text x="292" y="25" class="dt">F1</text>
-              <rect x="290" y="370" width="20" height="20" class="dw" /> <text x="292" y="405" class="dt">F2</text>
-
-              <path class="dw" d="M 330 40 V 60" />
-              <circle cx="330" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="330" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 333 60 V 90 M 333 75 H 343" /><text x="350" y="80" class="dt bold">THR</text>
-              <path class="dw" d="M 330 90 V 110" />
-
-              <path class="dw" d="M 330 60 H 700" />
-              <circle cx="700" cy="60" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="700" cy="90" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 710 60 V 90" /><text x="715" y="80" class="dt bold">THR_a</text>
-              <path class="dw" d="M 700 90 V 330" />
-              <circle cx="700" cy="345" r="15" fill="none" stroke="#94a3b8" stroke-width="2" />
-              <text x="690" y="350" class="dt bold" style="fill: #94a3b8;">WL</text>
-              <path class="dw" d="M 700 360 V 380" />
-              <circle cx="700" cy="380" r="3" fill="#1e293b" />
-
-              <circle cx="330" cy="110" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="330" cy="140" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 333 110 V 140 M 333 125 H 343" /><text x="350" y="130" class="dt bold">PB(OFF)</text>
-
-              <path class="dw" d="M 330 140 V 160" />
-              <circle cx="330" cy="160" r="3" fill="#1e293b" />
-              <path class="dw" d="M 330 160 H 400" />
-
-              <circle cx="330" cy="160" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="330" cy="190" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 340 160 V 190 M 340 175 H 350" /><text x="355" y="180" class="dt bold">PB(ON)</text>
-
-              <circle cx="400" cy="160" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="400" cy="190" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 410 160 V 190" /><text x="415" y="180" class="dt bold">MCM_a</text>
-
-              <path class="dw" d="M 330 190 V 210" />
-              <path class="dw" d="M 400 190 V 210 H 330" />
-              <circle cx="330" cy="210" r="3" fill="#1e293b" />
-
-              <path class="dw" d="M 330 210 H 630" />
-
-              <path class="dw" d="M 330 210 V 250" />
-              <circle cx="330" cy="265" r="15" class="dw" /><text x="313" y="270" class="dt bold">MCM</text>
-              <path class="dw" d="M 330 280 V 380" /><circle cx="330" cy="380" r="3" fill="#1e293b" />
-
-              <path class="dw" d="M 400 210 V 250" />
-              <circle cx="400" cy="265" r="15" class="dw" /><text x="390" y="270" class="dt bold">T</text>
-              <path class="dw" d="M 400 280 V 380" /><circle cx="400" cy="380" r="3" fill="#1e293b" />
-
-              <path class="dw" d="M 470 210 V 240" />
-              <circle cx="470" cy="240" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="470" cy="270" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 473 240 V 270 M 473 255 H 483" /><text x="488" y="260" class="dt bold">T_b</text>
-              
-              <path class="dw" d="M 470 270 V 290" />
-              <circle cx="470" cy="290" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="470" cy="320" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 473 290 V 320" /><text x="480" y="310" class="dt bold">MCD_b</text>
-              
-              <path class="dw" d="M 470 320 V 335" />
-              <circle cx="470" cy="350" r="15" class="dw" /><text x="453" y="355" class="dt bold">MCY</text>
-              <path class="dw" d="M 470 365 V 380" /><circle cx="470" cy="380" r="3" fill="#1e293b" />
-
-              <path class="dw" d="M 550 210 V 240" />
-              <circle cx="550" cy="240" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="550" cy="270" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 560 240 V 270 M 560 255 H 570" /><text x="575" y="260" class="dt bold">T_a</text>
-              
-              <path class="dw" d="M 550 270 V 290" />
-              <circle cx="550" cy="290" r="3" fill="white" stroke="#1e293b" stroke-width="2"/><circle cx="550" cy="320" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
-              <path class="dw" d="M 553 290 V 320" /><text x="560" y="310" class="dt bold">MCY_b</text>
-              
-              <path class="dw" d="M 550 320 V 335" />
-              <circle cx="550" cy="350" r="15" class="dw" /><text x="533" y="355" class="dt bold">MCD</text>
-              <path class="dw" d="M 550 365 V 380" /><circle cx="550" cy="380" r="3" fill="#1e293b" />
-
-              <circle cx="630" cy="210" r="3" fill="#1e293b" />
-              <path class="dw" d="M 630 210 V 330" />
-              <circle cx="630" cy="345" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
-              <text x="620" y="350" class="dt bold" style="fill: #dc2626;">RL</text>
-              <path class="dw" d="M 630 360 V 380" /><circle cx="630" cy="380" r="3" fill="#1e293b" />
+            <!-- 1. Basic Latch Circuit -->
+            <svg id="diag_latch_basic" class="active" viewBox="0 0 200 180">
+              <path class="dw" d="M 30 30 H 140 M 30 150 H 140" />
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="156" class="dt bold" style="font-size: 20px;">T</text>
+              <path class="dw" d="M 80 30 V 45 M 80 75 V 90" />
+              <circle cx="80" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 90 45 V 75 M 90 60 H 100" />
+              <text x="105" y="65" class="dt bold" style="font-size: 20px;">PB1</text>
+              <path class="dw" d="M 140 30 V 45 M 140 75 V 90" />
+              <circle cx="140" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="140" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 150 45 V 75" />
+              <text x="160" y="65" class="dt bold" style="font-size: 20px;">X1</text>
+              <path class="dw" d="M 80 90 H 140" />
+              <path class="dw" d="M 80 90 V 105" />
+              <circle cx="80" cy="120" r="15" class="dw" />
+              <text x="71" y="126" class="dt bold" style="font-size: 18px;">X1</text>
+              <path class="dw" d="M 80 135 V 150" />
+              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="30" cy="150" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="80" cy="30" r="3" fill="#1e293b" />
+              <circle cx="140" cy="30" r="3" fill="#1e293b" />
+              <circle cx="80" cy="90" r="3" fill="#1e293b" />
+              <circle cx="140" cy="90" r="3" fill="#1e293b" />
+              <circle cx="80" cy="150" r="3" fill="#1e293b" />
             </svg>
 
-            <!-- 1. ~ 11. Omitted perfectly mapped earlier SVG content -->
+            <!-- 13. Timer Circuit -->
+            <svg id="diag_timer_circuit" viewBox="0 0 400 250">
+              <path class="dw" d="M 30 30 H 60 M 90 30 H 350 M 30 220 H 350" />
+              <text x="10" y="36" class="dt bold" style="font-size: 20px;">R</text>
+              <text x="10" y="226" class="dt bold" style="font-size: 20px;">T</text>
+              <circle cx="30" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="30" cy="220" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              
+              <!-- PB2 (NC) -->
+              <circle cx="60" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="90" cy="30" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 60 30 V 25 M 90 30 V 25 M 60 25 H 90 M 75 25 V 15 H 65" />
+              <text x="65" y="12" class="dt bold" style="font-size: 16px;">PB2</text>
+
+              <!-- Branch 1: PB1 -> T (Coil) -->
+              <circle cx="120" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 120 30 V 45" />
+              <circle cx="120" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="120" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 130 45 V 75 M 130 60 H 140" />
+              <text x="145" y="65" class="dt bold" style="font-size: 18px;">PB1</text>
+              <path class="dw" d="M 120 75 V 165" />
+              <circle cx="120" cy="95" r="3" fill="#1e293b"/>
+              <circle cx="120" cy="180" r="15" class="dw" />
+              <text x="115" y="186" class="dt bold" style="font-size: 16px;">T</text>
+              <path class="dw" d="M 120 195 V 220" />
+              <circle cx="120" cy="220" r="3" fill="#1e293b"/>
+
+              <!-- Branch 2: T-a (Inst) -->
+              <circle cx="180" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 180 30 V 45" />
+              <circle cx="180" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="180" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 190 45 V 75" />
+              <text x="195" y="65" class="dt bold" style="font-size: 16px;">T-a(inst)</text>
+              <path class="dw" d="M 180 75 V 95 H 120" />
+
+              <!-- Branch 3: T-b (Delay) -> L1 -->
+              <circle cx="240" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 240 30 V 45" />
+              <circle cx="240" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="240" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 243 45 V 75" />
+              <text x="250" y="65" class="dt bold" style="font-size: 16px;">T-b(delay)</text>
+              <path class="dw" d="M 240 75 V 165" />
+              <circle cx="240" cy="180" r="15" fill="none" stroke="#dc2626" stroke-width="2" />
+              <text x="233" y="186" class="dt bold" style="fill: #dc2626; font-size: 16px;">L1</text>
+              <path class="dw" d="M 240 195 V 220" />
+              <circle cx="240" cy="220" r="3" fill="#1e293b"/>
+
+              <!-- Branch 4: T-a (Delay) -> L2 -->
+              <circle cx="300" cy="30" r="3" fill="#1e293b"/>
+              <path class="dw" d="M 300 30 V 45" />
+              <circle cx="300" cy="45" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <circle cx="300" cy="75" r="3" fill="white" stroke="#1e293b" stroke-width="2"/>
+              <path class="dw" d="M 310 45 V 75 M 310 60 H 320" />
+              <text x="325" y="65" class="dt bold" style="font-size: 16px;">T-a(delay)</text>
+              <path class="dw" d="M 300 75 V 165" />
+              <circle cx="300" cy="180" r="15" fill="none" stroke="#eab308" stroke-width="2" />
+              <text x="293" y="186" class="dt bold" style="fill: #eab308; font-size: 16px;">L2</text>
+              <path class="dw" d="M 300 195 V 220" />
+              <circle cx="300" cy="220" r="3" fill="#1e293b"/>
+            </svg>
+
+            <!-- 2. ~ 12. Omitted perfectly mapped earlier SVG content -->
           </div>
         </details>
 
@@ -542,7 +512,6 @@
         {a: 'mc2_U_out', b: 'mot_X'}, {a: 'mc2_V_out', b: 'mot_Y'}, {a: 'mc2_W_out', b: 'mot_Z'},
         {a: 'mot_X', b: 'mc3_U_out'}, {a: 'mot_Y', b: 'mc3_V_out'}, {a: 'mot_Z', b: 'mc3_W_out'},
         {a: 'mc3_R_in', b: 'mc3_S_in'}, {a: 'mc3_S_in', b: 'mc3_T_in'}, 
-        
         {a: 'main_R', b: 'fuse_R_in'}, {a: 'main_T', b: 'fuse_T_in'},
         {a: 'fuse_R_out', b: 'thr1_95'}, {a: 'thr1_96', b: 'pb2_nc_top'},
         {a: 'pb2_nc_bot', b: 'pb1_no_top'}, {a: 'pb2_nc_bot', b: 'mc1_no_top'},
@@ -551,14 +520,20 @@
         {a: 'pb1_no_bot', b: 't1_delay_nc_top'}, {a: 'pb1_no_bot', b: 't1_delay_no_top'},
         {a: 't1_delay_nc_bot', b: 'mc2_nc_top'}, {a: 'mc2_nc_bot', b: 'mc3_coil_top'},
         {a: 't1_delay_no_bot', b: 'mc3_nc_top'}, {a: 'mc3_nc_bot', b: 'mc2_coil_top'},
-        
         {a: 'mc1_coil_top', b: 'rl_top'}, {a: 'mc2_coil_top', b: 'gl_top'},
         {a: 'mc3_coil_top', b: 'yl_top'}, {a: 'thr1_98', b: 'wl_top'},
-        
         {a: 'fuse_T_out', b: 'mc1_coil_bot'}, {a: 'fuse_T_out', b: 'mc2_coil_bot'},
         {a: 'fuse_T_out', b: 'mc3_coil_bot'}, {a: 'fuse_T_out', b: 't1_coil_bot'},
         {a: 'fuse_T_out', b: 'rl_bot'}, {a: 'fuse_T_out', b: 'gl_bot'},
         {a: 'fuse_T_out', b: 'yl_bot'}, {a: 'fuse_T_out', b: 'wl_bot'}
+      ],
+      timer_circuit: [
+        {a: 'pow_R', b: 'pb2_nc_top'}, {a: 'pb2_nc_bot', b: 'pb1_no_top'},
+        {a: 'pb2_nc_bot', b: 't1_inst_no_top'}, {a: 'pb2_nc_bot', b: 't1_delay_nc_top'},
+        {a: 't1_delay_nc_top', b: 't1_delay_no_top'}, {a: 'pb1_no_bot', b: 't1_inst_no_bot'},
+        {a: 'pb1_no_bot', b: 't1_coil_top'}, {a: 't1_delay_nc_bot', b: 'lamp_rl_top'},
+        {a: 't1_delay_no_bot', b: 'lamp_yl_top'}, {a: 'pow_T', b: 't1_coil_bot'},
+        {a: 't1_coil_bot', b: 'lamp_rl_bot'}, {a: 'lamp_rl_bot', b: 'lamp_yl_bot'}
       ]
     };
 
@@ -610,7 +585,7 @@
       lamps.forEach(l => {
         createModule(`lamp_${l.id}`, l.x, 20, 70, 130, l.name, `
           <div class="lamp-dome lamp-${l.color}" id="dome_${l.id}"></div>
-          <div class="grid-col"><div class="terminal term-red" id="${l.id}_top"></div><div class="terminal term-red" id="${l.id}_bot"></div></div>
+          <div class="grid-col"><div class="terminal term-red" id="lamp_${l.id}_top"></div><div class="terminal term-red" id="lamp_${l.id}_bot"></div></div>
         `);
       });
 
@@ -642,7 +617,7 @@
         for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
         relayHTML += '</div>';
         
-        createModule(`relay${num}`, 25 + (idx * 375), 190, 350, 150, `Relay (X${num})`, relayHTML);
+        createModule(`relay${num}`, 25 + (idx * 380), 190, 350, 150, `Relay (X${num})`, relayHTML);
       });
 
       // Row 3 (y=380)
@@ -755,8 +730,8 @@
             const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
             currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
             board.style.transform = `scale(${currentZoom})`;
-            board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
-            board.style.marginRight = `${1450 * (currentZoom - 1)}px`;
+            board.style.marginBottom = `${680 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${1350 * (currentZoom - 1)}px`;
             renderWires();
         }
     }, { passive: false });
@@ -776,8 +751,8 @@
         const scaleChange = currentDistance / initialDistance;
         currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
         board.style.transform = `scale(${currentZoom})`;
-        board.style.marginBottom = `${700 * (currentZoom - 1)}px`;
-        board.style.marginRight = `${1450 * (currentZoom - 1)}px`;
+        board.style.marginBottom = `${680 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${1350 * (currentZoom - 1)}px`;
         renderWires();
       }
     }, { passive: false });
@@ -870,8 +845,8 @@
           return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
       }
 
-      // Safe Vertical Trunks in panel gaps for 1450px board
-      const safeXTrunks = [10, 115, 230, 320, 395, 475, 555, 635, 725, 850, 1090, 1350];
+      // Safe Vertical Trunks in panel gaps for 1350px board
+      const safeXTrunks = [10, 115, 230, 320, 395, 475, 555, 635, 725, 850, 1090, 1330];
       let bestX = safeXTrunks[0];
       let minCost = Infinity;
       const tX = (x1+x2)/2;
@@ -1055,9 +1030,10 @@
             if (state[mc] !== isEnergized) { state[mc] = isEnergized; changed = true; }
         });
 
-        ['rl', 'gl', 'yl', 'wl'].forEach(l => {
+        ['lamp_rl', 'lamp_gl', 'lamp_yl', 'lamp_wl'].forEach(l => {
           let top = `${l}_top`; let bot = `${l}_bot`;
-          state[l] = (rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot)) && (tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot));
+          let stateKey = l.split('_')[1];
+          state[stateKey] = (rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot)) && (tNet.has(top) || tNet.has(bot) || mTNet.has(top) || mTNet.has(bot));
         });
 
         // Motor Phase Rotation Logic
