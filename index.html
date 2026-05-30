@@ -461,7 +461,7 @@
     // Created by Ray from Global U Class, AI Convergence Mechanical Engineering 2nd Year 1st Sem
     const board = document.getElementById('board');
     const wireLayer = document.getElementById('wire-layer');
-    const tempWire = document.getElementById('temp-wire');
+    let tempWire = document.getElementById('temp-wire');
     const statusPanel = document.getElementById('status-panel');
     const wireContainer = document.getElementById('wire-container');
     const scrollContainer = document.getElementById('scroll-container');
@@ -829,7 +829,7 @@
         if (selectedTerminal !== term) { addWire(selectedTerminal.id, term.id); }
         selectedTerminal.classList.remove('selected');
         selectedTerminal = null;
-        tempWire.setAttribute('d', '');
+        if (tempWire) tempWire.setAttribute('d', '');
       }
     }
 
@@ -842,7 +842,7 @@
       const termRect = selectedTerminal.getBoundingClientRect();
       const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
       const startY = (termRect.top - rect.top) / currentZoom + (selectedTerminal.offsetHeight / 2);
-      tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${(startY + mousePos.y)/2} L ${mousePos.x} ${(startY + mousePos.y)/2} L ${mousePos.x} ${mousePos.y}`);
+      if (tempWire) tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${(startY + mousePos.y)/2} L ${mousePos.x} ${(startY + mousePos.y)/2} L ${mousePos.x} ${mousePos.y}`);
     }
 
     board.addEventListener('mousemove', handleMove);
@@ -911,6 +911,7 @@
 
     function renderWires() {
       wireLayer.innerHTML = '<path id="temp-wire" class="wire-temp" d="" />';
+      tempWire = document.getElementById('temp-wire');
       const rect = board.getBoundingClientRect();
       
       wires.forEach((w, i) => {
@@ -938,7 +939,8 @@
 
         wireLayer.appendChild(path);
       });
-      document.getElementById('wire-count').innerText = wires.length;
+      const wireCount = document.getElementById('wire-count');
+      if (wireCount) wireCount.innerText = wires.length;
 
       if (wires.length === 0) {
         wireContainer.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections (연결 없음).</div>`;
@@ -1168,6 +1170,7 @@
 
     document.getElementById('diag_latch_basic').classList.add('active');
     buildHardware();
+    renderWires();
   </script>
 </body>
 </html>
