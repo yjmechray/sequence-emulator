@@ -152,22 +152,26 @@
 
     #wire-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
     
-    /* CSS controls highlighting to prevent JS sticky bugs */
+    /* Pure CSS interaction styling */
     .wire-path {
       fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(1px 3px 3px rgba(0,0,0,0.25)); pointer-events: stroke; cursor: pointer;
-      opacity: 0.8; transition: stroke-width 0.1s, opacity 0.1s, stroke 0.1s;
+      opacity: 0.8; transition: stroke-width 0.2s ease, opacity 0.2s ease;
     }
     
-    /* Highlight triggers purely on CSS hover or the applied highlight class */
-    .wire-path:hover, .wire-highlighted { 
-      stroke-width: 7 !important; opacity: 1 !important; stroke: #3b82f6 !important; 
+    /* Hover and Active Highlights */
+    .wire-path:hover, .wire-path.wire-highlighted { 
+      stroke-width: 7 !important; 
+      opacity: 1 !important; 
+      stroke: #3b82f6 !important; 
       filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4)) !important; 
+      z-index: 15;
     }
     
     .wire-temp { fill: none; stroke: #94a3b8; stroke-width: 3.5; stroke-dasharray: 6 6; stroke-linecap: round; pointer-events: none; }
     
-    @keyframes shortBlink { 0%, 100% { stroke: #ef4444; filter: drop-shadow(0 0 10px #ef4444); } 50% { stroke: #fca5a5; filter: drop-shadow(0 0 2px #ef4444); } }
+    /* Short Circuit Wire Animation */
+    @keyframes shortBlink { 0%, 100% { stroke: #ef4444 !important; filter: drop-shadow(0 0 10px #ef4444); } 50% { stroke: #fca5a5 !important; filter: drop-shadow(0 0 2px #ef4444); } }
     .wire-shorted { animation: shortBlink 0.3s infinite !important; stroke-width: 6 !important; opacity: 1 !important; z-index: 50; }
 
     /* Hardware Modules */
@@ -232,7 +236,7 @@
     @keyframes spinCCW { 100% { transform: rotate(-360deg); } }
 
     /* THR Trip Button */
-    .thr-trip-btn { background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.55rem; font-weight: bold; cursor: margin-bottom: 4px; }
+    .thr-trip-btn { background: var(--danger); color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.55rem; font-weight: bold; cursor: pointer; margin-bottom: 4px; }
     .thr-trip-btn.tripped { background: #fbbf24; color: #78350f; animation: pulse 1s infinite; }
 
     @media (max-width: 768px) {
@@ -1045,4 +1049,402 @@
       createModule('fuse_mod', 865, 20, 110, 130, 'Fuse', `
         <div class="grid-row" style="margin-top:15px; gap: 20px;">
           <div class="grid-col"><div class="terminal term-red" id="fuse_R_in"></div><div class="symbol">F1</div><div class="terminal term-red" id="fuse_R_out"></div></div>
-          <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term
+          <div class="grid-col"><div class="terminal term-red" id="fuse_T_in"></div><div class="symbol">F2</div><div class="terminal term-red" id="fuse_T_out"></div></div>
+        </div>
+      `);
+
+      // Row 2
+      [1, 2].forEach((num, idx) => {
+        let relayHTML = `<div class="relay-indicator" id="ind_x${num}"></div><div class="grid-row" style="gap:8px;">`;
+        relayHTML += `<div class="grid-col"><div class="terminal term-red" id="x${num}_coil_top"></div><div class="symbol">R</div><div class="terminal term-red" id="x${num}_coil_bot"></div></div>`;
+        for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-yellow" id="x${num}_no${i}_top"></div><div class="symbol">NO</div><div class="terminal term-yellow" id="x${num}_no${i}_bot"></div></div>`;
+        for(let i=1; i<=4; i++) relayHTML += `<div class="grid-col"><div class="terminal term-blue" id="x${num}_nc${i}_top"></div><div class="symbol">NC</div><div class="terminal term-blue" id="x${num}_nc${i}_bot"></div></div>`;
+        relayHTML += '</div>';
+        createModule(`relay${num}`, 25 + (idx * 380), 190, 350, 150, `Relay (X${num})`, relayHTML);
+      });
+
+      // Row 3
+      createModule('main_power', 25, 360, 90, 100, '3-Ph Pow', `
+        <div class="grid-row" style="margin-top:10px;">
+          <div class="grid-col"><div class="terminal term-black" id="main_R"></div><div class="symbol">R</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_S"></div><div class="symbol">S</div></div>
+          <div class="grid-col"><div class="terminal term-black" id="main_T"></div><div class="symbol">T</div></div>
+        </div>
+      `);
+
+      const createMC = (id, name, x) => {
+          createModule(`${id}_mod`, x, 360, 225, 180, name, `
+            <div class="relay-indicator" id="ind_${id}"></div>
+            <div class="grid-row" style="gap: 15px;">
+                <div class="grid-col">
+                    <div class="grid-row" style="gap:4px;">
+                        <div class="grid-col"><div class="terminal term-black" id="${id}_R_in"></div><div class="symbol">R</div></div>
+                        <div class="grid-col"><div class="terminal term-black" id="${id}_S_in"></div><div class="symbol">S</div></div>
+                        <div class="grid-col"><div class="terminal term-black" id="${id}_T_in"></div><div class="symbol">T</div></div>
+                    </div>
+                    <div style="height: 10px;"></div>
+                    <div class="grid-row" style="gap:4px;">
+                        <div class="grid-col"><div class="symbol">U</div><div class="terminal term-black" id="${id}_U_out"></div></div>
+                        <div class="grid-col"><div class="symbol">V</div><div class="terminal term-black" id="${id}_V_out"></div></div>
+                        <div class="grid-col"><div class="symbol">W</div><div class="terminal term-black" id="${id}_W_out"></div></div>
+                    </div>
+                </div>
+                <div class="grid-col">
+                    <div class="grid-row" style="gap:4px;">
+                        <div class="grid-col"><div class="terminal term-red" id="${id}_coil_top"></div><div class="symbol">A1</div></div>
+                        <div class="grid-col"><div class="terminal term-yellow" id="${id}_no_top"></div><div class="symbol">a</div></div>
+                        <div class="grid-col"><div class="terminal term-blue" id="${id}_nc_top"></div><div class="symbol">b</div></div>
+                    </div>
+                    <div style="height: 10px;"></div>
+                    <div class="grid-row" style="gap:4px;">
+                        <div class="grid-col"><div class="symbol">A2</div><div class="terminal term-red" id="${id}_coil_bot"></div></div>
+                        <div class="grid-col"><div class="symbol">a</div><div class="terminal term-yellow" id="${id}_no_bot"></div></div>
+                        <div class="grid-col"><div class="symbol">b</div><div class="terminal term-blue" id="${id}_nc_bot"></div></div>
+                    </div>
+                </div>
+            </div>
+          `);
+      };
+
+      createMC('mc1', 'MC1 (MCM)', 125);
+      createMC('mc2', 'MC2 (MCD)', 360);
+      createMC('mc3', 'MC3 (MCY)', 595);
+
+      createModule('thr1_mod', 835, 360, 220, 180, 'Overload (THR)', `
+        <button id="thr_trip_btn" class="thr-trip-btn" onclick="toggleTHRTrip()">NORMAL (Click to Trip)</button>
+        <div class="grid-row" style="gap: 15px;">
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_U_in"></div><div class="symbol">U</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_V_in"></div><div class="symbol">V</div></div>
+                    <div class="grid-col"><div class="terminal term-black" id="thr1_W_in"></div><div class="symbol">W</div></div>
+                </div>
+                <div style="height: 10px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">U'</div><div class="terminal term-black" id="thr1_U_out"></div></div>
+                    <div class="grid-col"><div class="symbol">V'</div><div class="terminal term-black" id="thr1_V_out"></div></div>
+                    <div class="grid-col"><div class="symbol">W'</div><div class="terminal term-black" id="thr1_W_out"></div></div>
+                </div>
+            </div>
+            <div class="grid-col">
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="terminal term-blue" id="thr1_95"></div><div class="symbol">COM(95)</div></div>
+                </div>
+                <div style="height: 10px;"></div>
+                <div class="grid-row" style="gap:4px;">
+                    <div class="grid-col"><div class="symbol">NC(96)</div><div class="terminal term-blue" id="thr1_96"></div></div>
+                    <div class="grid-col"><div class="symbol">NO(98)</div><div class="terminal term-yellow" id="thr1_98"></div></div>
+                </div>
+            </div>
+        </div>
+      `);
+
+      createModule('motor_mod', 1070, 360, 170, 180, 'Motor (IM)', `
+        <div class="grid-row" style="gap:4px; margin-top:5px;">
+            <div class="grid-col"><div class="terminal term-black" id="mot_U"></div><div class="symbol">U</div></div>
+            <div class="grid-col"><div class="terminal term-black" id="mot_V"></div><div class="symbol">V</div></div>
+            <div class="grid-col"><div class="terminal term-black" id="mot_W"></div><div class="symbol">W</div></div>
+        </div>
+        <div class="motor-casing">
+            <svg class="motor-blade" id="motor_blade" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="10" fill="#334155" />
+                <path d="M 50 50 Q 80 20 90 50 Z" fill="#64748b" />
+                <path d="M 50 50 Q 20 80 50 90 Z" fill="#64748b" />
+                <path d="M 50 50 Q 20 20 10 50 Z" fill="#64748b" />
+                <path d="M 50 50 Q 80 80 50 10 Z" fill="#64748b" />
+            </svg>
+        </div>
+        <div class="grid-row" style="gap:4px; margin-top:5px;">
+            <div class="grid-col"><div class="symbol">X</div><div class="terminal term-black" id="mot_X"></div></div>
+            <div class="grid-col"><div class="symbol">Y</div><div class="terminal term-black" id="mot_Y"></div></div>
+            <div class="grid-col"><div class="symbol">Z</div><div class="terminal term-black" id="mot_Z"></div></div>
+        </div>
+      `);
+
+      document.querySelectorAll('.terminal').forEach(term => {
+        term.addEventListener('click', (e) => handleTerminalClick(e, term));
+      });
+    }
+
+    // --- ZOOM LOGIC ---
+    scrollContainer.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
+            currentZoom = Math.min(Math.max(0.4, currentZoom * zoomAmount), 3);
+            board.style.transform = `scale(${currentZoom})`;
+            board.style.marginBottom = `${680 * (currentZoom - 1)}px`;
+            board.style.marginRight = `${1350 * (currentZoom - 1)}px`;
+            renderWires();
+        }
+    }, { passive: false });
+
+    // Touch logic
+    scrollContainer.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        initialZoom = currentZoom;
+      }
+    }, { passive: false });
+
+    scrollContainer.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && initialDistance > 0) {
+        e.preventDefault();
+        const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        const scaleChange = currentDistance / initialDistance;
+        currentZoom = Math.min(Math.max(0.4, initialZoom * scaleChange), 3);
+        board.style.transform = `scale(${currentZoom})`;
+        board.style.marginBottom = `${680 * (currentZoom - 1)}px`;
+        board.style.marginRight = `${1350 * (currentZoom - 1)}px`;
+        renderWires();
+      }
+    }, { passive: false });
+
+    scrollContainer.addEventListener('touchend', (e) => { if (e.touches.length < 2) initialDistance = 0; });
+    
+    // --- INTERACTION & DRAWING ---
+    function toggleTHRTrip() {
+        state.thrTripped = !state.thrTripped;
+        const btn = document.getElementById('thr_trip_btn');
+        if(state.thrTripped) {
+            btn.classList.add('tripped'); btn.innerText = "TRIPPED! (Click to Reset)";
+        } else {
+            btn.classList.remove('tripped'); btn.innerText = "NORMAL (Click to Trip)";
+        }
+        evaluateCircuit();
+    }
+
+    function handleTerminalClick(e, term) {
+      document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash'));
+      if (!selectedTerminal) {
+        selectedTerminal = term;
+        term.classList.add('selected');
+        updateStatus("Select a second terminal to connect the wire. (두 번째 단자를 선택하세요.)");
+      } else {
+        if (selectedTerminal !== term) { addWire(selectedTerminal.id, term.id); }
+        selectedTerminal.classList.remove('selected');
+        selectedTerminal = null;
+        tempWire.setAttribute('d', '');
+      }
+    }
+
+    function handleMove(e) {
+      if (!selectedTerminal) return;
+      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const rect = board.getBoundingClientRect();
+      mousePos = { x: (clientX - rect.left) / currentZoom, y: (clientY - rect.top) / currentZoom };
+      const termRect = selectedTerminal.getBoundingClientRect();
+      const startX = (termRect.left - rect.left) / currentZoom + (selectedTerminal.offsetWidth / 2);
+      const startY = (termRect.top - rect.top) / currentZoom + (selectedTerminal.offsetHeight / 2);
+      tempWire.setAttribute('d', `M ${startX} ${startY} L ${startX} ${(startY + mousePos.y)/2} L ${mousePos.x} ${(startY + mousePos.y)/2} L ${mousePos.x} ${mousePos.y}`);
+    }
+
+    board.addEventListener('mousemove', handleMove);
+    board.addEventListener('touchmove', (e) => {
+        if (!selectedTerminal) return;
+        if (e.touches && e.touches.length > 1) return;
+        e.preventDefault(); 
+        handleMove(e);
+    }, { passive: false });
+
+    function addWire(idA, idB) {
+      if (wires.some(w => (w.a === idA && w.b === idB) || (w.a === idB && w.b === idA))) {
+        updateStatus("Wire already exists between these terminals. (이미 연결되어 있습니다.)", true); return;
+      }
+      const color = wireColors[wires.length % wireColors.length];
+      wires.push({ a: idA, b: idB, id: `w_${Date.now()}`, color: color, highlighted: false });
+      renderWires(); evaluateCircuit();
+    }
+
+    function removeWire(id) { wires = wires.filter(w => w.id !== id); renderWires(); evaluateCircuit(); }
+    function clearWires() { wires = []; document.querySelectorAll('.hint-flash').forEach(el => el.classList.remove('hint-flash')); renderWires(); evaluateCircuit(); updateStatus("All wires cleared. Ready to build. (초기화 완료.)"); }
+    function undoWire() { if (wires.length > 0) { wires.pop(); renderWires(); evaluateCircuit(); updateStatus("Last wire removed. (마지막 전선 삭제.)"); } }
+
+    function generatePCBPath(idA, x1, y1, idB, x2, y2, index = 0) {
+      const getDir = (id) => id.includes('_bot') || id.includes('_out') ? 'down' : 'up';
+      const dirA = getDir(idA);
+      const dirB = getDir(idB);
+
+      let baseYA, baseYB;
+      if (y1 < 170) baseYA = dirA === 'up' ? 10 : 165;
+      else if (y1 < 350) baseYA = dirA === 'up' ? 165 : 345;
+      else baseYA = dirA === 'up' ? 345 : 565;
+
+      if (y2 < 170) baseYB = dirB === 'up' ? 10 : 165;
+      else if (y2 < 350) baseYB = dirB === 'up' ? 165 : 345;
+      else baseYB = dirB === 'up' ? 345 : 565;
+
+      const getCorridor = (y, dir) => {
+          if (dir === 'up') return y < 170 ? 0 : (y < 350 ? 1 : 2);
+          return y < 170 ? 1 : (y < 350 ? 2 : 3);
+      };
+
+      const offsetY = ((index % 6) - 2.5) * 4; 
+      const cyA = baseYA + offsetY;
+      const cyB = baseYB + offsetY;
+
+      if (getCorridor(y1, dirA) === getCorridor(y2, dirB)) {
+          return `M ${x1} ${y1} L ${x1} ${cyA} L ${x2} ${cyA} L ${x2} ${y2}`;
+      }
+
+      // Safe Vertical Trunks in panel gaps
+      const safeXTrunks = [10, 115, 230, 320, 395, 475, 555, 635, 725, 845, 1085, 1330];
+      let bestX = safeXTrunks[0];
+      let minCost = Infinity;
+      const tX = (x1+x2)/2;
+      
+      for (let sx of safeXTrunks) {
+          let cost = Math.abs(tX - sx);
+          if (sx >= Math.min(x1, x2) && sx <= Math.max(x1, x2)) cost -= 1000;
+          if (cost < minCost) { minCost = cost; bestX = sx; }
+      }
+      
+      const trunkX = bestX + ((index % 6) - 2.5) * 4;
+      return `M ${x1} ${y1} L ${x1} ${cyA} L ${trunkX} ${cyA} L ${trunkX} ${cyB} L ${x2} ${cyB} L ${x2} ${y2}`;
+    }
+
+    function renderWires() {
+      wireLayer.innerHTML = '<path id="temp-wire" class="wire-temp" d="" />';
+      const rect = board.getBoundingClientRect();
+      
+      wires.forEach((w, i) => {
+        const tA = document.getElementById(w.a); const tB = document.getElementById(w.b);
+        if(!tA || !tB) return;
+        const rA = tA.getBoundingClientRect(); const rB = tB.getBoundingClientRect();
+        
+        const x1 = (rA.left - rect.left) / currentZoom + (tA.offsetWidth / 2);
+        const y1 = (rA.top - rect.top) / currentZoom + (tA.offsetHeight / 2);
+        const x2 = (rB.left - rect.left) / currentZoom + (tB.offsetWidth / 2);
+        const y2 = (rB.top - rect.top) / currentZoom + (tB.offsetHeight / 2);
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('id', w.id);
+        path.setAttribute('class', 'wire-path' + (w.highlighted ? ' wire-highlighted' : ''));
+        path.setAttribute('d', generatePCBPath(w.a, x1, y1, w.b, x2, y2, i));
+        path.setAttribute('stroke', w.color);
+        
+        // CSS handles hover colors entirely.
+        // We only use JS to pop the wire to the front of the SVG layer so it isn't hidden under others.
+        path.addEventListener('mouseenter', function() { 
+            this.parentNode.appendChild(this); 
+        });
+
+        // Click to toggle highlight pinning
+        path.onclick = (e) => {
+            e.stopPropagation();
+            w.highlighted = !w.highlighted;
+            if (w.highlighted) {
+                path.classList.add('wire-highlighted');
+                path.parentNode.appendChild(path); // Keep on top
+            } else {
+                path.classList.remove('wire-highlighted');
+            }
+        };
+
+        wireLayer.appendChild(path);
+      });
+      document.getElementById('wire-count').innerText = wires.length;
+
+      if (wires.length === 0) {
+        wireContainer.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; padding: 0.25rem;">No connections (연결 없음).</div>`;
+      } else {
+        wireContainer.innerHTML = wires.map(w => `
+          <div class="wire-item">
+            <span style="border-left: 4px solid ${w.color}; padding-left: 6px;">
+              ${w.a.toUpperCase().replace(/_/g, ' ')} ↔ ${w.b.toUpperCase().replace(/_/g, ' ')}
+            </span>
+            <button onclick="removeWire('${w.id}')">Remove</button>
+          </div>
+        `).join('');
+      }
+    }
+
+    // --- LOGIC ENGINE ---
+    function pressPB(id, isPressed) {
+      state[id] = isPressed; const btn = document.getElementById(`btn_${id}`);
+      if(isPressed) btn.classList.add('pressed'); else btn.classList.remove('pressed');
+      evaluateCircuit();
+    }
+
+    function evaluateCircuit() {
+      let changed = true; let iterations = 0; let graph = {};
+      
+      const addEdge = (u, v) => {
+        if(!u || !v) return;
+        if(!graph[u]) graph[u] = []; if(!graph[v]) graph[v] = [];
+        graph[u].push(v); graph[v].push(u);
+      };
+
+      const getConnected = (startNode) => {
+        let visited = new Set();
+        if(!graph[startNode]) return visited;
+        let queue = [startNode]; visited.add(startNode);
+        while(queue.length > 0) {
+          let node = queue.shift();
+          graph[node].forEach(neighbor => { if(!visited.has(neighbor)) { visited.add(neighbor); queue.push(neighbor); } });
+        }
+        return visited;
+      };
+
+      while(changed && iterations < 15) {
+        changed = false; iterations++; graph = {};
+        wires.forEach(w => addEdge(w.a, w.b));
+
+        // Push Buttons
+        [1, 2, 3].forEach(i => {
+          let pb = `pb${i}`;
+          if (state[pb]) addEdge(`${pb}_no_top`, `${pb}_no_bot`); 
+          else addEdge(`${pb}_nc_top`, `${pb}_nc_bot`);
+        });
+
+        // Relays X1, X2
+        [1, 2].forEach(i => {
+          let x = `x${i}`;
+          if (state[x]) { for(let j=1; j<=4; j++) addEdge(`${x}_no${j}_top`, `${x}_no${j}_bot`); } 
+          else { for(let j=1; j<=4; j++) addEdge(`${x}_nc${j}_top`, `${x}_nc${j}_bot`); }
+        });
+
+        // Timer T1 Logic
+        if (state.t1_coil) addEdge('t1_inst_no_top', 't1_inst_no_bot');
+        if (state.t1_delay_active) addEdge('t1_delay_no_top', 't1_delay_no_bot');
+        else addEdge('t1_delay_nc_top', 't1_delay_nc_bot');
+
+        // MCs logic
+        ['mc1', 'mc2', 'mc3'].forEach(mc => {
+            const mcMod = document.getElementById(`${mc}_mod`);
+            if(!mcMod) return;
+            if (state[mc]) {
+                addEdge(`${mc}_R_in`, `${mc}_U_out`); addEdge(`${mc}_S_in`, `${mc}_V_out`); addEdge(`${mc}_T_in`, `${mc}_W_out`);
+                addEdge(`${mc}_no_top`, `${mc}_no_bot`);
+            } else { addEdge(`${mc}_nc_top`, `${mc}_nc_bot`); }
+        });
+
+        addEdge('thr1_U_in', 'thr1_U_out'); addEdge('thr1_V_in', 'thr1_V_out'); addEdge('thr1_W_in', 'thr1_W_out');
+        if (state.thrTripped) { addEdge('thr1_95', 'thr1_98'); } else { addEdge('thr1_95', 'thr1_96'); }
+        addEdge('fuse_R_in', 'fuse_R_out'); addEdge('fuse_T_in', 'fuse_T_out');
+
+        let rNet = getConnected('pow_R'); let tNet = getConnected('pow_T');
+        let mRNet = getConnected('main_R'); let mTNet = getConnected('main_T'); let mSNet = getConnected('main_S');
+
+        if(mRNet.has('pow_R') || rNet.has('main_R')) { const merged = new Set([...rNet, ...mRNet]); rNet = merged; mRNet = merged; }
+        if(mTNet.has('pow_T') || tNet.has('main_T')) { const merged = new Set([...tNet, ...mTNet]); tNet = merged; mTNet = merged; }
+
+        // Strict short circuit check
+        isShortCircuit = 
+            rNet.has('pow_T') || rNet.has('main_S') || rNet.has('main_T') ||
+            tNet.has('pow_R') || tNet.has('main_R') || tNet.has('main_S') ||
+            mRNet.has('pow_T') || mRNet.has('main_S') || mRNet.has('main_T') ||
+            mSNet.has('pow_R') || mSNet.has('pow_T') || mSNet.has('main_R') || mSNet.has('main_T') ||
+            mTNet.has('pow_R') || mTNet.has('main_R') || mTNet.has('main_S');
+            
+        if (isShortCircuit) { 
+            state.shortedNodes = new Set([...rNet, ...tNet, ...mRNet, ...mSNet, ...mTNet]);
+            rNet = new Set(); tNet = new Set(); mRNet = new Set(); mSNet = new Set(); mTNet = new Set(); 
+        } else { state.shortedNodes = new Set(); }
+
+        // Process Coils
+        [1, 2].forEach(i => {
+          let x = `x${i}`; let top = `${x}_coil_top`; let bot = `${x}_coil_bot`;
+          let isEnergized = (rNet.has(top) || rNet.has(bot) || mRNet.has(top) || mRNet.has(bot)) && (tNet.has(top) || tNet.has(bot) || mTNet.has(top)
